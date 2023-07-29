@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "207472064851",
+    "project_id": "ecomodation-9399a",
+    "storage_bucket": "ecomodation-9399a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:207472064851:android:60a0c7fc04464020ad49a6",
+        "android_client_info": {
+          "package_name": "com.example.ecomodation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "207472064851-e21nqgja907psehi96iokg0mh2qar000.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmbicEQh1qXpBAA1iD_zaAFsrBGgb7Vco"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "207472064851-e21nqgja907psehi96iokg0mh2qar000.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "207472064851-857iu7l1ejaev4jrgs20ordmn7kra0n9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ecomodation"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:207472064851:android:a786cc13fbb712e9ad49a6",
+        "android_client_info": {
+          "package_name": "io.flutter.plugins.firebase.firestore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "207472064851-aujjb59isno1oqvgvsh2ovq6oq0ff6g9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.flutter.plugins.firebase.firestore",
+            "certificate_hash": "69e6b8458b4158f568400de115b0fdf28cb6ba80"
+          }
+        },
+        {
+          "client_id": "207472064851-e21nqgja907psehi96iokg0mh2qar000.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmbicEQh1qXpBAA1iD_zaAFsrBGgb7Vco"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "207472064851-e21nqgja907psehi96iokg0mh2qar000.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "207472064851-857iu7l1ejaev4jrgs20ordmn7kra0n9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ecomodation"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

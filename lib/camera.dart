@@ -28,11 +28,11 @@ class _CameraUIState extends State<CameraUI> {
   Future initCamera(CameraDescription cameraDescription) async {
     //Initialize the selected camera
 
-    _cameraController = CameraController(cameraDescription, ResolutionPreset.high); //Create a camera Controller
+    _cameraController = CameraController(cameraDescription, ResolutionPreset.high, imageFormatGroup: ImageFormatGroup.bgra8888); //Create a camera Controller
 
     await SystemChrome.setPreferredOrientations(
         [ DeviceOrientation.portraitUp,
-          DeviceOrientation.landscapeLeft,   //Initialize the setPrefferedOrientations
+          DeviceOrientation.portraitDown,
         ]
     );
 
@@ -42,8 +42,9 @@ class _CameraUIState extends State<CameraUI> {
         if (!mounted) {
           return;
         }
+
         setState(() {
-          portrait = true;
+       //   portrait = true;
         });
       });
     } on CameraException catch (e) {
@@ -84,8 +85,8 @@ class _CameraUIState extends State<CameraUI> {
 
   {
 
-    var sizeOfTakePicButton = screenWidth / 6.5; //Adjust the size of the picture button according to the screenWidth\
-    var sizeOfAddPhotoButton = screenWidth / 13; //Adjust the padding of the addphotoButton according to each screen
+ //   var sizeOfTakePicButton = screenWidth / 6.5; //Adjust the size of the picture button according to the screenWidth\
+  //  var sizeOfAddPhotoButton = screenWidth / 13; //Adjust the padding of the addphotoButton according to each screen
 
     return   Row( // Use a row Widget to handle upload from album icon and take picture
       mainAxisAlignment: MainAxisAlignment.center,
@@ -102,7 +103,7 @@ class _CameraUIState extends State<CameraUI> {
 
   Widget cameraPortrait(BuildContext context) {
 
-   var boxheight = screenHeight/13;    // leng
+ //  var boxheight = screenHeight/13;    // leng
 
     return Column(
       children: [
@@ -140,7 +141,7 @@ class _CameraUIState extends State<CameraUI> {
                       });
                       if(isPictureTaken) //if the picture is taken, navigate to the takepicture UI
                         {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => TakePicture(picture: pictureTaken)));
+                         Navigator.push(context, MaterialPageRoute(builder: (context) => TakePicture(picture: pictureTaken)));
                         }
                     },
                     icon: Icon(Icons.circle_outlined, color: Colors.white, size: 80),

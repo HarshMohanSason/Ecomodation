@@ -105,15 +105,21 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
   {
     return Form(
        key: _loginphone,  //key for the loginphone
-        child: Container(
-          padding: const EdgeInsets.only(top: 80), //Padding from the top (Same as the signup Info)
-
+        child: Padding(
+          padding: const EdgeInsets.only(top: 70),
           child: Column(  //Put all the textform fields in a column widget
 
               children: <Widget> [
-
-                const SizedBox(height:30),
-
+                Align(
+                  alignment: const Alignment(-1,-0.8),
+                  child: IconButton (
+                      onPressed: () {
+                        Navigator.pushNamed(context, 'AppIntroUI');
+                      },
+                      icon: const Icon(Icons.arrow_back_rounded, size: 35, color: Colors.black)
+                  ),
+                ),
+                SizedBox(height: 20),
                 _phonetextform(context),//Call the phone textform
 
                 if(!phoneNumberValidated)   //Return an error if no account is associated with the phone number entered
@@ -129,7 +135,6 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
                 _loginButton(context), //call the login button
               ],
           ),
-          //insert 80 pixels from the top
         ),
 
     );
@@ -153,7 +158,7 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
 
           hintText: 'Enter your phone number ', //hintText
 
-          border: OutlineInputBorder(
+            border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(   //decorate the border of the box
               width: 8,
@@ -195,13 +200,13 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
             colorTheme), //set the color for the continue button
       ),
       onPressed: () async {
-        verifyForm(context);
+      await verifyForm(context);
       },
-      child: const Text(
+      child: Text(
         'Login',
         style: TextStyle(
-          fontSize: 16,
-          color: Color(0xFFFFFFFF),
+          fontSize: 18 * (screenHeight/ 932),
+          color: const Color(0xFFFFFFFF),
           fontWeight: FontWeight.bold,
         ),
       ),

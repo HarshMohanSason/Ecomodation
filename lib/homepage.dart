@@ -1,8 +1,6 @@
-
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:anim_search_bar/anim_search_bar.dart';
-import 'AddListing.dart';
 
 class MainScreen extends StatefulWidget {
 
@@ -61,21 +59,21 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.home, color: Colors.black, size: sizeofIcons),
           ),
         ),
-       const Spacer(flex: 20),
+       const Spacer(),
         Align(
           alignment: const Alignment(0, 0.90),
           child: IconButton(
 
             onPressed: ()  {
 
-              Navigator.push(context, MaterialPageRoute(builder: (context) => AddListing()));
+              Navigator.pushNamed(context, 'AddImagePage');
 
               },
             icon:
                 Icon(Icons.add_a_photo, color: Colors.black, size: sizeofIcons),
           ),
         ),
-        const Spacer(flex: 20),
+        const Spacer(),
         Align(
           alignment: const Alignment(0, 0.91),
           child: IconButton(
@@ -84,7 +82,7 @@ class _MainScreenState extends State<MainScreen> {
             Icon(Icons.messenger_rounded, color: Colors.black, size: sizeofIcons),
           ),
         ),
-      const  Spacer(flex: 20),
+      const  Spacer(),
         Align(
           alignment: const Alignment(0, 0.9),
           child: IconButton(
@@ -92,7 +90,6 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.settings, color: Colors.black, size: sizeofIcons),
           ),
         ),
-       const Spacer(flex: 1),
       ],
     );
   }
@@ -101,8 +98,8 @@ class _MainScreenState extends State<MainScreen> {
   //Widget searchbar to place at the top.
   Widget _searchbar (BuildContext context){
     return AnimSearchBar(
-            helpText: "Enter your college name",
-            width: 450,
+            helpText: "Enter your location",
+            width: screenWidth,
             textController: TextEditingController(),
             onSuffixTap: null,
             onSubmitted: handleSearch,

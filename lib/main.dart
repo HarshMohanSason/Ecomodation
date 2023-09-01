@@ -1,9 +1,14 @@
+import 'package:ecomodation/AddDescription.dart';
+import 'package:ecomodation/ListingPrice.dart';
 import 'package:ecomodation/PhoneSignupUI.dart';
 import 'package:ecomodation/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import './loginpage.dart';
+import 'AddDescription_StateManage.dart';
+import 'AddListing.dart';
 import 'firebase_options.dart';
 import 'AddListing_StateManage.dart';
 
@@ -25,8 +30,11 @@ void main() async {
 
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => AddListingState(), //Call the AddListing State manage class here
+      MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => AddListingState()),
+        ChangeNotifierProvider(create: (context) => AddDescriptionState()),
+      ],
       child: const Ecomodation())
   );
 
@@ -44,9 +52,14 @@ class Ecomodation extends StatelessWidget {
       initialRoute: 'loginpage', //define the inital route as login page
       routes:
       {
-        'loginpage': (context) => const LoginScreen(),
+        'LoginPage': (context) => const LoginScreen(),
         'PhoneSignupPage': (context) => const PhoneSignupInfo(),
-        'MainhomePage': (contxt) => const MainScreen(),
+        'HomeScreen': (context) => const MainScreen(),
+        'AppIntroUI': (context) => const LoginScreen(),
+        'AddImagePage':(context) => const AddListing(),
+        'AddDescriptionPage': (context) => const AddDescription(),
+        'AddPricePage': (context) => const ListingPrice(),
+
       }
 
     );

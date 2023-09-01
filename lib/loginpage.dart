@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Authentication().signInWithGoogle().then((userCred) {
           //If Login is successful, then
           if (userCred != null) {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const MainScreen())); //Navigate to the home screen.
+            Navigator.pushNamed(context, 'HomeScreen' ); //Navigate to the home screen.
           }
         });
       },

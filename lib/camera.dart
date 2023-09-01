@@ -13,7 +13,6 @@ class CameraUI extends StatefulWidget {
 
   @override
   State<CameraUI> createState() => _CameraUIState();
-
 }
 
 class _CameraUIState extends State<CameraUI> {
@@ -30,28 +29,24 @@ class _CameraUIState extends State<CameraUI> {
 
     _cameraController = CameraController(cameraDescription, ResolutionPreset.high, imageFormatGroup: ImageFormatGroup.bgra8888); //Create a camera Controller
 
-    await SystemChrome.setPreferredOrientations(
-        [ DeviceOrientation.portraitUp,
-          DeviceOrientation.portraitDown,
-        ]
-    );
-
-
     try {
       await _cameraController.initialize().then((_) {
-        if (!mounted) {
-          return;
+
+        if (mounted) {
+          setState(() {
+
+          });
         }
 
-        setState(() {
-       //   portrait = true;
-        });
       });
+
     } on CameraException catch (e) {
       debugPrint('Camera error $e');
     }
-  }
 
+    await  _cameraController.lockCaptureOrientation(DeviceOrientation.portraitUp);
+
+  }
 
   @override
   void initState() {
@@ -70,19 +65,20 @@ class _CameraUIState extends State<CameraUI> {
   @override
   Widget build(BuildContext context) {
 
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: cameraPortrait(context),  //call the camera_portrait widget to build the camera.
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: cameraPortrait(context),  //call the camera_portrait widget to build the camera.
-
-        //   Expanded(child: bottomIcons(context)),
+          //   Expanded(child: bottomIcons(context)),
+      ),
     );
   }
 
 
 
   Widget bottomIcons(BuildContext context)
-
   {
 
  //   var sizeOfTakePicButton = screenWidth / 6.5; //Adjust the size of the picture button according to the screenWidth\
@@ -93,7 +89,7 @@ class _CameraUIState extends State<CameraUI> {
       //Align everytbhing in center
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-       const Spacer(flex:21),
+       const Spacer(),
       ],
     );
   }
@@ -106,6 +102,7 @@ class _CameraUIState extends State<CameraUI> {
  //  var boxheight = screenHeight/13;    // leng
 
     return Column(
+
       children: [
 
         SizedBox(
@@ -119,53 +116,61 @@ class _CameraUIState extends State<CameraUI> {
 
                mainAxisAlignment: MainAxisAlignment.center,
                crossAxisAlignment: CrossAxisAlignment.center,
+
                children: [
-                 const Spacer(),
-                 Align(
-                   alignment: const Alignment(-1,-0.3),
-                   child: IconButton(
-                     onPressed: () {
-                       Navigator.push(context, MaterialPageRoute(builder: (context) => AddListing()));
-                     },
-                     icon: Icon(Icons.arrow_back, color: Colors.white, size: 30),
+
+                 Expanded(
+                   child: Align(
+                     alignment: const Alignment(-1,-0.3),
+                     child: IconButton(
+                       onPressed: () {
+                         Navigator.push(context, MaterialPageRoute(builder: (context) => AddListing()));
+                       },
+                       icon: Icon(Icons.arrow_back, color: Colors.white, size: 30),
+                     ),
                    ),
                  ),
-                 const Spacer(flex: 4),
-                 Align(
-                   alignment: const Alignment(0,-0.7),
-                   child: IconButton(
-                    onPressed: () async {
-                      pictureTaken = await _cameraController.takePicture();
-                      setState(() {
-                        isPictureTaken = true;
-                      });
-                      if(isPictureTaken) //if the picture is taken, navigate to the takepicture UI
-                        {
-                         Navigator.push(context, MaterialPageRoute(builder: (context) => TakePicture(picture: pictureTaken)));
-                        }
-                    },
-                    icon: Icon(Icons.circle_outlined, color: Colors.white, size: 80),
+
+                 Expanded(
+                   child: Align(
+                     alignment: const Alignment(0,0),
+                     child: OutlinedButton(
+                      onPressed: () async {
+                        pictureTaken = await _cameraController.takePicture();
+                        setState(() {
+                          isPictureTaken = true;
+                        });
+                        if(isPictureTaken) //if the picture is taken, navigate to the takepicture UI
+                          {
+                           Navigator.push(context, MaterialPageRoute(builder: (context) => TakePicture(picture: pictureTaken)));
+                          }
+                      },
+                      child: Icon(Icons.circle_outlined, color: Colors.white, size: 80),
           ),
+                   ),
                  ),
-                const Spacer(flex: 7),
-                 Align(
-                   alignment: const Alignment(0,-0.3),
-                   child: IconButton(
-                     onPressed: () {
 
-                       setState(() {
-                         if (_currentCamera == widget.cameras![0]) {  //if the rear camera is selected
+                 Expanded(
+                   child: Align(
+                     alignment: const Alignment(1,-0.3),
+                     child: IconButton(
+                       onPressed: ()
+                       {
 
-                           _currentCamera = widget.cameras![1]; //select the front camera
-                         }
-                         else{
-                           _currentCamera = widget.cameras![0];  //else select the rear camera
-                         }
-                         initCamera(_currentCamera); //initialize the camera
-                       });
-                     },
+                         setState(() {
+                           if (_currentCamera == widget.cameras![0]) {  //if the rear camera is selected
 
-                     icon: Icon(Icons.cameraswitch, color: Colors.white, size: 30),
+                             _currentCamera = widget.cameras![1]; //select the front camera
+                           }
+                           else{
+                             _currentCamera = widget.cameras![0];  //else select the rear camera
+                           }
+                           initCamera(_currentCamera); //initialize the camera
+                         });
+                       },
+
+                       icon: Icon(Icons.cameraswitch, color: Colors.white, size: 30),
+                     ),
                    ),
                  ),
 

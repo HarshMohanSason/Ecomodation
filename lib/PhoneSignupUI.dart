@@ -1,9 +1,11 @@
 
+import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'OTPpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'AddListing.dart';
 
 
 class PhoneSignupInfo extends StatefulWidget {
@@ -117,11 +119,25 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
 
     return Form(    //Return the form widget
       key: _formKey,  // key for the form.
-      child: Container(
-        padding: const EdgeInsets.only(top: 80.0),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 60),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end, //Align all the child widgets of the column to center
+
+          mainAxisAlignment: MainAxisAlignment.start, //Align all the child widgets of the column to center
+          crossAxisAlignment: CrossAxisAlignment.center,
+
           children: [
+
+            Align(
+              alignment: const Alignment(-1,-0.8),
+              child: IconButton (
+                  onPressed: () {
+                    Navigator.pushNamed(context, 'AppIntroUI');
+                  },
+                  icon: const Icon(Icons.arrow_back_rounded, size: 35, color: Colors.black)
+              ),
+            ),
+
             Align(
               alignment: Alignment.topCenter,
               child: Image.asset('assets/house.png',
@@ -199,7 +215,7 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
                   borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(   //decorate the border of the box
                     width: 8,
-                    style: BorderStyle.solid, 
+                    style: BorderStyle.solid,
                     //style of the border
                     color: Color(0x000000FF),  //color of the borderlines
                   ),
@@ -235,8 +251,7 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
              ElevatedButton(
               style:  ButtonStyle(
                fixedSize: MaterialStateProperty.all(const Size(160,40)),
-                backgroundColor: const MaterialStatePropertyAll(
-                    Color(0xD3089B5B)), //set the color for the continue button
+                backgroundColor: MaterialStateProperty.all(colorTheme), //set the color for the continue button
               ),
 
               onPressed: () => navigateToOTPUI(context), //Once added, navigate to the OTP screen to get the OTP

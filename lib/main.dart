@@ -7,7 +7,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import './loginpage.dart';
-import 'AddDescription_StateManage.dart';
 import 'AddListing.dart';
 import 'firebase_options.dart';
 import 'AddListing_StateManage.dart';
@@ -33,7 +32,6 @@ void main() async {
       MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AddListingState()),
-        ChangeNotifierProvider(create: (context) => AddDescriptionState()),
       ],
       child: const Ecomodation())
   );

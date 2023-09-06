@@ -1,20 +1,23 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'homepage.dart';
 
+late final documentIDPhoneLogin; //Get the documentID for the PhoneLogin
+
 class LoginWithPhone extends StatefulWidget {
-  const LoginWithPhone({Key? key}) : super(key: key);
+   LoginWithPhone({Key? key}) : super(key: key);
 
   @override
   State<LoginWithPhone> createState() => _LoginWithPhoneState();
+
+
 }
 
 class _LoginWithPhoneState extends State<LoginWithPhone>
 {
-
+ //Store the document id in this variable
   final _loginphone = GlobalKey<FormState>(); //key for the form.
   final phone = TextEditingController(); //Control the phone number entered in the textform field
  // bool loginsuccess = false; //bool variable to set state for login
@@ -38,6 +41,7 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
 
           if (phoneNumber == phone.text)
           {
+            documentIDPhoneLogin = documentSnapshot.id;
             phoneNumberExists = true; //  When the phone number matched, set the flag to true
             break; //break the loop
           }

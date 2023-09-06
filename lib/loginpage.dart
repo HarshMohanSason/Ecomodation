@@ -168,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Align(
       alignment: const Alignment(0, 0.9),
       child: ElevatedButton.icon(
-        onPressed: () { Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginWithPhone()));
+        onPressed: () { Navigator.push(context, MaterialPageRoute(builder: (context) =>  LoginWithPhone()));
         },//Navigate to the loginWithPhone
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all<Color>(Colors.white),

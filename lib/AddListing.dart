@@ -13,22 +13,19 @@ class AddListing extends StatefulWidget {
   final XFile? imagePath; // passing the list from the TakePicture.dart
   const AddListing({Key? key, this.imagePath}) : super(key: key); //Note: we are setting the default value for angle at 0.0 because we do not need to pas value of
   //other UI's where we are using Addlisting
-
+  static List<ImageData> imagePaths = []; // To hold all the images inside this list.
   @override
   State<AddListing> createState() => _AddListingState();
 }
 
-class _AddListingState extends State<AddListing>
-    with AutomaticKeepAliveClientMixin<AddListing> {
+class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMixin<AddListing> {
+
   @override
-  bool get wantKeepAlive =>
-      true; //getter function to keep the state of the widget same
+  bool get wantKeepAlive => true; //getter function to keep the state of the widget same
 
-  static List<ImageData> imagePaths =
-      []; // To hold all the images inside this list.
-  XFile? image; //
+
+  XFile? image;
   int currentIndex = 0; //Pointer to keep track of the images when deleted
-
 
   double fontSize(BuildContext context, double baseFontSize) //Handle the FontSizes according to the respective screen Sizes
   {
@@ -56,7 +53,7 @@ class _AddListingState extends State<AddListing>
   void updateList(XFile? image, double imageAngle) //add the images to the list here
   {
     setState(() {
-      imagePaths.add(ImageData(
+      AddListing.imagePaths.add(ImageData(
           image!.path, imageAngle)); //adding the angle to each individual image
     });
   }
@@ -96,22 +93,25 @@ class _AddListingState extends State<AddListing>
 
             navigateBackButton(),
 
-            Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 100),
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 100),
 
-                  buildImageViewer(),
+                    buildImageViewer(),
 
-                  const SizedBox(height: 10),
-                  //Space between the container and the add image button
-                  addImageButton(), //call the addImage button here
+                    const SizedBox(height: 10),
+                    //Space between the container and the add image button
+                    addImageButton(), //call the addImage button here
 
-                  const SizedBox(height: 175),
+                    const SizedBox(height: 175),
 
-                  nextPageButton(), //call the next Pagebutton here
-                ]),
+                    nextPageButton(), //call the next Pagebutton here
+                  ]),
+            ),
           ],
         ),
       ),
@@ -124,14 +124,14 @@ class _AddListingState extends State<AddListing>
       color: Colors.grey,
       width: screenWidth,
       height: screenHeight - 454,
-      child: imagePaths != null
+      child: AddListing.imagePaths != null
           ? PageView.builder(
               controller: null,
-              itemCount: imagePaths.length,
+              itemCount: AddListing.imagePaths.length,
               itemBuilder: (context, index) {
                 currentIndex = index;
-                return buildImageWidget(imagePaths[index].imagePath,
-                    imagePaths[index].rotationAngle);
+                return buildImageWidget(AddListing.imagePaths[index].imagePath,
+                    AddListing.imagePaths[index].rotationAngle);
               },
             )
           : null,
@@ -141,7 +141,7 @@ class _AddListingState extends State<AddListing>
   /* Widget to Edit the image */
   Widget buildEditImage() //Widget Icon to build the edit image icon
   {
-    if (imagePaths.isNotEmpty) {
+    if (AddListing.imagePaths.isNotEmpty) {
       return Align(
         alignment: const Alignment(1, -0.8),
         child: Ink(
@@ -347,9 +347,9 @@ class _AddListingState extends State<AddListing>
                               child: ElevatedButton(
                                   onPressed: () {
                                     setState(() {
-                                      imagePaths
-                                          .remove(imagePaths[currentIndex]);
-                                      currentIndex = imagePaths.length - 1;
+                                      AddListing.imagePaths
+                                          .remove(AddListing.imagePaths[currentIndex]);
+                                      currentIndex = AddListing.imagePaths.length - 1;
                                       Navigator.pop(context);
                                     });
                                   },

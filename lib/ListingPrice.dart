@@ -1,21 +1,51 @@
+import 'package:ecomodation/AddListing.dart';
+import 'package:ecomodation/LoginWithPhone.dart';
+import 'package:ecomodation/image_data.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+import 'AddDescription.dart';
 import 'main.dart';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
 
 class ListingPrice extends StatefulWidget {
   const ListingPrice({Key? key}) : super(key: key);
 
   @override
   State<ListingPrice> createState() => _ListingPriceState();
+
+
 }
 
-class _ListingPriceState extends State<ListingPrice> {
+
+class _ListingPriceState extends State<ListingPrice> with TickerProviderStateMixin{
 
 
   static final phoneText = TextEditingController(); //to control the text editing inside the textForm widget
-  final priceForm = GlobalKey<FormState>();
+  final priceForm = GlobalKey<FormState>(); //key to verify the form when submitted
 
   bool formValidated = false;
+  bool isUploading = false;
+
+
+  late AnimationController controller;
+
+  @override
+  void initState() {
+    controller = AnimationController(
+      /// [AnimationController]s can be created with `vsync: this` because of
+      /// [TickerProviderStateMixin].
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    );
+    controller.repeat(reverse: false);
+    super.initState();
+  }
+
+
+  // Create a reference to the user's document in the 'userInfo' collection
 
   Future<void> verifyForm(BuildContext context) async {
 
@@ -44,7 +74,6 @@ class _ListingPriceState extends State<ListingPrice> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-
         body: listingPrice(context),
       ),
     );
@@ -89,7 +118,7 @@ class _ListingPriceState extends State<ListingPrice> {
           Expanded(child:
           Align(
               alignment: Alignment(0,0.87),
-              child: uploadButton())),
+              child: uploadButton(context))),
         ],
       ),
     );
@@ -139,12 +168,75 @@ class _ListingPriceState extends State<ListingPrice> {
     );
   }
 
-  Widget uploadButton(){
+  Widget uploadButton(BuildContext context)
+
+  {
+    DocumentReference userDocument = FirebaseFirestore.instance.collection('userInfo').doc(documentIDPhoneLogin); //refer to the document ID.
+
+     // Reference to the 'ListingInfo' collection within the user's document
+    CollectionReference writeListingInfo = userDocument.collection('ListingInfo');  //refer to the listing Info collection
 
     return  ElevatedButton(
-      onPressed: () async {
 
-       await verifyForm(context);
+      onPressed: () async
+      {
+       await verifyForm(context);  //make sure the form submitted is correct
+
+       if(formValidated == true) {
+         showDialog(
+           context: context,
+           barrierDismissible: false, // Prevent the user from dismissing the dialog
+           builder: (BuildContext context) {
+             return Center(
+               child: CircularProgressIndicator(
+                 color: colorTheme,
+                 value: controller.value,
+               ),
+             );
+           },
+         );
+         List<Map<String, dynamic>> imageInfoList = []; // Upload the info.
+
+         for (ImageData imageData in AddListing.imagePaths) {
+           File imageFile = File(imageData.imagePath); //Get the image path
+           String imageName = basename(imageFile.path); //get the basename from the path
+
+           //Upload the image
+           Reference storageReference = FirebaseStorage.instance.ref().child('images/$imageName');
+           UploadTask uploadTask = storageReference.putFile(imageFile);
+
+           await uploadTask.whenComplete(() async {
+             String imageUrl = await storageReference.getDownloadURL();
+
+             imageInfoList.add({
+               'url': imageUrl,
+               'rotationAngle': imageData.rotationAngle,
+             });
+           });
+         }
+
+
+         try {
+           await writeListingInfo.add({
+             'Title': AddDescription.titleController.text,
+             'Description': AddDescription.descriptionController.text,
+             'Price': phoneText.text,
+             'imageInfoList': imageInfoList
+           });
+         }
+         catch (e) {
+           // print(e);
+         }
+
+
+         AddListing.imagePaths.clear(); //clear the imagePaths list
+         AddDescription.descriptionController.clear(); //clear the description text from the description box
+         AddDescription.titleController.clear(); //clear the title text from the title box
+         phoneText.clear(); //clear the phone price from the textbox
+
+         Navigator.pushNamed(context, 'HomeScreen'); //Navigate back to the home screen once the listing has been uploaded to the database
+
+       }
       },
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -154,6 +246,7 @@ class _ListingPriceState extends State<ListingPrice> {
         backgroundColor: const MaterialStatePropertyAll(
             colorTheme), //set the color for the continue button
       ),
+
       child:  Text(
         'Upload',
         style: TextStyle(
@@ -164,7 +257,6 @@ class _ListingPriceState extends State<ListingPrice> {
       ),
     );
   }
-
 }
 
 /* Separate class to add the rupee symbol whenever the user enters any amount in the TextForm field. */

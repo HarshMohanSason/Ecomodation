@@ -6,13 +6,14 @@ class AddDescription extends StatefulWidget {
 
   @override
   State<AddDescription> createState() => _AddDescriptionState();
-}
-
-class _AddDescriptionState extends State<AddDescription> with AutomaticKeepAliveClientMixin <AddDescription>{
-
 
   static final descriptionController = TextEditingController();
   static final titleController = TextEditingController();
+
+}
+
+class _AddDescriptionState extends State<AddDescription> {
+
 
   double fontSize(BuildContext context, double baseFontSize) //Handle the FontSizes according to the respective screen Sizes
   {
@@ -24,12 +25,8 @@ class _AddDescriptionState extends State<AddDescription> with AutomaticKeepAlive
   }
 
 
-
-
   @override
   Widget build(BuildContext context) {
-
-    super.build(context);
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -97,7 +94,7 @@ class _AddDescriptionState extends State<AddDescription> with AutomaticKeepAlive
 
           Flexible(
             child: Align(
-              alignment: const Alignment(0,0.77),
+              alignment: const Alignment(0,0.83),
                 child: nextPageButton(context)),
           ),
         ],
@@ -109,7 +106,7 @@ class _AddDescriptionState extends State<AddDescription> with AutomaticKeepAlive
   Widget title()
   {
     return TextFormField(
-      controller: titleController,
+      controller: AddDescription.titleController ,
       cursorColor: colorTheme,
       cursorWidth: 2,
       maxLines: 1,
@@ -127,7 +124,7 @@ class _AddDescriptionState extends State<AddDescription> with AutomaticKeepAlive
     return TextFormField(
       cursorColor: colorTheme,
       cursorWidth: 2,
-      controller: descriptionController,
+      controller: AddDescription.descriptionController,
       textAlignVertical: TextAlignVertical.top,
       maxLines: 10,
          decoration: InputDecoration(
@@ -166,7 +163,4 @@ class _AddDescriptionState extends State<AddDescription> with AutomaticKeepAlive
     );
   }
 
-  @override
-  // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
 }

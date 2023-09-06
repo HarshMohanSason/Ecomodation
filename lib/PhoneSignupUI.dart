@@ -1,11 +1,9 @@
-
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'OTPpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'AddListing.dart';
 
 
 class PhoneSignupInfo extends StatefulWidget {
@@ -25,7 +23,7 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
   var readUserInfo = FirebaseFirestore.instance.collection('userInfo'); //create an instance to read data from firebase
 
 
-  bool displayerrorUnameexists = true; //flag to set if the userexists, then display the error;
+  bool displayErrorUNameexists = true; //flag to set if the userexists, then display the error;
   bool displayerrorPhnoexists = true;
 
   final _formKey = GlobalKey<FormState>(); //key for the form.
@@ -53,7 +51,7 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
            if(userexists) //if userexists
              {
               setState(() {
-                displayerrorUnameexists = false;  //set the flag to display error to be true
+                displayErrorUNameexists = false;  //set the flag to display error to be true
                 displayerrorPhnoexists = false;
               });
              }

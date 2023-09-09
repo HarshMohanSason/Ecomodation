@@ -11,9 +11,17 @@ class AddDescription extends StatefulWidget {
   static final titleController = TextEditingController();
 
 }
+final addDescriptionAndTitle = GlobalKey<FormState>(); //key to verify the form when submitted\
 
 class _AddDescriptionState extends State<AddDescription> {
 
+  Future<void> verifyForm(BuildContext context) async {
+
+    if(addDescriptionAndTitle.currentState!.validate())
+    {
+      Navigator.pushNamed(context, 'AddPricePage');
+    }
+  }
 
   double fontSize(BuildContext context, double baseFontSize) //Handle the FontSizes according to the respective screen Sizes
   {
@@ -43,99 +51,107 @@ class _AddDescriptionState extends State<AddDescription> {
   {
     return Padding(
       padding: const EdgeInsets.only(top: 80.0),
-      child: Column(
+      child: Form(
+        key: addDescriptionAndTitle,
+        child: Column(
 
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
 
-        children: [
+          children: [
 
-          Align(
-            alignment: const Alignment(-1,-0.8),
-            child: IconButton (
-                onPressed: () {
-                  Navigator.pushNamed(context, 'AddImagePage');
-                },
-                icon: const Icon(Icons.arrow_back_rounded, size: 35, color: Colors.black)
+            Align(
+              alignment: const Alignment(-1,-0.8),
+              child: IconButton (
+                  onPressed: () {
+                    Navigator.pushNamed(context, 'AddImagePage');
+                  },
+                  icon: const Icon(Icons.arrow_back_rounded, size: 35, color: Colors.black)
+              ),
             ),
-          ),
 
-           const SizedBox(height: 20),
+             const SizedBox(height: 20),
 
-           Align(
-                alignment: Alignment.center,
-                child: Text('Let\'s add some more info to your listing',
-                    style: TextStyle(
-                      fontSize: fontSize(context, 18),fontWeight: FontWeight.bold
-                )),
-            ),
+             Align(
+                  alignment: Alignment.center,
+                  child: Text('Let\'s add some more info to your listing',
+                      style: TextStyle(
+                        fontSize: fontSize(context, 18),fontWeight: FontWeight.bold
+                  )),
+              ),
+
+             const  SizedBox(height: 40),
+
+               const Align(
+               alignment: Alignment(-0.95, 0), //Align the heading 'title'
+             child: Text('Title', style:
+             TextStyle(
+             fontWeight: FontWeight.bold,
+             ))), //Heading for textform for entering the titl
+
+            TextFormField(
+             controller: AddDescription.titleController ,
+             cursorColor: colorTheme,
+             cursorWidth: 2,
+             maxLines: 1,
+             decoration: InputDecoration(
+             border: OutlineInputBorder(
+             borderSide: const BorderSide(width: 2.0),
+             borderRadius: BorderRadius.circular(20),
+             ),
+             ),
+             validator: (value)
+             {
+             if(value!.isEmpty)
+             {
+             return 'Title cannot be empty';
+             }
+             return null;
+             },
+             ),
 
            const  SizedBox(height: 40),
 
-             const Align(
-             alignment: Alignment(-0.95, 0), //Align the heading 'title'
-           child: Text('Title', style:
-           TextStyle(
-           fontWeight: FontWeight.bold,
-           ))), //Heading for textform for entering the titl
+            const Align(
+                alignment: Alignment(-0.95,0),  //Align the heading 'title'
+                child: Text('Description (optional)', style:
+                  TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),)),
 
-             title(),
+               TextFormField(
+               cursorColor: colorTheme,
+               cursorWidth: 2,
+               controller: AddDescription.descriptionController,
+               textAlignVertical: TextAlignVertical.top,
+               maxLines: 10,
+               decoration: InputDecoration(
+               hintText: 'Listings with detailed descriptions sell better!',
+               isDense:  true,
+               // contentPadding: const EdgeInsets.all(100),
+               border: OutlineInputBorder(
+               //    borderSide: const BorderSide(width: 10.0),
+               borderRadius: BorderRadius.circular(20),
+               ),
+               ),
+               validator: (value)
+               {
+               if(value!.isEmpty)
+               {
+               return 'Description cannot be empty';
+               }
+               return null;
+               },
+               ),
 
-         const  SizedBox(height: 40),
-
-          const Align(
-              alignment: Alignment(-0.95,0),  //Align the heading 'title'
-              child: Text('Description (optional)', style:
-                TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),)),
-
-          description(context),
-
-          Flexible(
-            child: Align(
-              alignment: const Alignment(0,0.83),
-                child: nextPageButton(context)),
-          ),
-        ],
-      ),
-    );
-  }
-
-
-  Widget title()
-  {
-    return TextFormField(
-      controller: AddDescription.titleController ,
-      cursorColor: colorTheme,
-      cursorWidth: 2,
-      maxLines: 1,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-             borderSide: const BorderSide(width: 2.0),
-              borderRadius: BorderRadius.circular(20),
+            Flexible(
+              child: Align(
+                alignment: const Alignment(0,0.83),
+                  child: nextPageButton(context)),
             ),
-       ),
-    );
-  }
-
-  Widget description(BuildContext context)
-  {
-    return TextFormField(
-      cursorColor: colorTheme,
-      cursorWidth: 2,
-      controller: AddDescription.descriptionController,
-      textAlignVertical: TextAlignVertical.top,
-      maxLines: 10,
-         decoration: InputDecoration(
-          hintText: 'Listings with detailed descriptions sell better!',
-          isDense:  true,
-         // contentPadding: const EdgeInsets.all(100),
-          border: OutlineInputBorder(
-        //    borderSide: const BorderSide(width: 10.0),
-          borderRadius: BorderRadius.circular(20),
-          ),
+          ],
         ),
+      ),
     );
   }
 
@@ -143,7 +159,10 @@ class _AddDescriptionState extends State<AddDescription> {
   Widget nextPageButton(BuildContext context){
 
     return  ElevatedButton(
-      onPressed: () =>  Navigator.pushNamed(context, 'AddPricePage'),
+      onPressed: () async {
+
+        await verifyForm(context);},
+
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(

@@ -6,6 +6,7 @@ import 'homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 
+bool loggedInWithPhone = false; //set to true since user has been logged in
 class OtpUI extends StatefulWidget {
 
   final String verificationId;  //get the verification Id.
@@ -41,7 +42,7 @@ class _OtpUIState extends State<OtpUI> {
         //create a PhoneAuthCredential
         PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: widget.verificationId, smsCode: otp_pin.text);
         await auth.signInWithCredential(credential); //sign in the user with credential
-
+        loggedInWithPhone = true; //set to true since user has been logged in
         //if the sign is successful, navigate the user to the main screen.
         Navigator.push(context, MaterialPageRoute(builder: (_) => const MainScreen()));
         }

@@ -6,9 +6,6 @@ import 'PhoneSignupUI.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'dart:io';
 import 'Auth/auth_provider.dart';
-import 'homepage.dart';
-import 'LoginWithPhone.dart';
-
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -168,12 +165,12 @@ class _LoginScreenState extends State<LoginScreen> {
     return Align(
       alignment: const Alignment(0, 0.9),
       child: ElevatedButton.icon(
-        onPressed: () { Navigator.push(context, MaterialPageRoute(builder: (context) =>  LoginWithPhone()));
+        onPressed: () { Navigator.pushNamed(context, 'LoginWithPhone');
         },//Navigate to the loginWithPhone
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
           foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
-          fixedSize: MaterialStateProperty.all(const Size(223, 35)),
+          fixedSize: MaterialStateProperty.all(const Size(220, 35)),
         ),
         icon: const Padding(
           padding: EdgeInsets.only(left: 0, right: 8),
@@ -183,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         label: const Padding(
-          padding: EdgeInsets.only(right: 25.0),
+          padding: EdgeInsets.only(right: 18.0),
           child: Text("Login with Phone  ",
               style: TextStyle(
                 fontSize: 14,

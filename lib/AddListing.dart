@@ -379,7 +379,37 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
   Widget nextPageButton() {
     final fontSizeNextButton = 18 * (screenHeight / 844);
     return ElevatedButton(
-      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AddDescription())),
+      onPressed: () => {
+        Navigator.pushNamed(context, 'AddDescriptionPage')
+       /* if(AddListing.imagePaths.isNotEmpty) //if the list is not empty, then navigate to adddescription
+           {
+        Navigator.pushNamed(context, 'AddDescriptionPage')
+          }
+        else  //else display a toast message
+         {
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.black,
+            content: const Padding(
+                padding: EdgeInsets.only(left: 100),
+            child: Text("Please add an image", style: TextStyle(
+              color: Colors.white,
+            ),)),
+            behavior: SnackBarBehavior.floating,
+             margin: EdgeInsets.all(screenWidth/18),
+             shape: const StadiumBorder(),
+             action: SnackBarAction(
+             label: '',
+              onPressed: () {
+          },
+        ),
+      ),
+    )
+  },
+
+        */
+      },
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(

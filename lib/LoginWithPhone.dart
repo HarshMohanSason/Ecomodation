@@ -2,16 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'homepage.dart';
+import 'OTPpage.dart';
+
 
 late final documentIDPhoneLogin; //Get the documentID for the PhoneLogin
 
 class LoginWithPhone extends StatefulWidget {
-   LoginWithPhone({Key? key}) : super(key: key);
+   const LoginWithPhone({Key? key}) : super(key: key);
 
   @override
   State<LoginWithPhone> createState() => _LoginWithPhoneState();
-
 
 }
 
@@ -26,7 +26,7 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
   bool phoneNumberValidated = true;
 
   Future<void> verifyForm(BuildContext context) async { //Verify form which checks the form, reads data from the database and logs user in with their phone number
-    var readUserInfo = FirebaseFirestore.instance.collection('userInfo'); //create instance referring to the userinfo at database
+    final readUserInfo = FirebaseFirestore.instance.collection('userInfo'); //create instance referring to the userinfo at database
 
     if (_loginphone.currentState!.validate()) {  //if the form is validated t
 
@@ -48,12 +48,10 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
         }
 
         if (phoneNumberExists) {
-
-          Navigator.push(context, MaterialPageRoute(builder: (context) =>  const MainScreen()));
           // Phone number matched, proceed with login
-          /*await auth.verifyPhoneNumber(  //Verify the user provided phone number
+          await auth.verifyPhoneNumber(  //Verify the user provided phone number
 
-              phoneNumber: '+1${phone.text}',  //Get the phone number
+              phoneNumber: '+91${phone.text}',  //Get the phone number
 
               verificationCompleted: (PhoneAuthCredential credential) async {   //if verification is completed, sign in
                 await auth.signInWithCredential(credential).then((value) => {
@@ -76,7 +74,6 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
               }
           );
 
-           */
         }
 
         else {
@@ -112,7 +109,6 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
         child: Padding(
           padding: const EdgeInsets.only(top: 70),
           child: Column(  //Put all the textform fields in a column widget
-
               children: <Widget> [
                 Align(
                   alignment: const Alignment(-1,-0.8),
@@ -132,7 +128,6 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
                   color: Colors.red,
                   fontSize: 16,
                 )),
-
 
                 const SizedBox(height: 40),
 

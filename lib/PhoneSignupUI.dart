@@ -1,3 +1,4 @@
+import 'package:ecomodation/LoginWithPhone.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,8 +24,8 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
   var readUserInfo = FirebaseFirestore.instance.collection('userInfo'); //create an instance to read data from firebase
 
 
-  bool displayErrorUNameexists = true; //flag to set if the userexists, then display the error;
-  bool displayerrorPhnoexists = true;
+  bool displayErrorUserExists = false; //flag to set if the userexists, then display the error;
+  bool displayErrorPhoneNoExists = false;
 
   final _formKey = GlobalKey<FormState>(); //key for the form.
 
@@ -35,29 +36,31 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
        if(_formKey.currentState!.validate()) {            //if the form is validated
          try{
            var document =  await readUserInfo.get(); //get the documents from the collection reference
-           bool userexists = false;
-           for(var documentval in document.docs)
+           bool userExists = false;
+           for(var documentVal in document.docs)
              {
-               Map<String, dynamic> data = documentval.data(); //get the data from each document;
+               Map<String, dynamic> data = documentVal.data(); //get the data from each document;
                var uname = data['username']; //store the username
-               var phno = data['phonenumber']; //store the phone number
+               var phNo = data['phonenumber']; //store the phone number
 
-               if(uname == username.text && phno == _phoneNoController.text)
+               if(uname == username.text || phNo == _phoneNoController.text)
                  {
-                   userexists = true;
+                   userExists = true;
+                   documentIDPhoneLogin = documentVal.id;
                    break;
                  }
+
              }
-           if(userexists) //if userexists
+           if(userExists == true) //if userExists
              {
-              setState(() {
-                displayErrorUNameexists = false;  //set the flag to display error to be true
-                displayerrorPhnoexists = false;
-              });
+                displayErrorUserExists = true;  //set the flag to display error to be true
+                displayErrorPhoneNoExists = true;
+
              }
            else //if user does not exists, prompt to enter the OTP
              {
-             writeUserInfo.add({'username': username.text, 'phonenumber' :  _phoneNoController.text}); //add the data to the database
+            var newPhoneLoginUser = await writeUserInfo.add({'username': username.text, 'phonenumber' :  _phoneNoController.text}); //add the data to the database
+            documentIDPhoneLogin = newPhoneLoginUser.id; //store the documentID for login with phone to update the listing later
                await auth.verifyPhoneNumber(  //Verify the user provided phone number
 
                    phoneNumber: '+91${_phoneNoController.text}',  //Get the phone number
@@ -233,15 +236,17 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
                       {
                     return 'Number should be a ten digit number';
                   }
-                  return null;
-                }
-            ),
 
-            if(!displayerrorPhnoexists) //If true
-            const Text('There is already an account associated with this phone number',  //Display the error
+                  return null;
+
+                }
+
+            ),
+            if(displayErrorPhoneNoExists == true && displayErrorUserExists == true) //If true
+            const Text('There is already an account associated with this phone number or userName',  //Display the error
             style: TextStyle(
               color: Colors.red,
-              fontSize: 14,
+              fontSize: 14.5,
             )),
 
             const SizedBox(height: 40),

@@ -1,14 +1,16 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 late final googleLoginDocID;
+bool loggedinWithGoogle = false;
+
 class Authentication {
 
-  CollectionReference writeUserInfo = FirebaseFirestore.instance.collection('userInfo');
+  final writeUserInfo = FirebaseFirestore.instance.collection('userInfo'); //refer to the collection userInfo
+  final readUserInfo = FirebaseFirestore.instance.collection('userInfo'); //refer to read the data
+
   //create an instance to write data to firebase
   static Future <FirebaseApp> initializeFirebase() async  //create a async function
   {
@@ -16,6 +18,8 @@ class Authentication {
 
     return firebaseApp; //return the firebaseApp when initialized
   }
+
+
 
   //Function to implement signInWith Google;
 
@@ -29,9 +33,31 @@ class Authentication {
       accessToken: gAuth.accessToken,
       idToken: gAuth.idToken,
     );
-    writeUserInfo.add({'username': gUser.displayName, 'email': gUser.email});
+
+    var docSnapshot = await readUserInfo.get(); //wait to get the user info
+    bool userExists = false;
+    for(var eachDocument in docSnapshot.docs)
+    {
+      Map<String, dynamic> data = eachDocument.data(); //get the document data
+      var email = data['email']; //store the email for each document
+
+      if (email == gUser.email) //if the email matches, that means user already logged in, no need to write data again.
+          {
+        userExists = true;
+        googleLoginDocID = eachDocument.id;
+        break;
+          }
+     }
+
+       if(userExists == false)
+          {
+            var newGoogleUser = await writeUserInfo.add({'username': gUser.displayName, 'email': gUser.email}); //if no email found, write the data.
+            googleLoginDocID = newGoogleUser.id; //get the loginID
+          }
+
+    loggedinWithGoogle = true;
     return await FirebaseAuth.instance.signInWithCredential(credential); //pass the credentials to the signInWithCredential method
-  }
+      }
 
 
   signInWithApple() async {
@@ -40,8 +66,6 @@ class Authentication {
 
     //final SignInWithApple? aUser =
   }
-
-
 
 }
 

@@ -82,36 +82,45 @@ class _TakePictureState extends State<TakePicture> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Spacer(flex: 3),
-                    IconButton(
-                        alignment: Alignment(0, -1),
-                        icon: const Icon(custom_icons.MyFlutterApp.cancel_circled,
-                            color: Colors.red, size: 65),
-                        onPressed: () async =>
+                    GestureDetector(
+                      onTap: () async {
                         await availableCameras().then((value) => Navigator.push(
                             context, MaterialPageRoute(
-                            builder: (_) => CameraUI(cameras: value))))
+                            builder: (_) => CameraUI(cameras: value))));
+                      },
+                      child: const IconButton(
+                          alignment: Alignment(0, -1),
+                          icon: Icon(custom_icons.MyFlutterApp.cancel_circled,
+                              color: Colors.red, size: 65),
+                          onPressed: null,
+
+                      ),
                     ),
 
                     const Spacer(flex: 2),
 
-                    IconButton(
-                        alignment: const Alignment(0, -1),
-                        icon: const Icon(custom_icons.MyFlutterApp.ok_circled,
-                            color: Colors.green, size: 65),
-
-                        onPressed: ()
-                        {
-                          if(isZoomed == true)
-                          {
-                             Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                                  AddListing(imagePath: widget.picture)));
-                          }
-                          else
+                    GestureDetector(
+                      onTap: () {
                             {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                                  AddListing(imagePath: widget.picture)));
+                            if(isZoomed == true)
+                            {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                            AddListing(imagePath: widget.picture)));
                             }
-                        }
+                            else
+                            {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                            AddListing(imagePath: widget.picture)));
+                            }
+                            }
+                            },
+                      child: const IconButton(
+                          alignment: Alignment(0, -1),
+                          icon: Icon(custom_icons.MyFlutterApp.ok_circled,
+                              color: Colors.green, size: 65),
+
+                          onPressed: null,
+                      ),
                     ),
                     const Spacer(flex: 4),
                   ]),

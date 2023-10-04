@@ -23,77 +23,82 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
   CollectionReference writeUserInfo = FirebaseFirestore.instance.collection('userInfo'); //create an instance to write data to firebase
   var readUserInfo = FirebaseFirestore.instance.collection('userInfo'); //create an instance to read data from firebase
 
-
   bool displayErrorUserExists = false; //flag to set if the userexists, then display the error;
   bool displayErrorPhoneNoExists = false;
 
   final _formKey = GlobalKey<FormState>(); //key for the form.
 
   Future <void> navigateToOTPUI(BuildContext context) async   //This function will take the User to the OTP verification page
-  {
+      {
 
 
-       if(_formKey.currentState!.validate()) {            //if the form is validated
-         try{
-           var document =  await readUserInfo.get(); //get the documents from the collection reference
-           bool userExists = false;
-           for(var documentVal in document.docs)
-             {
-               Map<String, dynamic> data = documentVal.data(); //get the data from each document;
-               var uname = data['username']; //store the username
-               var phNo = data['phonenumber']; //store the phone number
+    if(_formKey.currentState!.validate()) {            //if the form is validated
+      try{
+        var document =  await readUserInfo.get(); //get the documents from the collection reference
+        bool userExists = false;
+        for(var documentVal in document.docs)
+        {
+          Map<String, dynamic> data = documentVal.data(); //get the data from each document;
+          var uname = data['username']; //store the username
+          var phNo = data['phonenumber']; //store the phone number
 
-               if(uname == username.text || phNo == _phoneNoController.text)
-                 {
-                   userExists = true;
-                   documentIDPhoneLogin = documentVal.id;
-                   break;
-                 }
+          if(uname == username.text || phNo == _phoneNoController.text)
+          {
+            userExists = true;
+            if(phoneLoginDocID.isEmpty)
+            {
+              phoneLoginDocID = documentVal.id;
+            }
+            break;
+          }
 
-             }
-           if(userExists == true) //if userExists
-             {
-                displayErrorUserExists = true;  //set the flag to display error to be true
-                displayErrorPhoneNoExists = true;
+        }
 
-             }
-           else //if user does not exists, prompt to enter the OTP
-             {
-            var newPhoneLoginUser = await writeUserInfo.add({'username': username.text, 'phonenumber' :  _phoneNoController.text}); //add the data to the database
-            documentIDPhoneLogin = newPhoneLoginUser.id; //store the documentID for login with phone to update the listing later
-               await auth.verifyPhoneNumber(  //Verify the user provided phone number
+        if(userExists == true) //if userExists
+            {
+          setState(() {
+            displayErrorUserExists = true;  //set the flag to display error to be true
+            displayErrorPhoneNoExists = true;
+          });
 
-                   phoneNumber: '+91${_phoneNoController.text}',  //Get the phone number
+        }
+        else //if user does not exists, prompt to enter the OTP
+            {
+          var newPhoneLoginUser = await writeUserInfo.add({'username': username.text, 'phonenumber' :  _phoneNoController.text}); //add the data to the database
+          phoneLoginDocID = newPhoneLoginUser.id; //store the documentID for login with phone to update the listing later
+          await auth.verifyPhoneNumber(  //Verify the user provided phone number
 
-                   verificationCompleted: (PhoneAuthCredential credential) async {   //if verification is completed, sign in
-                     await auth.signInWithCredential(credential).then((value) => {
-                       // print("You are logged in"),
-                     });
-                   },
+              phoneNumber: '+91${_phoneNoController.text}',  //Get the phone number
 
-                   verificationFailed: (FirebaseAuthException e) async {
-                     // print(e.message);//if verification is failed, print the error
-                   },
+              verificationCompleted: (PhoneAuthCredential credential) async {   //if verification is completed, sign in
+                await auth.signInWithCredential(credential).then((value) => {
+                  // print("You are logged in"),
+                });
+              },
 
-                   codeSent: (String verificationId, int? resendToken) async {  //send the OTP code.
-                     Navigator.push(context, MaterialPageRoute(builder: (context) =>  OtpUI(verificationId: verificationId)));
-                     //  PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: smsCode);
+              verificationFailed: (FirebaseAuthException e) async {
+                // print(e.message);//if verification is failed, print the error
+              },
 
-                   },
-                   codeAutoRetrievalTimeout: (String verificationId) {
-                   }
-               );
+              codeSent: (String verificationId, int? resendToken) async {  //send the OTP code.
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>  OtpUI(verificationId: verificationId)));
+                //  PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: smsCode);
 
-             }
+              },
+              codeAutoRetrievalTimeout: (String verificationId) {
+              }
+          );
 
-         }
-         catch(e){ //to catch any error during the process.
-         //  print('Error: $e');
-         }
+        }
+
+      }
+      catch(e){ //to catch any error during the process.
+        //  print('Error: $e');
+      }
 
 
       //check if the form is validated
-     // push to the OTP page if it is
+      // push to the OTP page if it is
     }
   }
 
@@ -105,11 +110,11 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
       child: Scaffold(
         backgroundColor: const Color(0xFFFFFFFF),  //set the background color to white
         body: SingleChildScrollView(   // Put everything in singlechild scroll view to make sure no pixel overflow error occures
-        child: Column(                  //Prevent the pixel overflowing error on the bottom of the screen.
-          children: [
-            _enterinfo(context),  //call the _Enterinfo widget here.
-          ],
-        ),
+          child: Column(                  //Prevent the pixel overflowing error on the bottom of the screen.
+            children: [
+              _enterinfo(context),  //call the _Enterinfo widget here.
+            ],
+          ),
         ),
       ),
     );
@@ -146,7 +151,7 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
             ),
 
             const SizedBox(height: 30),
-              AnimatedTextKit(
+            AnimatedTextKit(
               animatedTexts: [
                 TyperAnimatedText('Let\'s get you started',
                   textStyle : const TextStyle(
@@ -164,26 +169,26 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
 
             const SizedBox(height: 30),
 
-           TextFormField(
-              controller: username,
-              maxLength: 18,
-              cursorColor: const Color(0xFF0BC25F),
-              cursorWidth: 4,
-              decoration:  InputDecoration(   //For decorating the TextForm box
-                hintStyle: const TextStyle(
-                  fontSize: 18, // Size of the hintText
-                ),
-                hintText: 'Enter your username ', //hintText
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(   //decorate the border of the box
-                    width: 10,
-                    style: BorderStyle.solid,  //style of the border
-                    color: Color(0xFF0BC25F),  //color of the borderlines
+            TextFormField(
+                controller: username,
+                maxLength: 18,
+                cursorColor: const Color(0xFF0BC25F),
+                cursorWidth: 4,
+                decoration:  InputDecoration(   //For decorating the TextForm box
+                  hintStyle: const TextStyle(
+                    fontSize: 18, // Size of the hintText
+                  ),
+                  hintText: 'Enter your username ', //hintText
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(   //decorate the border of the box
+                      width: 10,
+                      style: BorderStyle.solid,  //style of the border
+                      color: Color(0xFF0BC25F),  //color of the borderlines
+                    ),
                   ),
                 ),
-              ),
-               validator: (text ) {
+                validator: (text ) {
                   if (text!.isEmpty) {
                     return 'Please enter a valid username';
                   }
@@ -192,6 +197,11 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
                   if (!nonNumericRegExp.hasMatch(text)) {
                     return 'Username can only contain digits and lowercase letters';  //return error if it doesn't match the REGEXP
                   }
+                  final containAlpha = RegExp(r'^[a-z]');
+                  if(containAlpha.hasMatch(text) == false)
+                    {
+                      return 'Username needs to contain at least one alphabet';
+                    }
                   return null;
                 }
 
@@ -205,23 +215,23 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
                 cursorWidth: 4,
                 controller: _phoneNoController,
 
-              //keyboardType: TextInputType.text,
-              decoration:  InputDecoration(//For decorating the TextForm box
-                hintStyle: const TextStyle(
-                  fontSize: 18, // Size of the hintText
-                ),
-                hintText: 'Enter your phone number ', //hintText
+                //keyboardType: TextInputType.text,
+                decoration:  InputDecoration(//For decorating the TextForm box
+                  hintStyle: const TextStyle(
+                    fontSize: 18, // Size of the hintText
+                  ),
+                  hintText: 'Enter your phone number ', //hintText
 
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(   //decorate the border of the box
-                    width: 8,
-                    style: BorderStyle.solid,
-                    //style of the border
-                    color: Color(0x000000FF),  //color of the borderlines
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(   //decorate the border of the box
+                      width: 8,
+                      style: BorderStyle.solid,
+                      //style of the border
+                      color: Color(0x000000FF),  //color of the borderlines
+                    ),
                   ),
                 ),
-              ),
 
                 validator: (text) {
                   final nonNumericRegExp = RegExp(r'^[0-9]+$'); //RegExp to match the phone number
@@ -229,7 +239,7 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
                     return 'Please enter a valid phone number';
                   }
                   //check if the number isWithin 0-9.
-                   if (!nonNumericRegExp.hasMatch(text)) {
+                  if (!nonNumericRegExp.hasMatch(text)) {
                     return 'Phone number must contain only digits'; //
                   }
                   if (text.length < 10) //Make sure the number is a total of 10 digits.
@@ -242,18 +252,18 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
                 }
 
             ),
-            if(displayErrorPhoneNoExists == true && displayErrorUserExists == true) //If true
-            const Text('There is already an account associated with this phone number or userName',  //Display the error
-            style: TextStyle(
-              color: Colors.red,
-              fontSize: 14.5,
-            )),
+            if(displayErrorPhoneNoExists == true || displayErrorUserExists == true) //If true
+              const Text('There is already an account associated with this phone number or Username',  //Display the error
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 14.5,
+                  )),
 
             const SizedBox(height: 40),
 
-             ElevatedButton(
+            ElevatedButton(
               style:  ButtonStyle(
-               fixedSize: MaterialStateProperty.all(const Size(160,40)),
+                fixedSize: MaterialStateProperty.all(const Size(160,40)),
                 backgroundColor: MaterialStateProperty.all(colorTheme), //set the color for the continue button
               ),
 

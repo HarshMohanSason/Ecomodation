@@ -51,10 +51,6 @@ class UploadListing{
       // print(e);
     }
 
-    AddListing.imagePaths.clear(); //clear the imagePaths list
-    AddDescription.descriptionController.clear(); //clear the description text from the description box
-    AddDescription.titleController.clear(); //clear the title text from the title box
-    ListingPrice.phoneText.clear(); //clear the phone price from the textbox
   }
 
 
@@ -64,11 +60,11 @@ class UploadListing{
 
     if (user != null) {
 
-      if (loggedinWithGoogle == true) { //if the user logged in via google, upload the listing to the google reg account
+      if (loggedInWithGoogle == true) { //if the user logged in via google, upload the listing to the google reg account
       await uploadListing(googleLoginDocID);
 
       } else if (loggedInWithPhone == true) { //if the user logged in via phone, upload the listing to the phone reg account
-       await uploadListing(documentIDPhoneLogin);
+       await uploadListing(phoneLoginDocID);
 
       } //else if (signInProvider == 'apple.com') {
         // User logged in using Apple Sign-In.

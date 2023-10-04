@@ -44,7 +44,7 @@ class _OtpUIState extends State<OtpUI> {
         await auth.signInWithCredential(credential); //sign in the user with credential
         loggedInWithPhone = true; //set to true since user has been logged in
         //if the sign is successful, navigate the user to the main screen.
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const MainScreen()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) =>  MainScreen()));
         }
       catch (e)  //catch any errors if the login is not successful.
       {

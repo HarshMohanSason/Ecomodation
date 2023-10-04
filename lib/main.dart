@@ -1,14 +1,19 @@
 import 'package:ecomodation/AddDescription.dart';
+import 'package:ecomodation/AppSettings.dart';
+import 'package:ecomodation/Auth/auth_provider.dart';
 import 'package:ecomodation/ListingPrice.dart';
+import 'package:ecomodation/Listings/DisplayListings.dart';
 import 'package:ecomodation/LoginWithPhone.dart';
+import 'package:ecomodation/Messaging/MessageWidget.dart';
+import 'package:ecomodation/Messaging/NoMessageWidget.dart';
 import 'package:ecomodation/PhoneSignupUI.dart';
 import 'package:ecomodation/homepage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import './loginpage.dart';
 import 'AddListing.dart';
+import 'Auth/auth_checkifloggedin.dart';
 import 'firebase_options.dart';
 import 'AddListing_StateManage.dart';
 
@@ -42,58 +47,31 @@ void main() async {
 
 
 class Ecomodation extends StatelessWidget {
-  const Ecomodation({Key? key}) : super(key: key);
 
+  const Ecomodation({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-   /* return  FutureBuilder<User>(
-      future:  Future.value(FirebaseAuth.instance.currentUser),
-      builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
+    return
+      MaterialApp(
 
-
-        if(snapshot.hasData)
+          home: const CheckIfLoggedIn(),
+          initialRoute: 'loginpage', //define the inital route as login page
+          routes:
           {
-            User? user = snapshot.data;
-
-            return  MaterialApp(
-              home: MainScreen(),
-                routes:
-                {
-                'LoginPage': (context) => const LoginScreen(),
-                'PhoneSignupPage': (context) => const PhoneSignupInfo(),
-                'HomeScreen': (context) => const MainScreen(),
-                'AppIntroUI': (context) => const LoginScreen(),
-                'AddImagePage':(context) => const AddListing(),
-                'AddDescriptionPage': (context) => const AddDescription(),
-                'AddPricePage': (context) => const ListingPrice(),
-                }
-            );
+            'LoginPage': (context) => const LoginScreen(),
+            'PhoneSignupPage': (context) => const PhoneSignupInfo(),
+            'HomeScreen': (context) =>  MainScreen(),
+            'AppIntroUI': (context) => const LoginScreen(),
+            'AddImagePage': (context) => const AddListing(),
+            'AddDescriptionPage': (context) => const AddDescription(),
+            'AddPricePage': (context) => const ListingPrice(),
+            'LoginWithPhone': (context) => const LoginWithPhone(),
+            'NoMessageWidget': (context) => const NoMessageWidget(),
+            'AppSettings':(context)=> const AppSettings(),
+            'DisplayListings': (context) => const DisplayListings(),
           }
-      else {
-
-    */
-          return
-        MaterialApp(
-
-            home: const LoginScreen(),
-            initialRoute: 'loginpage', //define the inital route as login page
-            routes:
-            {
-              'LoginPage': (context) => const LoginScreen(),
-              'PhoneSignupPage': (context) => const PhoneSignupInfo(),
-              'HomeScreen': (context) => const MainScreen(),
-              'AppIntroUI': (context) => const LoginScreen(),
-              'AddImagePage':(context) => const AddListing(),
-              'AddDescriptionPage': (context) => const AddDescription(),
-              'AddPricePage': (context) => const ListingPrice(),
-              'LoginWithPhone': (context)=> LoginWithPhone(),
-            }
-        );
-        }
-   //   },
-
-   // );
- // }
+      );
+  }
 
 }

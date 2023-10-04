@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:camera/camera.dart';
-import 'package:ecomodation/AddDescription.dart';
 import 'package:ecomodation/camera.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'AddListing_StateManage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'image_data.dart';
+import 'package:page_view_indicators/page_view_indicators.dart';
 
 class AddListing extends StatefulWidget {
   final XFile? imagePath; // passing the list from the TakePicture.dart
@@ -26,6 +26,9 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
 
   XFile? image;
   int currentIndex = 0; //Pointer to keep track of the images when deleted
+  int initialPage = 0;
+  final PageController _pageController = PageController();
+  final  _currentPageNotifier = ValueNotifier<int>(0);
 
   double fontSize(BuildContext context, double baseFontSize) //Handle the FontSizes according to the respective screen Sizes
   {
@@ -55,6 +58,10 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
     setState(() {
       AddListing.imagePaths.add(ImageData(
           image!.path, imageAngle)); //adding the angle to each individual image
+      initialPage = AddListing.imagePaths.length -1;
+      if(_pageController.hasClients) {
+        _pageController.jumpToPage(initialPage);
+      }
     });
   }
 
@@ -89,29 +96,33 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
       child: Scaffold(
         body: Stack(
           children: [
+            Align(
+                alignment: const Alignment(0, -0.87),
+                child: Text('Add an Image ', style: TextStyle(
+                  fontSize: fontSize(context, 30),
+                  fontFamily: 'Merriweather',
+                  fontWeight: FontWeight.bold,
+                ),)),
             buildEditImage(), //calling the buildEditImage button
 
             navigateBackButton(),
 
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 100),
+            Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: screenHeight/7.2),
+                  buildImageViewer(),
 
-                    buildImageViewer(),
+                  SizedBox(height: screenHeight/46.6),
+                  circleIndicator(),
 
-                    const SizedBox(height: 10),
-                    //Space between the container and the add image button
-                    addImageButton(), //call the addImage button here
+                   SizedBox(height: screenHeight/93.2), //Space between the container and the add image button
+                  addImageButton(), //call the addImage button here
 
-                    const SizedBox(height: 175),
-
-                    nextPageButton(), //call the next Pagebutton here
-                  ]),
-            ),
+                  SizedBox(height: screenHeight/7.456),
+                  nextPageButton(), //call the next Pagebutton here
+                ]),
           ],
         ),
       ),
@@ -126,13 +137,21 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
       height: screenHeight - 454,
       child: AddListing.imagePaths != null
           ? PageView.builder(
-              controller: null,
+
+              controller: _pageController,
               itemCount: AddListing.imagePaths.length,
               itemBuilder: (context, index) {
                 currentIndex = index;
                 return buildImageWidget(AddListing.imagePaths[index].imagePath,
                     AddListing.imagePaths[index].rotationAngle);
               },
+        onPageChanged:  (page)
+        {
+          setState(() {
+          initialPage = page;
+          _currentPageNotifier.value = page ;
+          });
+        },
             )
           : null,
     );
@@ -189,16 +208,15 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
             try {
               uploadOrTakeImage(context);
             } catch (e) {
-              print('Error $e');
+            // print('Error $e');
             }
             //Draw the UI for the user to choose to either upload or take the image using device's camera
             // XFile? pickedFile = await ImagePicker().pickImage(
             //source: ImageSource.gallery);
           },
-          icon:  Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: Icon(Icons.add, color: Colors.black, size: screenWidth/13),
-          ),
+          icon:  Align(
+              alignment: Alignment.center,
+               child: Icon(Icons.add, color: Colors.black, size: screenWidth/13)),
         ),
       ),
     );
@@ -206,14 +224,12 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
 
 /* Widget to give the user option to pick the image either from the gallery or from the camera */
 
-  Future uploadOrTakeImage(
-      BuildContext
-          context) //Widget to display the option to display and upload image
+  Future uploadOrTakeImage(BuildContext context) //Widget to display the option to display and upload image
 
   {
     var boxHeight = screenHeight / 5.62; //Adjust the size
-    var cameraIconSize = boxHeight / 2.5; //Adjust the size of the Icons
-    var paddingCameraText = boxHeight - 135; //Padding for the Camera Icon
+    var cameraIconSize = boxHeight / 2.7; //Adjust the size of the Icons
+    var paddingCameraText = boxHeight - 130; //Padding for the Camera Icon
     var paddingGalleryText = boxHeight - 120; //Padding for the Gallery icon
     var textSize = cameraIconSize / 2.5; //Size for the text
     // var gapBetweenIcons = boxHeight;  //gap between two icons
@@ -229,73 +245,80 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    //Using a row Widget to place each icon in a row fashion
-                    children: [
+
+                  GestureDetector(
+                    onTap: () async {
+                      try {
+                        await availableCameras().then((value) =>
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) =>
+                                        CameraUI(cameras: value))));
+                      } catch (e) //Handle the case when no camera can be loaded
+                          {
+                        const Text(
+                            'Unable to load the camera from the device'
+                            //display an error on the screen
+                            ,
+                            style: TextStyle(
+                                color: Colors
+                                    .red //Set the color of the text to red.
+                            ));
+                      }
+                    },
+                    child: Row(
+                      //Using a row Widget to place each icon in a row fashion
+                      children: [
+                        Align(
+                          alignment: const Alignment(-1, 0),
+                          //Align the icons to the corner
+                          child: IconButton(
+                              onPressed: null,
+                              icon: Icon(Icons.camera_alt,
+                                  size: cameraIconSize, color: Colors.black87)),
+                        ),
+                        SizedBox(width: screenWidth/13),
+                        Padding(
+                          padding: EdgeInsets.only(top: paddingCameraText),
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Camera',
+                              style: TextStyle(
+                                fontSize: textSize,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async =>  addImageFromGallery(),
+                    child: Row(
+                        children: [
                       Align(
                         alignment: const Alignment(-1, 0),
-                        //Align the icons to the corner
                         child: IconButton(
-                            onPressed: () async {
-                              try {
-                                await availableCameras().then((value) =>
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (_) =>
-                                                CameraUI(cameras: value))));
-                              } catch (e) //Handle the case when no camera can be loaded
-                              {
-                                const Text(
-                                    'Unable to load the camera from the device'
-                                    //display an error on the screen
-                                    ,
-                                    style: TextStyle(
-                                        color: Colors
-                                            .red //Set the color of the text to red.
-                                        ));
-                              }
-                            },
-                            icon: Icon(Icons.camera_alt,
+                            onPressed: null,
+                            icon: Icon(Icons.image_rounded,
                                 size: cameraIconSize, color: Colors.black87)),
                       ),
                       SizedBox(width: screenWidth/13),
                       Padding(
-                        padding: EdgeInsets.only(top: paddingCameraText),
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Camera',
-                            style: TextStyle(
-                              fontSize: textSize,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        padding: EdgeInsets.only(top: paddingGalleryText),
+                        child: Text(
+                          'Gallery',
+                          style: TextStyle(
+                            fontSize: textSize,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    ],
+                    ]),
                   ),
-                  Row(
-                      children: [
-                    Align(
-                      alignment: const Alignment(-1, 0),
-                      child: IconButton(
-                          onPressed: () async => addImageFromGallery(),
-                          icon: Icon(Icons.image_rounded,
-                              size: cameraIconSize, color: Colors.black87)),
-                    ),
-                    SizedBox(width: screenWidth/13),
-                    Padding(
-                      padding: EdgeInsets.only(top: paddingGalleryText),
-                      child: Text(
-                        'Gallery',
-                        style: TextStyle(
-                          fontSize: textSize,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ]),
                 ],
               ));
         });
@@ -316,7 +339,7 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
                       children: [
                         const Text('Do you want to delete this image?',
                             style: TextStyle(fontSize: 14)),
-                        const SizedBox(height: 10),
+                         SizedBox(height: screenHeight/80),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -331,7 +354,7 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
                                     backgroundColor:
                                         MaterialStateProperty.all(Colors.green),
                                     fixedSize: MaterialStateProperty.all(
-                                        const Size(100, 10)),
+                                         Size(screenWidth/4.32, screenWidth/43.2)),
                                   ),
                                   child: const Text(
                                     'Cancel',
@@ -357,7 +380,7 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
                                     backgroundColor:
                                         MaterialStateProperty.all(Colors.red),
                                     fixedSize: MaterialStateProperty.all(
-                                        const Size(100, 10)),
+                                      Size(screenWidth/4.32, screenWidth/43.2)),
                                   ),
                                   child: const Text(
                                     'Delete',
@@ -375,13 +398,23 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
         });
   }
 
+  Widget circleIndicator()
+  {
+    return CirclePageIndicator(
+      size: screenWidth/30,
+      selectedSize: screenWidth/26,
+      itemCount: AddListing.imagePaths.length,
+      currentPageNotifier: _currentPageNotifier,
+    );
+  }
+
 /* Widget to build the "Next" button*/
   Widget nextPageButton() {
     final fontSizeNextButton = 18 * (screenHeight / 844);
     return ElevatedButton(
       onPressed: () => {
-        Navigator.pushNamed(context, 'AddDescriptionPage')
-       /* if(AddListing.imagePaths.isNotEmpty) //if the list is not empty, then navigate to adddescription
+
+        if(AddListing.imagePaths.isNotEmpty) //if the list is not empty, then navigate to adddescription
            {
         Navigator.pushNamed(context, 'AddDescriptionPage')
           }
@@ -390,11 +423,13 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            duration: const Duration(seconds:2),
             backgroundColor: Colors.black,
-            content: const Padding(
-                padding: EdgeInsets.only(left: 100),
-            child: Text("Please add an image", style: TextStyle(
+            content:  Padding(
+                padding:  EdgeInsets.only(left: screenWidth/5),
+            child: Text("Please add an image!", style: TextStyle(
               color: Colors.white,
+              fontSize: fontSize(context, 18),
             ),)),
             behavior: SnackBarBehavior.floating,
              margin: EdgeInsets.all(screenWidth/18),
@@ -408,7 +443,6 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
     )
   },
 
-        */
       },
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(

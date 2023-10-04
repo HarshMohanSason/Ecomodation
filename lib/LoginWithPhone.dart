@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'OTPpage.dart';
 
-
-late final documentIDPhoneLogin; //Get the documentID for the PhoneLogin
+String phoneLoginDocID = ''; //Get the documentID for the PhoneLogin
 
 class LoginWithPhone extends StatefulWidget {
    const LoginWithPhone({Key? key}) : super(key: key);
@@ -23,6 +22,7 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
  // bool loginsuccess = false; //bool variable to set state for login
   FirebaseAuth auth = FirebaseAuth.instance;
 
+
   bool phoneNumberValidated = true;
 
   Future<void> verifyForm(BuildContext context) async { //Verify form which checks the form, reads data from the database and logs user in with their phone number
@@ -39,9 +39,9 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
           Map<String, dynamic> data = documentSnapshot.data(); //get the document data
           var phoneNumber = data['phonenumber']; //store the phoneNumber in the variable
 
-          if (phoneNumber == phone.text)
+          if (phoneNumber == phone.text )
           {
-            documentIDPhoneLogin = documentSnapshot.id;
+            phoneLoginDocID = documentSnapshot.id;
             phoneNumberExists = true; //  When the phone number matched, set the flag to true
             break; //break the loop
           }

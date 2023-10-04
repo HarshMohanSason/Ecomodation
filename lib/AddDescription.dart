@@ -5,19 +5,21 @@ class AddDescription extends StatefulWidget {
   const AddDescription({Key? key}) : super(key: key);
 
   @override
+
   State<AddDescription> createState() => _AddDescriptionState();
 
   static final descriptionController = TextEditingController();
   static final titleController = TextEditingController();
 
 }
-final addDescriptionAndTitle = GlobalKey<FormState>(); //key to verify the form when submitted\
+
+final GlobalKey<FormState> addDescriptionAndTitleKey = GlobalKey<FormState>();
 
 class _AddDescriptionState extends State<AddDescription> {
 
   Future<void> verifyForm(BuildContext context) async {
 
-    if(addDescriptionAndTitle.currentState!.validate())
+    if(addDescriptionAndTitleKey.currentState!.validate())
     {
       Navigator.pushNamed(context, 'AddPricePage');
     }
@@ -49,10 +51,10 @@ class _AddDescriptionState extends State<AddDescription> {
 
   Widget titleAndDescription(BuildContext context)
   {
-    return Padding(
-      padding: const EdgeInsets.only(top: 80.0),
-      child: Form(
-        key: addDescriptionAndTitle,
+    return Form(
+      key: addDescriptionAndTitleKey,
+      child: Padding(
+        padding:  EdgeInsets.only(top: screenHeight/11.65),
         child: Column(
 
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,7 +72,7 @@ class _AddDescriptionState extends State<AddDescription> {
               ),
             ),
 
-             const SizedBox(height: 20),
+              SizedBox(height: screenHeight/46.6),
 
              Align(
                   alignment: Alignment.center,
@@ -80,7 +82,7 @@ class _AddDescriptionState extends State<AddDescription> {
                   )),
               ),
 
-             const  SizedBox(height: 40),
+              SizedBox(height: screenHeight/23.3),
 
                const Align(
                alignment: Alignment(-0.95, 0), //Align the heading 'title'
@@ -110,7 +112,7 @@ class _AddDescriptionState extends State<AddDescription> {
              },
              ),
 
-           const  SizedBox(height: 40),
+           SizedBox(height: screenHeight/23.3),
 
             const Align(
                 alignment: Alignment(-0.95,0),  //Align the heading 'title'
@@ -136,10 +138,6 @@ class _AddDescriptionState extends State<AddDescription> {
                ),
                validator: (value)
                {
-               if(value!.isEmpty)
-               {
-               return 'Description cannot be empty';
-               }
                return null;
                },
                ),
@@ -147,36 +145,31 @@ class _AddDescriptionState extends State<AddDescription> {
             Flexible(
               child: Align(
                 alignment: const Alignment(0,0.83),
-                  child: nextPageButton(context)),
+                  child: ElevatedButton(
+                    onPressed: () async {
+
+                      await verifyForm(context);},
+
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),)),
+                      fixedSize: MaterialStateProperty.all(Size(screenWidth - 10, screenHeight/38)),
+                      backgroundColor: const MaterialStatePropertyAll(
+                          colorTheme), //set the color for the continue button
+                    ),
+                    child:  Text(
+                      'Next',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: fontSize(context, 18),
+                      ),
+                    ),
+                  ),
+              ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  /* Widget to build the "Next" button*/
-  Widget nextPageButton(BuildContext context){
-
-    return  ElevatedButton(
-      onPressed: () async {
-
-        await verifyForm(context);},
-
-      style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),)),
-        fixedSize: MaterialStateProperty.all(Size(screenWidth - 10, screenHeight/38)),
-        backgroundColor: const MaterialStatePropertyAll(
-            colorTheme), //set the color for the continue button
-      ),
-      child:  Text(
-        'Next',
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: fontSize(context, 18),
         ),
       ),
     );

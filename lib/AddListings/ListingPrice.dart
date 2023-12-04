@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
+import '../main.dart';
 import 'package:flutter/services.dart';
 import 'UploadListing.dart';
-import 'AddListing.dart';
+import '/AddListings/AddListing.dart';
 import 'AddDescription.dart';
 
 

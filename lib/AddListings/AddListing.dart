@@ -4,13 +4,14 @@ import 'package:ecomodation/camera.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../Modelload.dart';
 import 'AddListing_StateManage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'image_data.dart';
+import 'package:ecomodation/image_data.dart';
 import 'package:page_view_indicators/page_view_indicators.dart';
 
 class AddListing extends StatefulWidget {
-  final XFile? imagePath; // passing the list from the TakePicture.dart
+  final XFile? imagePath; // passing the image from the TakePicture.dart
   const AddListing({Key? key, this.imagePath}) : super(key: key); //Note: we are setting the default value for angle at 0.0 because we do not need to pas value of
   //other UI's where we are using Addlisting
   static List<ImageData> imagePaths = []; // To hold all the images inside this list.
@@ -21,14 +22,18 @@ class AddListing extends StatefulWidget {
 class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMixin<AddListing> {
 
   @override
+
   bool get wantKeepAlive => true; //getter function to keep the state of the widget same
-
-
+  Model model = Model();
   XFile? image;
   int currentIndex = 0; //Pointer to keep track of the images when deleted
   int initialPage = 0;
   final PageController _pageController = PageController();
   final  _currentPageNotifier = ValueNotifier<int>(0);
+  bool? isApartment = false;
+  bool? isModelLoaded = false;
+  late dynamic labels;
+  List<double> probThreshold = [0.2]; //set the prob Threshold for the model to predict whether an uploaded image is related to apartment or non apartment
 
   double fontSize(BuildContext context, double baseFontSize) //Handle the FontSizes according to the respective screen Sizes
   {
@@ -44,14 +49,25 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
   {
     super.initState();
 
-    final addListingState = Provider.of<AddListingState>(context, listen: false); //create instance of the addListingState here.
+    model.loadModel(); //load the model
 
+    final addListingState = Provider.of<AddListingState>(context, listen: false); //create instance of the addListingState here.
+  //
     if (widget.imagePath != null) //if the list is not empty
     {
       updateList(widget.imagePath,
           addListingState.angle); //Update the list each time with the angle
     }
+
+
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+    model.interpreter.close();
+  }
+
 
   void updateList(XFile? image, double imageAngle) //add the images to the list here
   {
@@ -59,10 +75,12 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
       AddListing.imagePaths.add(ImageData(
           image!.path, imageAngle)); //adding the angle to each individual image
       initialPage = AddListing.imagePaths.length -1;
+      verifyIfApartmentImage();
       if(_pageController.hasClients) {
         _pageController.jumpToPage(initialPage);
       }
     });
+
   }
 
   Future<void> addImageFromGallery() async {
@@ -74,14 +92,16 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
       image = await picker.pickImage(
           source: ImageSource.gallery); //get the image from the galleryq
 
-      final galleryImageAngle = Provider.of<AddListingState>(context, listen: false); //create separate instance from addListing class
+      if(mounted) {
+        final galleryImageAngle = Provider.of<AddListingState>(context,
+            listen: false); //create separate instance from addListing class
 
-      galleryImageAngle.angle =
-          0.0; //reset the angle to zero here so it takes the angle of the original image chosen from the gallery
+        galleryImageAngle.angle =
+        0.0; //reset the angle to zero here so it takes the angle of the original image chosen from the gallery
 
-      updateList(image,
-          galleryImageAngle.angle); //update the image and add to the list.
-    } catch (e) {
+        updateList(image,
+            galleryImageAngle.angle); //update the image and add to the list.
+      }} catch (e) {
       //print(e);
     }
   }
@@ -245,7 +265,6 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   GestureDetector(
                     onTap: () async {
                       try {
@@ -412,16 +431,15 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
   Widget nextPageButton() {
     final fontSizeNextButton = 18 * (screenHeight / 844);
     return ElevatedButton(
-      onPressed: () => {
+      onPressed: () async {
 
-        if(AddListing.imagePaths.isNotEmpty) //if the list is not empty, then navigate to adddescription
+        if(AddListing.imagePaths.isNotEmpty ) //if the list is not empty, then navigate to adddescription
            {
-        Navigator.pushNamed(context, 'AddDescriptionPage')
-          }
-        else  //else display a toast message
-         {
 
-        ScaffoldMessenger.of(context).showSnackBar(
+        if(mounted){Navigator.pushNamed(context, 'AddDescriptionPage');}
+          }
+        else {
+          ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             duration: const Duration(seconds:2),
             backgroundColor: Colors.black,
@@ -440,10 +458,12 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
           },
         ),
       ),
-    )
-  },
+    );
+        }
+
 
       },
+
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
@@ -464,7 +484,44 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
     );
   }
 
+  Future<void> verifyIfApartmentImage() async {
+    for (var imageData in AddListing.imagePaths) {
+      List<double> prob = await model.preprocessImage(imageData.imagePath);
+
+      if (prob.first > probThreshold.first && mounted) {
+        final snackBar = SnackBar(
+          duration: const Duration(seconds: 3),
+          backgroundColor: Colors.black,
+          content: Padding(
+            padding: EdgeInsets.only(left: screenWidth / 5),
+            child: Text(
+              "We have detected that the image is not apartment related. Please make sure the image uploaded is Apartment related. ",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: fontSize(context, 18),
+              ),
+            ),
+          ),
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.all(screenWidth / 18),
+          shape: const StadiumBorder(),
+          action: SnackBarAction(
+            label: '',
+            onPressed: () {},
+          ),
+        );
+
+        // Get the current ScaffoldMessenger
+        final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+        // Show the snackbar
+        scaffoldMessenger.showSnackBar(snackBar);
+      }
+    }
+  }
+
   Widget navigateBackButton() {
+
     return Align(
       alignment: const Alignment(-1, -0.8),
       child: IconButton(

@@ -48,6 +48,7 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
             if(phoneLoginDocID.isEmpty)
             {
               phoneLoginDocID = documentVal.id;
+              phoneUserName = data['username'];
             }
             break;
           }

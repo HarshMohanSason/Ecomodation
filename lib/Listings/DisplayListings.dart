@@ -1,8 +1,9 @@
 import 'package:ecomodation/Listings/DetailedListing.dart';
-import 'package:ecomodation/Messaging/MessageWidget.dart';
+import 'package:ecomodation/Listings/DetailedListingsStore.dart';
 import 'package:flutter/material.dart';
 import '../main.dart';
 import 'ListingService.dart';
+
 
 class DisplayListings extends StatefulWidget {
   const DisplayListings({Key? key}) : super(key: key);
@@ -11,21 +12,24 @@ class DisplayListings extends StatefulWidget {
   State<DisplayListings> createState() => _DisplayListingsState();
 }
 
-ListingService _listingService = ListingService();
-
-List<Map<String, dynamic>> listingInfoList = [];
-
 class _DisplayListingsState extends State<DisplayListings> {
+
+  final ListingService _listingService = ListingService();
+
+  List<Map<String, dynamic>> listingInfoList = [];
+
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: colorTheme,
       body:  _displayListings(),
-
     );
   }
 
   Widget _displayListings() {
+
     return FutureBuilder(
 
         future: _listingService.getTotalListingsPerUser(),
@@ -35,7 +39,7 @@ class _DisplayListingsState extends State<DisplayListings> {
               child: Column(
                 children:  [
                   SizedBox(height: screenHeight/40),
-                   Text('Loading nearby listings...', style: TextStyle(
+                  Text('Loading nearby listings...', style: TextStyle(
                     fontSize: screenWidth/28,
                   ),),
                 ],
@@ -47,15 +51,14 @@ class _DisplayListingsState extends State<DisplayListings> {
             return Text('Error: ${snapshot.error}');
           }
 
-          else if (snapshot.hasData && (snapshot.data as List<Map<String, dynamic>>).isEmpty) {
+          else if (snapshot.hasData && (snapshot.data as Map<String, List<Map<String, dynamic>>>).isEmpty) {
               return  Center(child:Text('No listings nearby :(', style: TextStyle(
                 fontSize: screenWidth/27,
               ),));
             }
 
           else {
-            List<Map<String, dynamic>> listingInfoList = snapshot.data as List<
-                Map<String, dynamic>>;
+            Map<String, List<Map<String, dynamic>>> listingInfoList = snapshot.data as Map<String, List<Map<String, dynamic>>>;
 
             return RefreshIndicator(
               color: Colors.black,
@@ -68,17 +71,18 @@ class _DisplayListingsState extends State<DisplayListings> {
                 shrinkWrap: true,
                 scrollDirection: Axis.vertical,
                 itemCount: listingInfoList.length,
-                itemBuilder: (context, index) {
-                  Map<String, dynamic> listingInfo = listingInfoList[index];
-                 return GestureDetector
+                itemBuilder: (context, index)
+                 {
+                  String docID = listingInfoList.keys.elementAt(index);
+                  List<Map<String, dynamic>> listings = listingInfoList[docID] as List<Map<String, dynamic>>;
+                  final DetailedListingsStore detailedListingsStore = DetailedListingsStore(docID, listings[index]);
+                  return GestureDetector
                    ( onTap: ()
                        {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => DetailedListingInfo(listingDetails: listingInfoList[index])));
-
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => DetailedListingInfo(detailedListingsStore: detailedListingsStore)));
                        },
-
-                     child: buildListingWidget(listingInfo));
-
+                     child: buildListingWidget(listings[index])
+                   );
                 },
               ),
             );

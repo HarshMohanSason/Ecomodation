@@ -1,7 +1,7 @@
 import 'package:ecomodation/Auth/auth_provider.dart';
 import 'package:ecomodation/Listings/DisplayListings.dart';
 import 'package:ecomodation/LoginWithPhone.dart';
-import 'package:ecomodation/Messaging/MessageWidget.dart';
+import 'package:ecomodation/Modelload.dart';
 import 'package:ecomodation/OTPpage.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/foundation.dart';
@@ -28,7 +28,7 @@ class MainScreen extends StatefulWidget {
   set setLatitude(double latitude) => this.latitude = latitude;
   set setLongitude(double longitude) => this.longitude = longitude;
 
- // final String imagePath;
+  // final String imagePath;
    MainScreen({Key? key}) : super(key: key);
 
   @override
@@ -37,6 +37,14 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
 
+  @override
+  void initState()
+  {
+    super.initState();
+
+  //  Model.loadModel();
+
+  }
   MainScreen _mainScreen = MainScreen();
 
   bool _serviceEnabled = false;
@@ -49,6 +57,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final String currentUserID = FirebaseAuth.instance.currentUser!.uid;
   final writeUserInfo =  FirebaseFirestore.instance.collection('userInfo');
+
 
   Future<LocationPermission> getPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -157,6 +166,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+
   Widget _bottomIcons(BuildContext context) {
 
     var sizeofIcons = screenWidth/13; //Adjust size of Icons to screenWidth of each screen.
@@ -193,7 +203,7 @@ class _MainScreenState extends State<MainScreen> {
         Align(
           alignment: const Alignment(0, 0.91),
           child: IconButton(
-            onPressed: () => null, // Navigator.push(context, MaterialPageRoute(builder: (context) => MessageDisplay(receiverID: ''))),
+            onPressed: () => Navigator.pushNamed(context, 'HomeScreenMessagingUI'),
             icon: Icon(Icons.messenger_rounded, color: Colors.black, size: sizeofIcons),
           ),
         ),

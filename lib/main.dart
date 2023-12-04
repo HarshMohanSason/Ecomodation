@@ -1,21 +1,21 @@
-import 'package:ecomodation/AddDescription.dart';
+import 'package:ecomodation/AddListings/AddDescription.dart';
 import 'package:ecomodation/AppSettings.dart';
-import 'package:ecomodation/Auth/auth_provider.dart';
-import 'package:ecomodation/ListingPrice.dart';
+import 'package:ecomodation/AddListings/ListingPrice.dart';
+import 'package:ecomodation/Listings/DetailedListing_StateManage.dart';
 import 'package:ecomodation/Listings/DisplayListings.dart';
 import 'package:ecomodation/LoginWithPhone.dart';
-import 'package:ecomodation/Messaging/MessageWidget.dart';
 import 'package:ecomodation/Messaging/NoMessageWidget.dart';
+import 'package:ecomodation/Messaging/homeScreenMessageUI.dart';
 import 'package:ecomodation/PhoneSignupUI.dart';
 import 'package:ecomodation/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import './loginpage.dart';
-import 'AddListing.dart';
+import 'AddListings/AddListing.dart';
 import 'Auth/auth_checkifloggedin.dart';
 import 'firebase_options.dart';
-import 'AddListing_StateManage.dart';
+import 'AddListings/AddListing_StateManage.dart';
 
 // Declaring them as global as they are used in almost all the files to resize different widgets according to different devices.
 
@@ -38,6 +38,7 @@ void main() async {
       MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AddListingState()),
+        ChangeNotifierProvider(create: (context) => DetailedListingStateManage())
       ],
       child: const Ecomodation())
   );
@@ -70,6 +71,7 @@ class Ecomodation extends StatelessWidget {
             'NoMessageWidget': (context) => const NoMessageWidget(),
             'AppSettings':(context)=> const AppSettings(),
             'DisplayListings': (context) => const DisplayListings(),
+            'HomeScreenMessagingUI': (context) => const HomeScreenMessagingUI(),
           }
       );
   }

@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:ecomodation/AddListing.dart';
+import 'package:ecomodation/AddListings/AddListing.dart';
 import 'package:provider/provider.dart';
 import 'camera.dart';
 import 'CustomIcons/my_flutter_app_icons.dart' as custom_icons;
@@ -7,11 +7,12 @@ import 'package:camera/camera.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:ecomodation/AddListing_StateManage.dart';
+import 'package:ecomodation/AddListings/AddListing_StateManage.dart';
 
 
 
 class TakePicture extends StatefulWidget {
+
 
   XFile picture;
   TakePicture({Key? key, required this.picture}) : super(key: key);

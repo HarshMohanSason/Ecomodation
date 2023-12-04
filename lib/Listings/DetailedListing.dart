@@ -1,15 +1,19 @@
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecomodation/Auth/auth_provider.dart';
+import 'package:ecomodation/Messaging/InitialMessage.dart';
 import 'package:ecomodation/Messaging/MessageService.dart';
 import 'package:flutter/material.dart';
 import 'package:ecomodation/main.dart';
 import 'package:page_view_indicators/circle_page_indicator.dart';
-import '../Messaging/MessageWidget.dart';
+import 'DetailedListingsStore.dart';
 
 
 class DetailedListingInfo extends StatefulWidget {
 
-  Map<String, dynamic> listingDetails;
+  final DetailedListingsStore detailedListingsStore;
 
-  DetailedListingInfo({Key? key, required this.listingDetails}) : super(key: key);
+  const DetailedListingInfo({Key? key, required this.detailedListingsStore}) : super(key: key);
 
   @override
   State<DetailedListingInfo> createState() => _DetailedListingInfoState();
@@ -21,8 +25,51 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
 
   final  _currentPageNotifier = ValueNotifier<int>(0);
 
+  Future<void> getAskButtonState() async
+  {
+    try {
+      // Read data from Firestore
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('userInfo')
+          .doc(googleLoginDocID)
+          .collection('ListingInfo')
+          .doc(widget.detailedListingsStore.docID)
+          .get();
+
+      // Check if the document exists
+      if (snapshot.exists) {
+        // Access the data from the document
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        var askButtonState = data['InitialMessageSent'];
+
+        // Update the local state
+        widget.detailedListingsStore.listingInfo.update('InitialMessageSent', (value) => value = askButtonState);
+      } else {
+        // Handle the case when the document does not exist
+        // You can provide feedback to the user or take other appropriate action here.
+      }
+    } catch (e) {
+      // Handle any errors that occurred during the data retrieval
+     // print('Error reading data from Firestore: $e');
+      // You can provide feedback to the user or take other appropriate action here.
+    }
+
+  }
+
+  @override
+  void initState() {
+
+    getAskButtonState();
+    super.initState();
+
+  }
+
   @override
   Widget build(BuildContext context) {
+
+  //  print(widget.detailedListingsStore.docID);
+
+
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
@@ -37,7 +84,7 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Stack(children: [
-                    _buildListing(widget.listingDetails),
+                    _buildListing(widget.detailedListingsStore.listingInfo),
                     Padding(
                       padding: const EdgeInsets.only(top: 60),
                       child: Align(
@@ -63,16 +110,16 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
                   Center(child: circleIndicator()),
                   const SizedBox(height: 20),
                   Align(
-                    alignment: Alignment(-0.9, 0),
-                    child: Text(widget.listingDetails['Title'],
+                    alignment: const Alignment(-0.9, 0),
+                    child: Text(widget.detailedListingsStore.listingInfo['Title'],
                         style: TextStyle(
                           fontSize: screenWidth / 13,
                         )),
                   ),
                   const SizedBox(height: 20),
                   Align(
-                    alignment: Alignment(-0.9, 0),
-                    child: Text(widget.listingDetails['Price'],
+                    alignment: const Alignment(-0.9, 0),
+                    child: Text(widget.detailedListingsStore.listingInfo['Price'],
                         style: TextStyle(
                           fontSize: screenWidth/13,
                           fontWeight: FontWeight.bold,
@@ -81,15 +128,27 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
 
                   const SizedBox(height: 20),
                   Align(
-                    alignment: Alignment(-0.9, 0),
-                    child: Text('Description:' + ' ' +  widget.listingDetails['Description'],
+                    alignment: const Alignment(-0.9, 0),
+                    child: Text('Description:' + ' ' +  widget.detailedListingsStore.listingInfo['Description'],
                         style: TextStyle(
                           fontSize: screenWidth/25,
                         ) ),
                   ),
 
-                  Spacer(),
-                  sendMessageButton(),
+                  const Spacer(),
+
+
+                  if(widget.detailedListingsStore.listingInfo['InitialMessageSent'] == true)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 35),
+                          child: Center(child: Text('Already contacted!', style: TextStyle(
+                            fontSize: screenWidth/20,
+                            fontWeight: FontWeight.bold,
+                          )))),
+
+                  if(widget.detailedListingsStore.listingInfo['InitialMessageSent'] == false)
+                    sendMessageButton()
+
                 ],
               ),
             ),
@@ -135,36 +194,50 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
     );
   }
 
-  Widget sendMessageButton()
-  {
-      return Align(
-        alignment: const Alignment(0, 0.9),
-        child: SizedBox(
-          height: screenHeight/7,
-          width: screenWidth/7,
-          child: DecoratedBox(
-            decoration: const BoxDecoration(
-              color: colorTheme,
-              shape: BoxShape.circle,
+  Widget sendMessageButton() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 25),
+      child: Align(
+          alignment: const Alignment(0, 0.5),
+          child: ElevatedButton(
+            style: ButtonStyle(
+              fixedSize: MaterialStateProperty.all(const Size(180, 40)),
+              backgroundColor: const MaterialStatePropertyAll(
+                  colorTheme), //set the color for the continue button
             ),
-            child: IconButton(
-              icon: Icon(Icons.messenger, size: screenWidth/16, color: Colors.black,), onPressed: ()
-            async {
-              var receiverId = await _messageService.getrecieverID(widget.listingDetails);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => MessageDisplay(receiverID: receiverId)));
-            }
+            onPressed: () async {
+              {
+                var receiverId = await _messageService
+                    .getReceiverID(widget.detailedListingsStore.listingInfo); //get the receiverID
+               //print(receiverId);
+
+                if(mounted) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                      builder: (context) => InitialMessageWidget(receiverID: receiverId, detailedListingsStore: widget.detailedListingsStore,)));
+                }
+              }
+            },
+
+            child: Text(
+              'Ask',
+              style: TextStyle(
+                fontSize: 17 * (screenHeight / 932),
+                color: const Color(0xFFFFFFFF),
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-        )
-      );
-    }
+          )),
+    );
+  }
 
   Widget circleIndicator()
   {
     return CirclePageIndicator(
       size: screenWidth/30,
       selectedSize: screenWidth/26,
-      itemCount: widget.listingDetails['imageInfoList'].length,
+      itemCount: widget.detailedListingsStore.listingInfo['imageInfoList'].length,
       currentPageNotifier: _currentPageNotifier,
     );
   }

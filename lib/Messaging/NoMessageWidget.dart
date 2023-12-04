@@ -1,6 +1,7 @@
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 
+
 class NoMessageWidget extends StatelessWidget {
   const NoMessageWidget({Key? key}) : super(key: key);
 
@@ -16,15 +17,6 @@ class NoMessageWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Align(
-                alignment: const Alignment(-1,-0.8),
-                child: IconButton (
-                    onPressed: () {
-                      Navigator.pushNamed(context, 'HomeScreen');
-                    },
-                    icon:  Icon(Icons.arrow_back_rounded, size: screenWidth/12, color: Colors.black)
-                ),
-              ),
               Align(
                 alignment: Alignment.center,
                 child: Image.asset('assets/5783800.jpg',

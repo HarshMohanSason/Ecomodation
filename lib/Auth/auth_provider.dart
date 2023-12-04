@@ -1,13 +1,21 @@
 import 'package:ecomodation/OTPpage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'auth_checkifloggedin.dart';
 
 var googleLoginDocID = '';
+var googleUserName = ' ';
+
 bool loggedInWithGoogle = false;
 
-class Authentication {
+
+
+class Authentication  extends ChangeNotifier{
+
 
   final writeUserInfo = FirebaseFirestore.instance.collection(
       'userInfo'); //refer to the collection userInfo
@@ -15,8 +23,7 @@ class Authentication {
       'userInfo'); //refer to read the data
 
   //create an instance to write data to firebase
-  static Future <
-      FirebaseApp> initializeFirebase() async //create a async function
+  static Future <FirebaseApp> initializeFirebase() async //create a async function
       {
     FirebaseApp firebaseApp = await Firebase
         .initializeApp(); // Use the await keyword to wait for initialization to complete
@@ -30,7 +37,6 @@ class Authentication {
 
     try {
       final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
-
       if (gUser != null) {
         final GoogleSignInAuthentication gAuth = await gUser.authentication;
         final credential = GoogleAuthProvider.credential(
@@ -53,9 +59,13 @@ class Authentication {
             'email': gUser.email,
           });
           googleLoginDocID = newGoogleUser.id;
+          await storage.write(key: 'googleLoginDocID',value: googleLoginDocID); //write this to the storage
+          googleUserName = gUser.displayName!;
+
         }
 
         loggedInWithGoogle = true;
+
         return await FirebaseAuth.instance.signInWithCredential(credential);
       }
     } catch (e) { //Catch any errors which occur during the sign in process.
@@ -63,9 +73,6 @@ class Authentication {
       return null;
     }
   }
-
-
-
       signOut() async
       {
         if(loggedInWithGoogle == true)

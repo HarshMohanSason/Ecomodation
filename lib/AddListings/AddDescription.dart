@@ -13,10 +13,10 @@ class AddDescription extends StatefulWidget {
 
 }
 
-final GlobalKey<FormState> addDescriptionAndTitleKey = GlobalKey<FormState>();
+
 
 class _AddDescriptionState extends State<AddDescription> {
-
+  final GlobalKey<FormState> addDescriptionAndTitleKey = GlobalKey<FormState>();
   Future<void> verifyForm(BuildContext context) async {
 
     if(addDescriptionAndTitleKey.currentState!.validate())
@@ -43,7 +43,15 @@ class _AddDescriptionState extends State<AddDescription> {
       child: Scaffold(
        resizeToAvoidBottomInset: false,
        backgroundColor: Colors.white,
-       body: titleAndDescription(context),
+       body: ListView(
+
+         children: <Widget> [
+           SizedBox(
+               height: screenHeight,
+               child: titleAndDescription(context))
+         ]
+
+       ),
       ),
     );
   }
@@ -54,7 +62,9 @@ class _AddDescriptionState extends State<AddDescription> {
     return Form(
       key: addDescriptionAndTitleKey,
       child: Padding(
+
         padding:  EdgeInsets.only(top: screenHeight/11.65),
+
         child: Column(
 
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,7 +152,9 @@ class _AddDescriptionState extends State<AddDescription> {
                },
                ),
 
-            Flexible(
+            Spacer(),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
               child: Align(
                 alignment: const Alignment(0,0.83),
                   child: ElevatedButton(

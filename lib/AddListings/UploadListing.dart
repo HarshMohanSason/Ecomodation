@@ -4,16 +4,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
 import 'AddDescription.dart';
-import 'AddListing.dart';
-import 'OTPpage.dart';
-import 'image_data.dart';
+import '/AddListings/AddListing.dart';
+import '../OTPpage.dart';
+import '../image_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'ListingPrice.dart';
 import 'dart:io';
 
+
 class UploadListing{
 
-  Future uploadListing(var documentId) async{
+
+  Future uploadListing(var documentId) async
+  {
 
     DocumentReference userDocument = FirebaseFirestore.instance.collection('userInfo').doc(documentId); //refer to the document ID.
 
@@ -24,19 +27,19 @@ class UploadListing{
     for (ImageData imageData in AddListing.imagePaths) {
       File imageFile = File(imageData.imagePath); //Get the image path
       String imageName = basename(imageFile.path); //get the basename from the path
-
+      String fileNameClean = imageName.split('.')[0];
+      fileNameClean = fileNameClean.replaceAll(RegExp('[^a-zA-Z0-9 ]'),"");
+      fileNameClean = fileNameClean.replaceAll(" ","-");
       //Upload the image
       Reference storageReference = FirebaseStorage.instance.ref().child('images/$imageName');
-      UploadTask uploadTask = storageReference.putFile(imageFile);
+         await storageReference.putFile(imageFile); //wait for
 
-      await uploadTask.whenComplete(() async {
         String imageUrl = await storageReference.getDownloadURL();
 
         imageInfoList.add({
           'url': imageUrl,
           'rotationAngle': imageData.rotationAngle,
         });
-      });
     }
 
     try {
@@ -44,7 +47,8 @@ class UploadListing{
         'Title': AddDescription.titleController.text,
         'Description': AddDescription.descriptionController.text,
         'Price': ListingPrice.phoneText.text,
-        'imageInfoList': imageInfoList
+        'imageInfoList': imageInfoList,
+        'InitialMessageSent': false, //set the initially sent message to false
       });
     }
     catch (e) {
@@ -71,4 +75,6 @@ class UploadListing{
         // Handle accordingly.
       }
     }
+
+
 }

@@ -2,9 +2,6 @@ import 'package:ecomodation/homepage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
 
-import '../Auth/auth_provider.dart';
-import '../LoginWithPhone.dart';
-import '../OTPpage.dart';
 
 
 class ListingService {
@@ -54,27 +51,24 @@ class ListingService {
     return filteredListingIDs;
   }
 
-
-
-  Future<List<Map<String, dynamic>>> getTotalListingsPerUser() async {
-
-   List<String> filteredListingIDs = []; //initialize the filteredListingIDs
-   filteredListingIDs = await getDistances(); // Wait to get the entire list of doc IDs.
-    List<Map<String, dynamic>> newListing = [];
-    for (var i = 0; i < filteredListingIDs.length; i++)
-    {
-
+  Future<Map<String, List<Map<String, dynamic>>>> getTotalListingsPerUser() async
+  {
+     List<String> filteredListingIDs = []; //initialize the filteredListingIDs
+     filteredListingIDs = await getDistances(); // Wait to get the entire list of doc IDs.
+     Map<String, List<Map<String, dynamic>>> eachListing = {};
+     List<Map<String, dynamic>> newListing = [];
+      for (var i = 0; i < filteredListingIDs.length; i++)
+      {
         var document = await readUserInfo.doc(filteredListingIDs[i]).collection('ListingInfo').get();
          {
                for (var snapshot in document.docs)
                {
                  newListing.add(snapshot.data());
+                 eachListing[snapshot.id] = newListing;
                }
          }
-
-    }
-
-    return newListing;
+  }
+    return eachListing;
  }
 
 }

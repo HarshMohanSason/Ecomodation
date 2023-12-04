@@ -1,27 +1,43 @@
 import 'package:ecomodation/Auth/auth_provider.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
-import 'AddListing.dart';
+
+import 'Modelload.dart';
 
 class AppSettings extends StatefulWidget {
-  const AppSettings({Key? key}) : super(key: key);
+
+   final String? googleImageUrl;
+   const AppSettings({Key? key, this.googleImageUrl}) : super(key: key);
 
   @override
   State<AppSettings> createState() => _AppSettingsState();
 }
 
+
 class _AppSettingsState extends State<AppSettings> {
 
   Authentication instance = Authentication();
   @override
+
+  void initState() {
+   // print(widget.googleImageUrl);
+    super.initState();
+
+  }
+  @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
       backgroundColor: Colors.white,
+
       body: Padding(
-        padding: EdgeInsets.only(top: 80),
+        padding: const EdgeInsets.only(top: 80),
         child: Column(
+
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
+
           children: [
 
              Align(
@@ -33,13 +49,48 @@ class _AppSettingsState extends State<AppSettings> {
                  icon:  Icon(Icons.home, size: screenWidth/12, color: Colors.black)
                ),
              ),
-                 const SizedBox(height: 400),
+            const SizedBox(height: 80),
+            displayProfilePicture(),
+                 const SizedBox(height: 100),
                  logoutButton()
           ],
         ),
       )
     );
   }
+
+  displayProfilePicture() {
+
+    try {
+
+      String? imageURL = widget.googleImageUrl;
+
+      return Center(
+        child: Container(
+          color: Colors.grey,
+          width: 200,
+          height: 200,
+          child: ClipOval(
+            child: imageURL != null
+                ? Image.network(
+              imageURL,
+              fit: BoxFit.fitWidth,
+            )
+                : Icon(
+              Icons.person, // Display a default icon when imageUrl is null
+              size: 100,
+            ),
+          ),
+        ),
+      );
+    }
+    catch(e)
+    {
+    //  print(e);
+    }
+  }
+
+
   Widget logoutButton()
   {
     return Align(
@@ -54,7 +105,9 @@ class _AppSettingsState extends State<AppSettings> {
         await instance.signOut();
         //oogleLoginDocID.clear();
         try{
-          Navigator.pushNamed(context, 'LoginPage');
+          if(mounted) {
+            Navigator.pushNamed(context, 'LoginPage');
+          }
        }
             catch(e)
           {

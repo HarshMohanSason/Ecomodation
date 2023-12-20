@@ -1,14 +1,17 @@
 import 'dart:io';
 import 'package:camera/camera.dart';
-import 'package:ecomodation/camera.dart';
+import 'package:dotted_border/dotted_border.dart';
+import 'package:ecomodation/Camera/camera.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../Modelload.dart';
+import 'package:ecomodation/Modelload.dart';
 import 'AddListing_StateManage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ecomodation/image_data.dart';
+import 'package:ecomodation/Camera/image_data.dart';
 import 'package:page_view_indicators/page_view_indicators.dart';
+
+
 
 class AddListing extends StatefulWidget {
   final XFile? imagePath; // passing the image from the TakePicture.dart
@@ -49,7 +52,7 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
   {
     super.initState();
 
-    model.loadModel(); //load the model
+    //model.loadModel(); //load the model
 
     final addListingState = Provider.of<AddListingState>(context, listen: false); //create instance of the addListingState here.
   //
@@ -99,8 +102,7 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
         galleryImageAngle.angle =
         0.0; //reset the angle to zero here so it takes the angle of the original image chosen from the gallery
 
-        updateList(image,
-            galleryImageAngle.angle); //update the image and add to the list.
+        updateList(image, galleryImageAngle.angle); //update the image and add to the list.
       }} catch (e) {
       //print(e);
     }
@@ -114,35 +116,42 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Stack(
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Padding(
+                padding: const EdgeInsets.only(top: 75),
+                child: navigateBackButton()),
             Align(
-                alignment: const Alignment(0, -0.87),
-                child: Text('Add an Image ', style: TextStyle(
-                  fontSize: fontSize(context, 30),
-                  fontFamily: 'Merriweather',
-                  fontWeight: FontWeight.bold,
-                ),)),
-            buildEditImage(), //calling the buildEditImage button
-
-            navigateBackButton(),
-
-            Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 15.0),
+                  child: Text('Add an Image', style: TextStyle(
+                    fontSize: fontSize(context, screenWidth/11),
+                    fontWeight: FontWeight.bold,
+                  ),),
+                )),
+            SizedBox(height: screenHeight/15.5),
+            Stack(
                 children: [
-                  SizedBox(height: screenHeight/7.2),
-                  buildImageViewer(),
+                  Align(
+                    alignment: Alignment(0,1),
+                    child: buildImageViewer(),
+                  ),
+                  buildEditImage(), //calling the buildEditImage button
+                ],
+            ),
 
-                  SizedBox(height: screenHeight/46.6),
-                  circleIndicator(),
+            SizedBox(height: screenHeight/46.6),
+            circleIndicator(),
 
-                   SizedBox(height: screenHeight/93.2), //Space between the container and the add image button
-                  addImageButton(), //call the addImage button here
+            addImageButton(), //call the addImage button here
 
-                  SizedBox(height: screenHeight/7.456),
-                  nextPageButton(), //call the next Pagebutton here
-                ]),
+            const Spacer(),
+            Padding(
+                padding:EdgeInsets.only(bottom: 20),
+                child: nextPageButton()),
           ],
         ),
       ),
@@ -151,49 +160,83 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
 
   /* Widget to view the Image in the PageViewBuilder*/
   Widget buildImageViewer() {
-    return Container(
-      color: Colors.grey,
-      width: screenWidth,
-      height: screenHeight - 454,
-      child: AddListing.imagePaths != null
-          ? PageView.builder(
 
-              controller: _pageController,
-              itemCount: AddListing.imagePaths.length,
-              itemBuilder: (context, index) {
-                currentIndex = index;
-                return buildImageWidget(AddListing.imagePaths[index].imagePath,
-                    AddListing.imagePaths[index].rotationAngle);
-              },
-        onPageChanged:  (page)
-        {
-          setState(() {
-          initialPage = page;
-          _currentPageNotifier.value = page ;
-          });
-        },
-            )
-          : null,
-    );
+    if (AddListing.imagePaths.isEmpty) {
+      return DottedBorder(
+        color: Colors.grey,
+        strokeWidth: 3,
+        dashPattern: const [22, 22],
+        child: Container(
+          color: Color(0x5AD3D3D3),
+          width: screenWidth - 13,
+          height: screenHeight - 454,
+          child: AddListing.imagePaths != null
+              ? PageView.builder(
+
+            controller: _pageController,
+            itemCount: AddListing.imagePaths.length,
+            itemBuilder: (context, index) {
+              currentIndex = index;
+              return buildImageWidget(AddListing.imagePaths[index].imagePath,
+                  AddListing.imagePaths[index].rotationAngle);
+            },
+            onPageChanged: (page) {
+              setState(() {
+                initialPage = page;
+                _currentPageNotifier.value = page;
+              });
+            },
+          )
+              : null,
+        ),
+      );
+    }
+    else
+      {
+        return Container(
+          color: Color(0x5AD3D3D3),
+          width: screenWidth,
+          height: screenHeight - 454,
+          child: AddListing.imagePaths != null
+              ? PageView.builder(
+
+            controller: _pageController,
+            itemCount: AddListing.imagePaths.length,
+            itemBuilder: (context, index) {
+              currentIndex = index;
+              return buildImageWidget(AddListing.imagePaths[index].imagePath,
+                  AddListing.imagePaths[index].rotationAngle);
+            },
+            onPageChanged: (page) {
+              setState(() {
+                initialPage = page;
+                _currentPageNotifier.value = page;
+              });
+            },
+          )
+              : null,
+        );
+      }
   }
 
+  /*
+   return DottedBorder(
+      color: Colors.grey,
+      strokeWidth: 3,
+      dashPattern: const [22,22],
+      child:
+   */
   /* Widget to Edit the image */
   Widget buildEditImage() //Widget Icon to build the edit image icon
   {
     if (AddListing.imagePaths.isNotEmpty) {
       return Align(
         alignment: const Alignment(1, -0.8),
-        child: Ink(
-          decoration: const ShapeDecoration(
-            color: colorTheme,
-            shape: CircleBorder(),
-          ),
-          child: IconButton(
-            onPressed: () async {
-              return deleteOrCancel(context);
-            },
-            icon: const Icon(Icons.edit, color: Colors.black, size: 30),
-          ),
+        child: IconButton(
+          onPressed: () async {
+            return deleteOrCancel(context);
+          },
+          icon: const Icon(Icons.edit, color: colorTheme, size: 30),
         ),
       );
     } else {
@@ -203,26 +246,25 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
 
 /* Widget to build the Image */
   Widget buildImageWidget(String imagePath, double rotationAngle) {
-    return FittedBox(
-      fit: BoxFit.cover,
-      child: Transform.rotate(
-        angle: rotationAngle,
-        child: Image.file(
-          // scale: addListingState.zoomLevel,
-          File(imagePath),
+    return AspectRatio(
+      aspectRatio: 16/9,
+      child: FittedBox(
+        fit: BoxFit.cover,
+        child: Transform.rotate(
+          angle: rotationAngle,
+          child: Image.file(
+            // scale: addListingState.zoomLevel,
+            File(imagePath),
+          ),
         ),
       ),
     );
   }
 
   Widget addImageButton() {
-    return Align(
-      alignment: const Alignment(0, 1),
-      child: Ink(
-        decoration: const ShapeDecoration(
-          color: colorTheme,
-          shape: CircleBorder(),
-        ),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(right: 20.0),
         child: IconButton(
           onPressed: () {
             try {
@@ -234,9 +276,10 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
             // XFile? pickedFile = await ImagePicker().pickImage(
             //source: ImageSource.gallery);
           },
+
           icon:  Align(
               alignment: Alignment.center,
-               child: Icon(Icons.add, color: Colors.black, size: screenWidth/13)),
+              child: Icon(Icons.add_circle, color: Colors.green, size: screenWidth/8)),
         ),
       ),
     );
@@ -247,25 +290,25 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
   Future uploadOrTakeImage(BuildContext context) //Widget to display the option to display and upload image
 
   {
-    var boxHeight = screenHeight / 5.62; //Adjust the size
-    var cameraIconSize = boxHeight / 2.7; //Adjust the size of the Icons
-    var paddingCameraText = boxHeight - 130; //Padding for the Camera Icon
-    var paddingGalleryText = boxHeight - 120; //Padding for the Gallery icon
-    var textSize = cameraIconSize / 2.5; //Size for the text
+    var boxHeight = screenHeight / 5; //Adjust the size
+    var cameraIconSize = boxHeight / 2.9; //Adjust the size of the Icons
+    var paddingCameraText = boxHeight - 150; //Padding for the Camera Icon
+    var paddingGalleryText = boxHeight - 150; //Padding for the Gallery icon
+    var textSize = cameraIconSize / 2.9; //Size for the text
     // var gapBetweenIcons = boxHeight;  //gap between two icons
 
     return showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
           return Container(
-              color: colorTheme,
+              color: Colors.white,
               height: boxHeight, //height of the container to each device
 
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
+                  InkWell(
                     onTap: () async {
                       try {
                         await availableCameras().then((value) =>
@@ -297,9 +340,9 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
                               icon: Icon(Icons.camera_alt,
                                   size: cameraIconSize, color: Colors.black87)),
                         ),
-                        SizedBox(width: screenWidth/13),
+                        SizedBox(width: screenWidth/16.5),
                         Padding(
-                          padding: EdgeInsets.only(top: paddingCameraText),
+                          padding: EdgeInsets.only(top: paddingCameraText, left: 6),
                           child: Align(
                             alignment: Alignment.center,
                             child: Text(
@@ -314,7 +357,9 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
                       ],
                     ),
                   ),
-                  GestureDetector(
+                SizedBox(height: 15),
+                Divider(thickness: 2, indent: screenWidth/4.9),
+                  InkWell(
                     onTap: () async =>  addImageFromGallery(),
                     child: Row(
                         children: [
@@ -338,8 +383,11 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
                       ),
                     ]),
                   ),
-                ],
+                  SizedBox(height :10),
+                  Divider(thickness: 2, indent: screenWidth/4.9),    ],
+
               ));
+
         });
   }
 
@@ -429,14 +477,15 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
 
 /* Widget to build the "Next" button*/
   Widget nextPageButton() {
-    final fontSizeNextButton = 18 * (screenHeight / 844);
+    final fontSizeNextButton = 19 * (screenHeight / 844);
     return ElevatedButton(
       onPressed: () async {
-
         if(AddListing.imagePaths.isNotEmpty ) //if the list is not empty, then navigate to adddescription
-           {
-
-        if(mounted){Navigator.pushNamed(context, 'AddDescriptionPage');}
+         {
+        if(mounted)
+        {
+          Navigator.pushNamed(context, 'AddDescriptionPage');
+        }
           }
         else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -469,7 +518,7 @@ class _AddListingState extends State<AddListing> with AutomaticKeepAliveClientMi
             RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
         )),
-        fixedSize: MaterialStateProperty.all(Size(screenWidth - 10, screenHeight/38)),
+        fixedSize: MaterialStateProperty.all(Size(screenWidth - 50, screenHeight/19)),
         backgroundColor: const MaterialStatePropertyAll(
             colorTheme), //set the color for the continue button
       ),

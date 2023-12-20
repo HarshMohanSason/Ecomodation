@@ -4,15 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'auth_checkifloggedin.dart';
 
 var googleLoginDocID = '';
 var googleUserName = ' ';
 
 bool loggedInWithGoogle = false;
-
-
 
 class Authentication  extends ChangeNotifier{
 
@@ -44,18 +41,20 @@ class Authentication  extends ChangeNotifier{
           idToken: gAuth.idToken,
         );
 
-        final userSnapshot = await FirebaseFirestore.instance.collection('userInfo')
+        final userSnapshot = await FirebaseFirestore.instance.collection('userInfo') //get a snapshot of collection userInfo
             .where('email', isEqualTo: gUser.email).get();
 
         if (userSnapshot.docs.isNotEmpty) {
           // User already exists in Firestore.
-          googleLoginDocID = userSnapshot.docs.first.id;
+          googleLoginDocID = userSnapshot.docs.first.id;  //get the docID
         }
         else {
           // User doesn't exist in Firestore, create a new document.
+
           final newGoogleUser = await FirebaseFirestore.instance.collection(
               'userInfo').add({
-            'username': gUser.displayName,
+            'photoURL': gUser.photoUrl!,
+            'username': gUser.displayName!,
             'email': gUser.email,
           });
           googleLoginDocID = newGoogleUser.id;

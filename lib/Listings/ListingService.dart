@@ -1,54 +1,80 @@
-import 'package:ecomodation/homepage.dart';
+
+
+import 'package:ecomodation/Auth/auth_provider.dart';
+import 'package:ecomodation/LoginWithPhone.dart';
+import 'package:ecomodation/OTPpage.dart';
+import 'package:ecomodation/homeScreenUI.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
-
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ListingService {
 
-  final MainScreen _mainScreen = MainScreen();
-  var readUserInfo = FirebaseFirestore.instance.collection('userInfo');
+  final HomeScreenUI _mainScreen = HomeScreenUI(); //instance of HomescreenUI
+
+
+  var readUserInfo = FirebaseFirestore.instance.collection('userInfo'); //Collection reference to collection UserInfo
+
+  //Function to get the listings within the user's entered location and distance
+  //Takes the currentUser Latitude and Longitude and will return listings within a certain distance (km)
 
   double calculateDistance(double currentUserLatitude, double currentUserLongitude, double otherUserLatitude,
       double otherUserLongitude) {
-    const double earthRadius = 6371.0;
+    const double earthRadius = 6371.0; //constant earth radius
 
-    // Haversine formula
+    //Calculate the distance between two locations using the Haversine formula
+
     double dLat = currentUserLatitude -  otherUserLatitude;
     double dLon = currentUserLongitude - otherUserLongitude;
     double a = sin(dLat / 2) * sin(dLat / 2) +
         cos(currentUserLatitude) * cos(otherUserLatitude) * sin(dLon / 2) *
             sin(dLon / 2);
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
     double distance = earthRadius * c;
 
     return distance;
-
   }
 
-
+  //Function to get read Distances of all users
   Future<List<String>> getDistances() async
   {
-    List<String> filteredListingIDs = [];
-    var document = await readUserInfo.get();
+    List<String> filteredListingIDs = []; //initialize an empty list
+    late QuerySnapshot<Map<String, dynamic>> document;
+
+    if(loggedInWithGoogle) {
+      document = await readUserInfo.where(
+          FieldPath.documentId, isNotEqualTo: googleLoginDocID)
+          .get(); //read the UserInfo from the collection
+    }
+    else if(loggedInWithPhone)
+      {  document = await readUserInfo.where(
+          FieldPath.documentId, isNotEqualTo: phoneLoginDocID)
+          .get(); //read the UserInfo from the collection
+      }
+
+    final readData = await SharedPreferences.getInstance(); //instance for the shared preferences;
+    var  userLatitude = readData.getDouble('Latitude'); //userLatitude
+    var  userLongitude = readData.getDouble('Longitude'); //userLongitude
 
     for (var snapshot in document.docs) {
-      Map<String, dynamic> data = snapshot.data();
+      
+        Map<String, dynamic> data = snapshot
+            .data(); //get the snapshot of the data
+      
+      if (data.containsKey('Latitude') && data.containsKey('Longitude')) { //if it contains latitude || longitude, return the latitude and longitude values
+        double otherUserLatitude = data['Latitude']; //get the latitude
+        double otherUserLongitude = data['Longitude']; //get the longitude
 
-      if (data.containsKey('Latitude') && data.containsKey('Longitude')) {
-        double otherUserLatitude = data['Latitude'];
-        double otherUserLongitude = data['Longitude'];
+        var getDistance = calculateDistance(userLatitude!, userLongitude!, otherUserLatitude, otherUserLongitude); //calculate the distance using the function above
 
-        var getDistance = calculateDistance(_mainScreen.getLatitude, _mainScreen.getLongitude, otherUserLatitude, otherUserLongitude);
-
-
-      //  if (getDistance >= 0 && getDistance <= _mainScreen.enteredDistanceRange)
+        if (getDistance >= 0 && getDistance <= _mainScreen.enteredDistanceRange) //if the distance is within the range which user entered
             {
-               filteredListingIDs.add(snapshot.id);
+               filteredListingIDs.add(snapshot.id); //add the Listing ID to show to display the listings
             }
       }
     }
-    return filteredListingIDs;
+    return filteredListingIDs; //return the filteredListingIDs.
   }
 
   Future<Map<String, List<Map<String, dynamic>>>> getTotalListingsPerUser() async
@@ -68,6 +94,7 @@ class ListingService {
                }
          }
   }
+
     return eachListing;
  }
 

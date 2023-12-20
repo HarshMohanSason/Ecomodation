@@ -1,6 +1,8 @@
+
 import 'package:ecomodation/Listings/DetailedListing.dart';
 import 'package:ecomodation/Listings/DetailedListingsStore.dart';
 import 'package:flutter/material.dart';
+import '../Auth/InternetChecker.dart';
 import '../main.dart';
 import 'ListingService.dart';
 
@@ -17,7 +19,25 @@ class _DisplayListingsState extends State<DisplayListings> {
   final ListingService _listingService = ListingService();
 
   List<Map<String, dynamic>> listingInfoList = [];
+  @override
+  void initState() {
 
+    super.initState();
+    checkInternet();
+  }
+
+  Future<void> checkInternet() async {
+    CheckInternet checkInternet = CheckInternet();
+    bool isConnected = await checkInternet.checkInternet();
+
+    if (!isConnected) {
+     const  Text("No internet connection");
+    }
+    else
+    {
+     const Text("internet connection found");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +50,10 @@ class _DisplayListingsState extends State<DisplayListings> {
 
   Widget _displayListings() {
 
-    return FutureBuilder(
+    var future =  _listingService.getTotalListingsPerUser();
 
-        future: _listingService.getTotalListingsPerUser(),
+    return FutureBuilder(
+        future: future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -65,10 +86,15 @@ class _DisplayListingsState extends State<DisplayListings> {
               backgroundColor: colorTheme,
               onRefresh: () async {
 
-                await Future.delayed(Duration(seconds: 2));
+                await Future.delayed(const Duration(seconds: 2));
+
+                setState(() {
+                  future = _listingService.getTotalListingsPerUser();
+                });
+
+               return Future(() => future);
               },
               child: ListView.builder(
-                shrinkWrap: true,
                 scrollDirection: Axis.vertical,
                 itemCount: listingInfoList.length,
                 itemBuilder: (context, index)
@@ -76,6 +102,8 @@ class _DisplayListingsState extends State<DisplayListings> {
                   String docID = listingInfoList.keys.elementAt(index);
                   List<Map<String, dynamic>> listings = listingInfoList[docID] as List<Map<String, dynamic>>;
                   final DetailedListingsStore detailedListingsStore = DetailedListingsStore(docID, listings[index]);
+
+
                   return GestureDetector
                    ( onTap: ()
                        {
@@ -94,6 +122,7 @@ class _DisplayListingsState extends State<DisplayListings> {
 
 
   Widget buildListingWidget(Map<String, dynamic> listingInfo) {
+
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),

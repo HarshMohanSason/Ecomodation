@@ -1,3 +1,4 @@
+
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 
@@ -23,7 +24,7 @@ class NoMessageWidget extends StatelessWidget {
                   scale: 4,
                 ),
               ),
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
               Align(
                 alignment: Alignment.center,
                 child: Text(

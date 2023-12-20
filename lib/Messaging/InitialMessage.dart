@@ -1,14 +1,10 @@
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ecomodation/LoginWithPhone.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ecomodation/Listings/DetailedListingsStore.dart';
-import '../Auth/auth_provider.dart';
-import '../Listings/DetailedListing_StateManage.dart';
+import '../Listings/AskButtonState.dart';
 import '../main.dart';
 import 'MessageService.dart';
-
 
 class InitialMessageWidget extends StatefulWidget {
 
@@ -29,27 +25,6 @@ class _InitialMessageWidgetState extends State<InitialMessageWidget> {
   //create instance of the addListingState here.
   bool checkIfEmpty = false;
 
-  Future<void> updateListing() async {
-    try {
-
-      await widget.detailedListingsStore.listingInfo.update('InitialMessageSent', (value) => showAskButtonState.getShowAskButton);
-
-      //print(widget.detailedListingsStore.listingInfo['InitialMessageSent']);
-      await FirebaseFirestore.instance
-          .collection('userInfo')
-          .doc(loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID)
-          .collection('ListingInfo')
-          .doc(widget.detailedListingsStore.docID)
-          .update({'InitialMessageSent': showAskButtonState.getShowAskButton});
-
-      // The update was successful.
-    } catch (e) {
-      // Handle any errors that occurred during the update.
-      // print(e);
-      // You can provide feedback to the user or take other appropriate action here.
-    }
-
-  }
 
   @override
 
@@ -57,7 +32,6 @@ class _InitialMessageWidgetState extends State<InitialMessageWidget> {
     super.initState();
     showAskButtonState = Provider.of<DetailedListingStateManage>(context, listen: false);
     // Initialize the stream to receive all messages
-
   }
 
   void sendMessage() async
@@ -68,12 +42,11 @@ class _InitialMessageWidgetState extends State<InitialMessageWidget> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
 
-
     return Scaffold(
+
       //appBar: AppBar(title: const Text('') ,
       backgroundColor: Colors.white,
       body: Column(
@@ -115,8 +88,8 @@ class _InitialMessageWidgetState extends State<InitialMessageWidget> {
               if(sendMessageKey.currentState!.validate())
               {
                 sendMessage();//send the message to the user
-                showAskButtonState.setShowAskButton = true;
-                 await  updateListing(); //update the Listing
+
+                await  _messageSerivce.sendInitialMessageInfo(widget.detailedListingsStore); //update the Listing
 
                 if(mounted)
                   {

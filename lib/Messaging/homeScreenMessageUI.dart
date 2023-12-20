@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomodation/Messaging/MessageWidget.dart';
 import 'package:ecomodation/Messaging/NoMessageWidget.dart';
 import 'package:flutter/material.dart';
 import 'MessageService.dart';
 import 'package:ecomodation/main.dart';
+import 'MessageSenderInfo.dart';
+
 
 class HomeScreenMessagingUI extends StatefulWidget {
   const HomeScreenMessagingUI({Key? key}) : super(key: key);
@@ -16,11 +19,13 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
   final MessageService _messageService = MessageService();
    Set getEachMessageSenderIDs = <String>{}; //create a Map which stores the senderID's as keys and the messageDetails in a list
 
+  Set messageSendersInfo = <MessageSenderInfo>{};
+
   @override
+
 
   Widget build(BuildContext context)
   {
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -73,20 +78,14 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
 
                   else //if the connection is successful, build the messageCards
                     {
-
-
                     for(var document in snapshot.data!.docs) //iterate through the document
                     {
-                      var messageInfo = document.data();
-                      String senderID = messageInfo['senderID']; //get the sender ID
-
-                      getEachMessageSenderIDs.add(senderID); //add the total senderID's here
+                        var messageInfo = document.data();
+                        getEachMessageSenderIDs.add(messageInfo['senderID']);
                     }
-
 
                     return Column(
                       children: [
-
                       Align(
                       alignment: const Alignment(0,0),
                       child: Text('Messages',
@@ -94,9 +93,7 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
                               fontSize: screenHeight/27,
                               fontWeight: FontWeight.bold)),
                         ),
-                       Divider(color: Colors.black,),
-
-
+                       const Divider(color: Colors.black,thickness: 4,),
                        Expanded(
                          child: ListView.builder
                             (
@@ -112,7 +109,6 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
                           ),
                        ),
                       ],
-
                     );
                     }
                 }
@@ -125,74 +121,117 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
 
 
   Widget displayMessageCard(String senderID) {
+
     var receiverID = senderID; //The senderID of the sender now becomes the receiver ID as the message will be sent back to that user
 
-    return GestureDetector(
+    String? userName;
+
+    return InkWell(
 
       onTap: ()
       {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => MessageDisplay(receiverID: receiverID)));
+         Navigator.push(context, MaterialPageRoute(builder: (context) => MessageDisplay(receiverID: receiverID)));
       },
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 15),
-        child: Container(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children:  <Widget>
-              [
-                 CircleAvatar(
-                   radius: screenWidth/12.5,
-                  child: Icon(Icons.person),
-                ),
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children:  <Widget>
+            [
+               FutureBuilder<MessageSenderInfo>(
+                 future: _messageService.getSenderInfo(senderID),
+                 builder: (BuildContext context, snapshot) {
 
-               Expanded(
-                 child: Padding(
-                  padding: EdgeInsets.only( left: 10),
-                   child: Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>
-                       [
-                          Text("Sourav Dhankar",style: TextStyle(
-                            fontSize: screenWidth/25,
-                            fontWeight: FontWeight.bold
-                          )),
-                        SizedBox(height: 10,),// Text for the User name
-                         Text("Hello there"),
-                        SizedBox(height: 10),// Text for the last sentMessage by the user
-                        Divider(color: Colors.black,),    ]
+                   if (snapshot.connectionState == ConnectionState.waiting) {
+                     return const CircularProgressIndicator();
+                   } else if (snapshot.hasError || !snapshot.hasData) {
+                     userName = null;
+                     return CircleAvatar(
+                       radius: screenWidth / 12.5,
+                       child: const Icon(Icons.person),
+                     );
+                   }  else {
+                     userName = snapshot.data!.userName;
+                     return CircleAvatar(
+                       radius: screenWidth / 12.5,
+                       child: ClipOval(
+                         child: Image.network(snapshot.data!
+                             .profileURL),
+                       ),
+                     );
+
+                   }
+                 },
                ),
-                 )),
 
-            ]
-          )
+             Expanded(
+               child: Padding(
+                padding: const EdgeInsets.only( left: 10),
+                 child: Column(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>
+                     [
+                        FutureBuilder<MessageSenderInfo>(
+                          future: _messageService.getSenderInfo(senderID),
+                          builder: (BuildContext context, snapshot) {
+                                return Text( userName ?? 'No Name',style: TextStyle(
+                                    fontSize: screenWidth/25,
+                                    fontWeight: FontWeight.bold
+                                )
+                                );
+                              }
+                          ),
+
+                      const SizedBox(height: 10),// Text for the User name
+                      StreamBuilder(
+                        stream: _messageService.getLastSentMessage(senderID),
+                        builder: (context, snapshot) {
+
+                          if(!snapshot.hasData || snapshot.hasError)
+                            {
+                              return const Text("");
+                            }
+                        else
+                          {
+                            List<QuerySnapshot> snapshotList = snapshot.data!;
+                            Map<String, bool> storeLastMessage = {};
+                            DateTime receivedMessageTimestamp = snapshotList.first.docs.isNotEmpty ? (snapshotList.first.docs.first.data() as Map<String, dynamic>)['Timestamp'].toDate() : DateTime(0);
+                            DateTime sentMessageTimestamp = snapshotList.last.docs.isNotEmpty ? (snapshotList.last.docs.last.data() as Map<String, dynamic>)['Timestamp'].toDate() : DateTime(0);
+                            // if the characters increase more than the given space, display the rest by '....'
+                            if(receivedMessageTimestamp.isAfter(sentMessageTimestamp))
+                              {
+                                var messageInfo = snapshotList.first.docs.first.data() as Map<String, dynamic>;
+                                storeLastMessage[messageInfo['message']] = true;
+                              }
+                            else
+                              {
+                                var messageInfo = snapshotList.last.docs.last.data() as Map<String, dynamic>;
+                                storeLastMessage[messageInfo['message']] = false;
+                              }
+                              var lastMessage = storeLastMessage.keys.first;
+
+                            return Text(storeLastMessage.values.contains(true) ? lastMessage : "You: $lastMessage", maxLines: 1 );
+                            //return  Text(lastSentMessages.first.length > screenWidth - 350 ? '${lastSentMessages.first.substring(0, 40)}....' : lastSentMessages.first, maxLines: 1,);
+                          }
+                        }
+
+   ),
+                     const  SizedBox(height: 10),// Text for the last sentMessage by the user
+                      const Divider(color: Colors.black,),]
+             ),
+               )),
+
+          ]
         ),
 
       ),
     );
 
-
-    /*Center(
-        child: Card(
-          color: Colors.white,
-         // margin: EdgeInsets.symmetric(horizontal: screenWidth - 420, vertical: screenHeight - 800),
-          //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          child: InkWell(
-            onTap: ()
-            {
-            ;
-            },
-            child:  ListTile(
-              leading:  CircleAvatar(radius: screenWidth/3,child: Icon(Icons.person)),
-              title: Text('Wow'), // will change this later as well
-             // subtitle: Text('hello'), //Gonna change later
-            ),
-          ),
-        ),
-      );
-
-       */
   }
+
+
+
 
 }
 

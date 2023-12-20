@@ -4,9 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
 import 'AddDescription.dart';
-import '/AddListings/AddListing.dart';
+import '/AddListingsUI/AddListing.dart';
 import '../OTPpage.dart';
-import '../image_data.dart';
+import '../Camera/image_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'ListingPrice.dart';
 import 'dart:io';
@@ -48,7 +48,6 @@ class UploadListing{
         'Description': AddDescription.descriptionController.text,
         'Price': ListingPrice.phoneText.text,
         'imageInfoList': imageInfoList,
-        'InitialMessageSent': false, //set the initially sent message to false
       });
     }
     catch (e) {
@@ -75,6 +74,4 @@ class UploadListing{
         // Handle accordingly.
       }
     }
-
-
 }

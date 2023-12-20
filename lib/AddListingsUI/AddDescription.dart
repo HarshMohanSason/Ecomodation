@@ -43,15 +43,9 @@ class _AddDescriptionState extends State<AddDescription> {
       child: Scaffold(
        resizeToAvoidBottomInset: false,
        backgroundColor: Colors.white,
-       body: ListView(
-
-         children: <Widget> [
-           SizedBox(
-               height: screenHeight,
-               child: titleAndDescription(context))
-         ]
-
-       ),
+       body: SizedBox(
+           height: screenHeight,
+           child: titleAndDescription(context)),
       ),
     );
   }
@@ -86,70 +80,91 @@ class _AddDescriptionState extends State<AddDescription> {
 
              Align(
                   alignment: Alignment.center,
-                  child: Text('Let\'s add some more info to your listing',
+                  child: Text('Let\'s add some more information',
                       style: TextStyle(
-                        fontSize: fontSize(context, 18),fontWeight: FontWeight.bold
+                        fontSize: fontSize(context, screenWidth/21),fontWeight: FontWeight.bold
                   )),
               ),
 
               SizedBox(height: screenHeight/23.3),
 
                const Align(
-               alignment: Alignment(-0.95, 0), //Align the heading 'title'
+               alignment: Alignment(-0.85, 0), //Align the heading 'title'
              child: Text('Title', style:
              TextStyle(
              fontWeight: FontWeight.bold,
              ))), //Heading for textform for entering the titl
 
-            TextFormField(
-             controller: AddDescription.titleController ,
-             cursorColor: colorTheme,
-             cursorWidth: 2,
-             maxLines: 1,
-             decoration: InputDecoration(
-             border: OutlineInputBorder(
-             borderSide: const BorderSide(width: 2.0),
-             borderRadius: BorderRadius.circular(20),
-             ),
-             ),
-             validator: (value)
-             {
-             if(value!.isEmpty)
-             {
-             return 'Title cannot be empty';
-             }
-             return null;
-             },
-             ),
+            Padding(
+              padding: EdgeInsets.only(top: 10),
+              child: SizedBox(
+                width: screenWidth - 20,
+                child: Padding(
+                  padding: const EdgeInsets.only(left:20.0),
+                  child: TextFormField(
+                   controller: AddDescription.titleController ,
+                   cursorColor: colorTheme,
+                   cursorWidth: 2,
+                   maxLines: 1,
+                   decoration: InputDecoration(
+                   border: OutlineInputBorder(
+                   borderSide: const BorderSide(width: 2.0, color: Colors.black),
+                   borderRadius: BorderRadius.circular(20),
+                   ),
+                   ),
+                   validator: (value)
+                   {
+                   if(value!.isEmpty)
+                   {
+                   return 'Title cannot be empty';
+                   }
+                   return null;
+                   },
+                   ),
+                ),
+              ),
+            ),
 
-           SizedBox(height: screenHeight/23.3),
+           SizedBox(height: screenHeight/23),
 
             const Align(
-                alignment: Alignment(-0.95,0),  //Align the heading 'title'
+                alignment: Alignment(-0.77,0),  //Align the heading 'title'
                 child: Text('Description (optional)', style:
                   TextStyle(
                     fontWeight: FontWeight.bold,
                   ),)),
 
-               TextFormField(
-               cursorColor: colorTheme,
-               cursorWidth: 2,
-               controller: AddDescription.descriptionController,
-               textAlignVertical: TextAlignVertical.top,
-               maxLines: 10,
-               decoration: InputDecoration(
-               hintText: 'Listings with detailed descriptions sell better!',
-               isDense:  true,
-               // contentPadding: const EdgeInsets.all(100),
-               border: OutlineInputBorder(
-               //    borderSide: const BorderSide(width: 10.0),
-               borderRadius: BorderRadius.circular(20),
-               ),
-               ),
-               validator: (value)
-               {
-               return null;
-               },
+               Padding(
+                 padding: const EdgeInsets.only(top: 10),
+                 child: SizedBox(
+                   width: screenWidth - 20,
+                   child: Padding(
+                     padding: const EdgeInsets.only(left: 20.0),
+                     child: TextFormField(
+                       textInputAction: TextInputAction.done,
+                     cursorColor: colorTheme,
+                     cursorWidth: 2,
+                     controller: AddDescription.descriptionController,
+                     textAlignVertical: TextAlignVertical.top,
+                     maxLines: 7,
+                     decoration: InputDecoration(
+                     hintText: 'Listings with detailed descriptions sell better!',
+                     isDense:  true,
+                     // contentPadding: const EdgeInsets.all(100),
+                     border: OutlineInputBorder(
+
+                       borderSide: const BorderSide(width: 2, color: Colors.black),
+                     borderRadius: BorderRadius.circular(20),
+
+                     ),
+                     ),
+                     validator: (value)
+                     {
+                     return null;
+                     },
+                     ),
+                   ),
+                 ),
                ),
 
             Spacer(),
@@ -165,8 +180,9 @@ class _AddDescriptionState extends State<AddDescription> {
                     style: ButtonStyle(
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),)),
-                      fixedSize: MaterialStateProperty.all(Size(screenWidth - 10, screenHeight/38)),
+                            borderRadius: BorderRadius.circular(20.0),
+                          )),
+                      fixedSize: MaterialStateProperty.all(Size(screenWidth - 50, screenHeight/19)),
                       backgroundColor: const MaterialStatePropertyAll(
                           colorTheme), //set the color for the continue button
                     ),

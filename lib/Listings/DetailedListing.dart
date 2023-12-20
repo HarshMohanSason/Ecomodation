@@ -1,6 +1,4 @@
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ecomodation/Auth/auth_provider.dart';
 import 'package:ecomodation/Messaging/InitialMessage.dart';
 import 'package:ecomodation/Messaging/MessageService.dart';
 import 'package:flutter/material.dart';
@@ -22,53 +20,19 @@ class DetailedListingInfo extends StatefulWidget {
 class _DetailedListingInfoState extends State<DetailedListingInfo> {
 
   final MessageService _messageService = MessageService();
-
   final  _currentPageNotifier = ValueNotifier<int>(0);
 
-  Future<void> getAskButtonState() async
-  {
-    try {
-      // Read data from Firestore
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection('userInfo')
-          .doc(googleLoginDocID)
-          .collection('ListingInfo')
-          .doc(widget.detailedListingsStore.docID)
-          .get();
-
-      // Check if the document exists
-      if (snapshot.exists) {
-        // Access the data from the document
-        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-        var askButtonState = data['InitialMessageSent'];
-
-        // Update the local state
-        widget.detailedListingsStore.listingInfo.update('InitialMessageSent', (value) => value = askButtonState);
-      } else {
-        // Handle the case when the document does not exist
-        // You can provide feedback to the user or take other appropriate action here.
-      }
-    } catch (e) {
-      // Handle any errors that occurred during the data retrieval
-     // print('Error reading data from Firestore: $e');
-      // You can provide feedback to the user or take other appropriate action here.
-    }
-
-  }
 
   @override
   void initState() {
 
-    getAskButtonState();
-    super.initState();
+     super.initState();
 
   }
 
+
   @override
   Widget build(BuildContext context) {
-
-  //  print(widget.detailedListingsStore.docID);
-
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -82,7 +46,7 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: [
+                children: <Widget>[
                   Stack(children: [
                     _buildListing(widget.detailedListingsStore.listingInfo),
                     Padding(
@@ -137,17 +101,21 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
 
                   const Spacer(),
 
-
-                  if(widget.detailedListingsStore.listingInfo['InitialMessageSent'] == true)
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 35),
-                          child: Center(child: Text('Already contacted!', style: TextStyle(
-                            fontSize: screenWidth/20,
-                            fontWeight: FontWeight.bold,
-                          )))),
-
-                  if(widget.detailedListingsStore.listingInfo['InitialMessageSent'] == false)
-                    sendMessageButton()
+                  FutureBuilder<Widget>(
+                    future: sendMessageButton(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        // Handle loading state
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        // Handle error state
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        // Handle the completed state
+                        return snapshot.data ?? const SizedBox(); // Returning an empty container if data is null
+                      }
+                    },
+                  ),
 
                 ],
               ),
@@ -194,43 +162,58 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
     );
   }
 
-  Widget sendMessageButton() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 25),
-      child: Align(
-          alignment: const Alignment(0, 0.5),
-          child: ElevatedButton(
-            style: ButtonStyle(
-              fixedSize: MaterialStateProperty.all(const Size(180, 40)),
-              backgroundColor: const MaterialStatePropertyAll(
-                  colorTheme), //set the color for the continue button
-            ),
-            onPressed: () async {
-              {
-                var receiverId = await _messageService
-                    .getReceiverID(widget.detailedListingsStore.listingInfo); //get the receiverID
-               //print(receiverId);
+  Future<Widget> sendMessageButton() async {
 
-                if(mounted) {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                      builder: (context) => InitialMessageWidget(receiverID: receiverId, detailedListingsStore: widget.detailedListingsStore,)));
-                }
-              }
-            },
+     var isInitialMessageSent = await _messageService.checkInitialMessageSent(widget.detailedListingsStore);
 
-            child: Text(
-              'Ask',
-              style: TextStyle(
-                fontSize: 17 * (screenHeight / 932),
-                color: const Color(0xFFFFFFFF),
-                fontWeight: FontWeight.bold,
+     if(isInitialMessageSent == false) {
+       return Padding(
+        padding: const EdgeInsets.only(bottom: 25),
+        child: Align(
+            alignment: const Alignment(0, 0.5),
+            child: ElevatedButton(
+              style: ButtonStyle(
+                fixedSize: MaterialStateProperty.all(const Size(180, 40)),
+                backgroundColor: const MaterialStatePropertyAll(
+                    colorTheme), //set the color for the continue button
               ),
-            ),
-          )),
-    );
+              onPressed: () async {
+                {
+                  var receiverId = await _messageService
+                      .getReceiverID(widget.detailedListingsStore.listingInfo); //get the receiverID
+
+                  if(mounted) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                        builder: (context) => InitialMessageWidget(receiverID: receiverId, detailedListingsStore: widget.detailedListingsStore,)));
+                  }
+                }
+              },
+
+              child: Text(
+                'Ask',
+                style: TextStyle(
+                  fontSize: 17 * (screenHeight / 932),
+                  color: const Color(0xFFFFFFFF),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )),
+      );
+     }
+     else
+       {
+         return Padding(
+             padding: const EdgeInsets.only(bottom: 35),
+             child: Center(child: Text('Already contacted!', style: TextStyle(
+               fontSize: screenWidth/20,
+               fontWeight: FontWeight.bold,
+             ))));
+       }
+
   }
+
 
   Widget circleIndicator()
   {

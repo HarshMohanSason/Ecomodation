@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../main.dart';
 import 'package:flutter/services.dart';
 import 'UploadListing.dart';
-import '/AddListings/AddListing.dart';
+import 'package:ecomodation/AddListingsUI//AddListing.dart';
 import 'AddDescription.dart';
 
 
@@ -124,91 +124,94 @@ class _ListingPriceState extends State<ListingPrice>
                 ),
               ),
             ),
-            Expanded(
-                child: Align(
+            Spacer(),
+            Align(
               alignment: const Alignment(0, 0.87),
-              child: ElevatedButton(
-                onPressed: () async {
-                  await verifyForm(
-                      context); //make sure the form submitted is correct
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: ElevatedButton(
+            onPressed: () async {
+                await verifyForm(
+                    context); //make sure the form submitted is correct
 
-                  if (formValidated == true) {
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      // Prevent the user from dismissing the dialog
-                      builder: (BuildContext context) {
-                        return  Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children:  [
-                              const CircularProgressIndicator(
-                                color: colorTheme,
-                              ),
-                              DefaultTextStyle(
-                                style: TextStyle(fontSize: screenWidth/28),
-                                child: const Text('Uploading...'),
-                              )
-                            ],
-                          ),
-                        );
-
-                      },
-                    );
-
-                    await newListing.checkLoginMethod();
-
-                    AddListing.imagePaths.clear(); //clear the imagePaths list
-                    AddDescription.descriptionController.clear(); //clear the description text from the description box
-                    AddDescription.titleController.clear(); //clear the title text from the title box
-                    ListingPrice.phoneText.clear(); //clear the phone price from the textbox
-                    Navigator.pushNamed(context, 'HomeScreen'); //Navigate back to the home screen once the listing has been uploaded to the database
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        duration: const Duration(seconds: 1),
-                        backgroundColor: Colors.black,
-                        content: Padding(
-                            padding: EdgeInsets.only(left: screenWidth/13),
-                            child: Text(
-                              "Your Listing has been uploaded!",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: fontSize(context, 14)
-                              ),
-                            )),
-                        behavior: SnackBarBehavior.floating,
-                        margin: EdgeInsets.all(screenWidth / 18),
-                        shape: const StadiumBorder(),
-                        action: SnackBarAction(
-                          label: '',
-                          onPressed: () {},
+                if (formValidated == true) {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    // Prevent the user from dismissing the dialog
+                    builder: (BuildContext context) {
+                      return  Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children:  [
+                            const CircularProgressIndicator(
+                              color: colorTheme,
+                            ),
+                            DefaultTextStyle(
+                              style: TextStyle(fontSize: screenWidth/28),
+                              child: const Text('Uploading...'),
+                            )
+                          ],
                         ),
+                      );
+
+                    },
+                  );
+
+                  await newListing.checkLoginMethod();
+
+                  AddListing.imagePaths.clear(); //clear the imagePaths list
+                  AddDescription.descriptionController.clear(); //clear the description text from the description box
+                  AddDescription.titleController.clear(); //clear the title text from the title box
+                  ListingPrice.phoneText.clear(); //clear the phone price from the textbox
+                  Navigator.pushNamed(context, 'HomeScreen'); //Navigate back to the home screen once the listing has been uploaded to the database
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      duration: const Duration(seconds: 1),
+                      backgroundColor: Colors.black,
+                      content: Padding(
+                          padding: EdgeInsets.only(left: screenWidth/13),
+                          child: Text(
+                            "Your Listing has been uploaded!",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: fontSize(context, 14)
+                            ),
+                          )),
+                      behavior: SnackBarBehavior.floating,
+                      margin: EdgeInsets.all(screenWidth / 18),
+                      shape:
+                      const StadiumBorder(),
+                      action: SnackBarAction(
+                        label: '',
+                        onPressed: () {},
                       ),
-                    );
-                  }
-                },
-                style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  )),
-                  fixedSize: MaterialStateProperty.all(
-                      Size(screenWidth - 10, screenHeight / 38)),
-                  backgroundColor: const MaterialStatePropertyAll(
-                      colorTheme), //set the color for the continue button
+                    ),
+                  );
+                }
+            },
+            style: ButtonStyle(
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    )),
+                fixedSize: MaterialStateProperty.all(Size(screenWidth - 50, screenHeight/19)),
+                backgroundColor: const MaterialStatePropertyAll(
+                    colorTheme), //set the color for the continue button
+            ),
+            child: Text(
+                'Upload',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: fontSize(context, 18),
                 ),
-                child: Text(
-                  'Upload',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: fontSize(context, 18),
-                  ),
+            ),
                 ),
               ),
-            )),
+            ),
           ],
         ),
       ),

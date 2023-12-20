@@ -1,5 +1,5 @@
 import 'package:camera/camera.dart';
-import 'package:ecomodation/AddListings/AddListing.dart';
+import 'package:ecomodation/AddListingsUI/AddListing.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -134,8 +134,8 @@ class _CameraUIState extends State<CameraUI> {
                  Expanded(
                    child: Align(
                      alignment: const Alignment(0,0),
-                     child: OutlinedButton(
-                      onPressed: () async {
+                     child: InkWell(
+                      onTap: () async {
                         pictureTaken = await _cameraController.takePicture();
                         setState(() {
                           isPictureTaken = true;

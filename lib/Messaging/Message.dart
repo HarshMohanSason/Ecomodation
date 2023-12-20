@@ -6,20 +6,15 @@ class Message {  //Base Message class
   final String receiverID;
   final String message;
   final Timestamp timestamp;
-  final String senderName;
 
-  Message({required this.senderID, required this.receiverID, required this.message, required this.timestamp, required this.senderName});
-
+  Message({required this.senderID, required this.receiverID, required this.message, required this.timestamp});
 
   Map<String, dynamic> toMap() {   //Convert the entire data to map in order to store at the data base
-
     return {
       'senderID': senderID,
       'receiverID': receiverID,
       'message': message,
       'Timestamp': timestamp,
-      'senderName': senderName,
     };
-
-    }
+  }
 }

@@ -1,6 +1,5 @@
 
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomodation/Messaging/MessageService.dart';
 import 'package:ecomodation/main.dart';
@@ -31,11 +30,23 @@ class _MessageDisplayState extends State<MessageDisplay> {
 
   bool checkIfEmpty = false;
 
+  late Stream<List<QuerySnapshot>> allMessagesStream; //stream to get all the messages
+
   @override
 
   void initState() {
     super.initState();
     // Initialize the stream to receive all messages
+    allMessagesStream =  _messageService.getAllMessagesStream(widget.receiverID);
+  }
+
+  @override
+  void dispose()
+  {
+    super.dispose();
+    _messageController.dispose();
+    _messageService.dispose();
+    _scrollController.dispose();
   }
 
   void sendMessage() async
@@ -43,8 +54,8 @@ class _MessageDisplayState extends State<MessageDisplay> {
     if(_messageController.text.isNotEmpty)  //check if the message is not null,
     {
       await _messageService.sendMessage(widget.receiverID, _messageController.text);  //sent the message to database
-      _messageController.clear(); //clear the message box
       _scrollController.animateTo(_scrollController.position.minScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut); //scroll to the new Message once the messages is sent
+
     }
 
   }
@@ -85,7 +96,7 @@ class _MessageDisplayState extends State<MessageDisplay> {
 
   Widget _buildMessageList() {
 
-    Stream<List<QuerySnapshot>> allMessagesStream =  _messageService.getAllMessagesStream(widget.receiverID);
+    allMessagesStream =  _messageService.getAllMessagesStream(widget.receiverID);
 
     return StreamBuilder<List<QuerySnapshot>>(
       stream: allMessagesStream,
@@ -109,7 +120,6 @@ class _MessageDisplayState extends State<MessageDisplay> {
         }
 
         thisUserMessages.sort((a, b) => (b['Timestamp'] as Timestamp).compareTo(a['Timestamp'] as Timestamp)); //sort all the messages by their timestamp
-
 
          return ListView.builder(
           reverse: true, //reverse display the items
@@ -147,7 +157,6 @@ class _MessageDisplayState extends State<MessageDisplay> {
   Widget _buildMessageInput()
   {
 
-
     return Row(
       children: [
         Expanded(
@@ -176,9 +185,8 @@ class _MessageDisplayState extends State<MessageDisplay> {
 
         Padding(padding: const EdgeInsets.only(bottom: 45, right: 10), child:
             IconButton(onPressed: () {
-
             sendMessage();
-
+            _messageController.clear(); //clear the sent Text
             }, icon: const Icon(Icons.send, size: 45, color: colorTheme,))),
 
       ],

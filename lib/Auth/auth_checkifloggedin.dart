@@ -1,5 +1,5 @@
 import 'package:ecomodation/Auth/auth_provider.dart';
-import 'package:ecomodation/homepage.dart';
+import 'package:ecomodation/homeScreenUI.dart';
 import'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../loginpage.dart';
@@ -35,7 +35,7 @@ class _CheckIfLoggedInState extends State<CheckIfLoggedIn> {
             if(snapshot.hasData)
               {
 
-                return  MainScreen();
+                return  HomeScreenUI();
               }
 
           else
@@ -59,7 +59,7 @@ class _CheckIfLoggedInState extends State<CheckIfLoggedIn> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => MainScreen(),
+            builder: (context) => HomeScreenUI(),
           ),
         );
       }

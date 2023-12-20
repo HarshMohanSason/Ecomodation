@@ -1,20 +1,20 @@
 
 import 'dart:async';
 import 'package:ecomodation/Auth/auth_provider.dart';
+import 'package:ecomodation/Listings/DetailedListingsStore.dart';
 import 'package:ecomodation/Listings/ListingService.dart';
 import 'package:ecomodation/LoginWithPhone.dart';
 import 'package:ecomodation/Messaging/Message.dart';
 import 'package:ecomodation/OTPpage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:collection/collection.dart';
+import 'MessageSenderInfo.dart';
 
 
 class MessageService extends ChangeNotifier {
 
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   final ListingService _listingService = ListingService();
   var receiverID = ' ';
@@ -26,12 +26,10 @@ class MessageService extends ChangeNotifier {
 
     final String currentUserID = loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID;
     final Timestamp timestamp = Timestamp.now();
-    final senderName = loggedInWithGoogle ? googleUserName : phoneUserName;
         Message newMessage = Message(senderID: currentUserID,
         receiverID: receiverID,
         message: message,
-        timestamp: timestamp,
-        senderName: senderName);
+        timestamp: timestamp);
     //create a new message
 
 
@@ -69,49 +67,53 @@ class MessageService extends ChangeNotifier {
 
   Future<String> getReceiverID(Map<String, dynamic> currentListingInfo) async
   {
-    var newReceiverID = ' ';
+    var newReceiverID = '';
 
     List<String> listingIDs = await _listingService.getDistances();
 
-    if (loggedInWithGoogle == true) {
-      for (int i = 0; i < listingIDs.length; i++) {
-        var documents = await FirebaseFirestore.instance.collection('userInfo')
-            .doc(listingIDs[i]).collection('ListingInfo').get();
+   try {
+     if (loggedInWithGoogle == true) {
+       for (int i = 0; i < listingIDs.length; i++) {
+         var documents = await FirebaseFirestore.instance.collection('userInfo')
+             .doc(listingIDs[i]).collection('ListingInfo').get();
 
-        for (var snapshot in documents.docs)
-        {
-          Map<String, dynamic> listingInfo = snapshot.data();
+         for (var snapshot in documents.docs) {
+           Map<String, dynamic> listingInfo = snapshot.data();
 
-          if (checkMapEquality.equals(listingInfo, currentListingInfo) == true)
-          {
-            newReceiverID = listingIDs[i];
-            receiverID = newReceiverID;
-            return newReceiverID;
-          }
-          break;
-        }
+           if (checkMapEquality.equals(listingInfo, currentListingInfo) ==
+               true) {
+             newReceiverID = listingIDs[i];
+             receiverID = newReceiverID;
+             return newReceiverID;
+           }
+           break;
+         }
+       }
+     }
 
+     else if (loggedInWithPhone == true) {
+       for (int i = 0; i < listingIDs.length; i++) {
+         var documents = await FirebaseFirestore.instance.collection('userInfo')
+             .doc(listingIDs[i]).collection('ListingInfo').get();
 
-      }
+         for (var snapshot in documents.docs) {
+           Map<String, dynamic> listingInfo = snapshot.data();
+           if (checkMapEquality.equals(listingInfo, currentListingInfo) ==
+               true) {
+             break;
+           }
+         }
+         newReceiverID = listingIDs[i];
+         receiverID = newReceiverID;
+         return newReceiverID;
+       }
+     }
+   }
+   catch(e)
+    {
+      print(e);
     }
-
-    else if (loggedInWithPhone == true) {
-      for (int i = 0; i < listingIDs.length; i++) {
-        var documents = await FirebaseFirestore.instance.collection('userInfo')
-            .doc(listingIDs[i]).collection('ListingInfo').get();
-
-        for (var snapshot in documents.docs) {
-          Map<String, dynamic> listingInfo = snapshot.data();
-          if (checkMapEquality.equals(listingInfo, currentListingInfo) == true) {
-            break;
-          }
-        }
-        newReceiverID = listingIDs[i];
-        receiverID = newReceiverID;
-        return newReceiverID;
-      }
-    }
-    return ' ';
+    return newReceiverID;
   }
 
   Stream<List<QuerySnapshot>> getAllMessagesStream(String senderID) {
@@ -187,4 +189,114 @@ class MessageService extends ChangeNotifier {
       return const Stream.empty();
     }
   }
+
+  Stream<List<QuerySnapshot>> getLastSentMessage(String senderID)
+  {
+    try {
+      if (loggedInWithGoogle == true) {
+        var receivedMessageQuery = FirebaseFirestore.instance.collection(
+            'userInfo').doc(
+            googleLoginDocID).collection('receivedMessages').where(
+            'senderID', isEqualTo: senderID)
+            .orderBy('Timestamp', descending: true).limit(1)
+            .snapshots();
+
+        var sentMessagesQuery = FirebaseFirestore.instance.collection(
+            'userInfo').doc(
+            googleLoginDocID).collection('sentMessages').where(
+            'receiverID', isEqualTo: senderID)
+            .orderBy('Timestamp', descending: true).limit(1)
+            .snapshots();
+
+        var combinedStream = Rx.combineLatest(
+            [receivedMessageQuery, sentMessagesQuery], (
+            List<QuerySnapshot> snapshot) => snapshot);
+
+        return combinedStream;
+      }
+
+      else if (loggedInWithPhone == true) {
+        var receivedMessageQuery = FirebaseFirestore.instance.collection(
+            'userInfo').doc(
+            googleLoginDocID).collection('receivedMessages').where(
+            'senderID', isEqualTo: senderID)
+            .orderBy('Timestamp', descending: true).limit(1)
+            .snapshots();
+
+        var sentMessagesQuery = FirebaseFirestore.instance.collection(
+            'userInfo').doc(
+            googleLoginDocID).collection('sentMessages').where(
+            'receiverID', isEqualTo: senderID)
+            .orderBy('Timestamp', descending: true).limit(1)
+            .snapshots();
+
+        var combinedStream = Rx.combineLatest(
+            [receivedMessageQuery, sentMessagesQuery], (
+            List<QuerySnapshot> snapshot) => snapshot);
+
+        return combinedStream;
+      }
+    }
+    catch(e)
+    {
+      rethrow;
+    }
+    return const Stream.empty();
+  }
+
+  Future<MessageSenderInfo> getSenderInfo(String senderID) async{
+
+    try{
+      var document = await FirebaseFirestore.instance.collection('userInfo').doc(senderID).get();
+      var senderInfo = document.data();
+      return MessageSenderInfo(userName: senderInfo!['username'], profileURL: senderInfo['photoURL'] );
+    }
+    catch(e)
+    {
+      rethrow;
+    }
+  }
+
+
+  Future<void> sendInitialMessageInfo(DetailedListingsStore detailedListingsStore) async
+  {
+    try {
+
+      var initialMessageSent = await checkInitialMessageSent(detailedListingsStore);
+      if(initialMessageSent == false) {
+        await FirebaseFirestore.instance
+            .collection('userInfo')
+            .doc(loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID)
+            .collection('InitialMessageSent').add({
+          'ListingID': detailedListingsStore.docID,
+          'Timestamp': DateTime.now()
+        });
+      }
+      // The update was successful.
+    } catch (e) {
+
+      rethrow;
+    }
+  }
+
+  Future<bool> checkInitialMessageSent(DetailedListingsStore detailedListingsStore)
+  async {
+
+    try {
+      var snapshot = await FirebaseFirestore.instance
+          .collection('userInfo')
+          .doc(loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID)
+          .collection('InitialMessageSent').where(
+          'ListingID', isEqualTo: detailedListingsStore.docID).get();
+
+      return snapshot.docs.isNotEmpty;
+    }
+
+    catch(e)
+    {
+      return Future.value(false);
+    }
+
+  }
+
 }

@@ -30,7 +30,7 @@ class _InitialMessageWidgetState extends State<InitialMessageWidget> {
 
   void initState() {
     super.initState();
-    showAskButtonState = Provider.of<DetailedListingStateManage>(context, listen: false);
+
     // Initialize the stream to receive all messages
   }
 
@@ -38,7 +38,7 @@ class _InitialMessageWidgetState extends State<InitialMessageWidget> {
   {
     if(_messageController.text.isNotEmpty)
     {
-      await _messageSerivce.sendMessage(widget.receiverID, _messageController.text);
+      await _messageSerivce.sendMessage(widget.receiverID, _messageController.text,);
     }
   }
 
@@ -125,7 +125,7 @@ class _InitialMessageWidgetState extends State<InitialMessageWidget> {
                         borderRadius: BorderRadius.circular(20.0), // Adjust the radius as needed
                       )),
                   fixedSize: MaterialStateProperty.all( Size(screenWidth - 60,40)),
-                  backgroundColor: const MaterialStatePropertyAll(colorTheme),
+                  backgroundColor: const MaterialStatePropertyAll(Colors.black),
                   foregroundColor: const MaterialStatePropertyAll(Colors.white),
                 ),
                 child: Text('Send',

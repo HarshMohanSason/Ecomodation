@@ -59,10 +59,12 @@ class _DisplayListingsState extends State<DisplayListings> {
             return Center(
               child: Column(
                 children:  [
-                  SizedBox(height: screenHeight/40),
-                  Text('Loading nearby listings...', style: TextStyle(
-                    fontSize: screenWidth/28,
-                  ),),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: Text('Loading nearby listings...', style: TextStyle(
+                      fontSize: screenWidth/28,
+                    ),),
+                  ),
                 ],
               ),
             );
@@ -88,12 +90,14 @@ class _DisplayListingsState extends State<DisplayListings> {
 
                 await Future.delayed(const Duration(seconds: 2));
 
-                setState(() {
-                  future = _listingService.getTotalListingsPerUser();
-                });
-
+                if(mounted) {
+                  setState(() {
+                    future = _listingService.getTotalListingsPerUser();
+                  });
+                }
                return Future(() => future);
               },
+
               child: ListView.builder(
                 scrollDirection: Axis.vertical,
                 itemCount: listingInfoList.length,
@@ -103,61 +107,75 @@ class _DisplayListingsState extends State<DisplayListings> {
                   List<Map<String, dynamic>> listings = listingInfoList[docID] as List<Map<String, dynamic>>;
                   final DetailedListingsStore detailedListingsStore = DetailedListingsStore(docID, listings[index]);
 
-
                   return GestureDetector
-                   ( onTap: ()
+                   (
+                      onTap: ()
                        {
                           Navigator.push(context, MaterialPageRoute(builder: (context) => DetailedListingInfo(detailedListingsStore: detailedListingsStore)));
                        },
-                     child: buildListingWidget(listings[index])
+                     child: Column(
+                       children: [
+                         buildListingWidget(listings[index]),
+                       ],
+                     )
                    );
                 },
               ),
             );
           }
         }
-
     );
   }
-
 
   Widget buildListingWidget(Map<String, dynamic> listingInfo) {
-
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Container(
-        color: Colors.transparent,
-        width: screenWidth - 20,
-        height: screenHeight - 450,
-        child: listingInfo != null
-            ? PageView.builder(
-          itemCount: listingInfo['imageInfoList'].length,
-          itemBuilder: (context, index) {
-            Map<String,
-                dynamic> imageInfo = listingInfo['imageInfoList'][index];
-            String imageUrl = imageInfo['url']; // Correct the field name
-            double rotationAngle = imageInfo['rotationAngle'];
-            return buildImageWidget(imageUrl, rotationAngle);
-          },
-        )
-            : null,
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 15, left: 15, right: 15),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.all(Radius.circular(15)),
+            child: SizedBox(
+              width: screenWidth - 30,
+              height: screenHeight - 500,
+              child: PageView.builder(
+                itemCount: listingInfo['imageInfoList'].length,
+                itemBuilder: (context, index) {
+                  Map<String, dynamic> imageInfo = listingInfo['imageInfoList'][index];
+                  String imageUrl = imageInfo['url'];
+                  return buildImageWidget(imageUrl);
+                },
+              )
+            ),
+          ),
+        ),
+    Padding(
+      padding: const EdgeInsets.only(top:10, left: 25.0),
+      child: Align(
+          alignment: Alignment.topLeft,
+          child: Text(listingInfo['Title'], style:
+          const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),),
       ),
+    ),
+    Padding(
+      padding: const EdgeInsets.only(top:2, left: 25.0),
+      child: Align(
+          alignment: Alignment.topLeft,
+          child: Text(listingInfo['Price']+ '/mo')),
+    ),],
     );
   }
 
-  Widget buildImageWidget(String imagePath, double rotationAngle) {
+  Widget buildImageWidget(String imagePath) {
     return FittedBox(
       fit: BoxFit.cover,
-      child: Transform.rotate(
-        angle: rotationAngle,
-        child: Image.network(
-          // scale: addListingState.zoomLevel,
-          imagePath,
-        ),
+      child: Image.network(
+        imagePath,
       ),
     );
   }
+
 
 
 }

@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:ecomodation/Auth/auth_provider.dart';
 import 'package:ecomodation/Listings/DetailedListingsStore.dart';
 import 'package:ecomodation/Listings/ListingService.dart';
-import 'package:ecomodation/LoginWithPhone.dart';
+import 'package:ecomodation/Messaging/MessageSentSeenStatus.dart';
+import '../phoneLogin/LoginWithPhone.dart';
 import 'package:ecomodation/Messaging/Message.dart';
-import 'package:ecomodation/OTPpage.dart';
+import 'package:ecomodation/phoneLogin/OTPpage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
@@ -19,38 +20,43 @@ class MessageService extends ChangeNotifier {
   final ListingService _listingService = ListingService();
   var receiverID = ' ';
   final checkMapEquality = const DeepCollectionEquality();
+  MessageStatus messageStatus = MessageStatus();
 
   Future<void> sendMessage(String receiverID, String message) async {
 
     //get the current user info
-
     final String currentUserID = loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID;
     final Timestamp timestamp = Timestamp.now();
         Message newMessage = Message(senderID: currentUserID,
         receiverID: receiverID,
         message: message,
-        timestamp: timestamp);
+        timestamp: timestamp,
+        isSeen: false);
+
     //create a new message
+            try{
+              if (loggedInWithGoogle == true) {
+                await _firebaseFirestore.collection('userInfo').doc(googleLoginDocID)
+                    .collection('sentMessages').add(newMessage.toMap());
 
+                await _firebaseFirestore.collection('userInfo').doc(receiverID).
+                collection('receivedMessages').add(newMessage.toMap());
+              }
+              else if (loggedInWithPhone == true) {
+                await _firebaseFirestore.collection('userInfo')
+                    .doc(phoneLoginDocID)
+                    .collection('sentMessages')
+                    .add(newMessage.toMap());
 
-    if (loggedInWithGoogle == true) {
-      await _firebaseFirestore.collection('userInfo').doc(googleLoginDocID)
-          .collection('sentMessages').add(newMessage.toMap());
-
-      await _firebaseFirestore.collection('userInfo').doc(receiverID).
-          collection('receivedMessages').add(newMessage.toMap());
-
-    }
-    else if (loggedInWithPhone == true) {
-      await _firebaseFirestore.collection('userInfo')
-          .doc(phoneLoginDocID)
-          .collection('sentMessages')
-          .add(newMessage.toMap());
-
-      await _firebaseFirestore.collection('userInfo').doc(receiverID).collection('receivedMessages').add(newMessage.toMap());
-
-    }
-    /*  else if(loggedinWithApple == true)
+                await _firebaseFirestore.collection('userInfo').doc(receiverID).collection(
+                    'receivedMessages').add(newMessage.toMap());
+              }
+            }
+            catch(e)
+                {
+                  //print(messageStatus.isMessageSent);
+                }
+                /*  else if(loggedinWithApple == true)
       {
 
       }
@@ -69,7 +75,7 @@ class MessageService extends ChangeNotifier {
   {
     var newReceiverID = '';
 
-    List<String> listingIDs = await _listingService.getDistances();
+    List<String> listingIDs = await _listingService.getListingsInUserDistance();
 
    try {
      if (loggedInWithGoogle == true) {
@@ -111,7 +117,7 @@ class MessageService extends ChangeNotifier {
    }
    catch(e)
     {
-      print(e);
+      //print(e);
     }
     return newReceiverID;
   }
@@ -299,4 +305,22 @@ class MessageService extends ChangeNotifier {
 
   }
 
+  Future <bool> markMessageSeen(String senderID) //Function to mark a message which has been seen.
+  async{
+
+    var snapshot = await FirebaseFirestore.instance.collection('userInfo').doc(senderID).collection('sentMessages').orderBy('Timestamp', descending: true).limit(1).get();
+
+  if(snapshot.docs.isNotEmpty)
+    {
+      String latestSentMessageID = snapshot.docs.first.id;
+
+      await FirebaseFirestore.instance
+          .collection('userInfo')
+          .doc(senderID)
+          .collection('sentMessages')
+          .doc(latestSentMessageID)
+          .update({'isSeen': true});
+      return true;
+    }
+return false;}
 }

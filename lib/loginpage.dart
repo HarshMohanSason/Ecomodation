@@ -2,7 +2,7 @@ import 'package:ecomodation/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'PhoneSignupUI.dart';
+import 'phoneLogin/PhoneSignupUI.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'dart:io';
 import 'Auth/auth_provider.dart';
@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return  Scaffold(
 
-        backgroundColor: const Color(0xFF0BC25F), //set the background color
+        backgroundColor: Colors.white,
 
         body: Column(
             children: <Widget>[
@@ -73,7 +73,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   textStyle: TextStyle( //style the text
                     fontSize: textSizeAnimated, //Adjust the size of the text
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Merriweather',
                   ),
                   speed: const Duration(milliseconds: 100), //How fast the animation runs
                 ),
@@ -168,14 +167,18 @@ class _LoginScreenState extends State<LoginScreen> {
         onPressed: () { Navigator.pushNamed(context, 'LoginWithPhone');
         },//Navigate to the loginWithPhone
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(5),
+              )),
+          backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
           foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
-          fixedSize: MaterialStateProperty.all(const Size(220, 35)),
+          fixedSize: MaterialStateProperty.all(const Size(220, 25)),
         ),
         icon: const Padding(
           padding: EdgeInsets.only(left: 0, right: 8),
           child: Icon(
             Icons.phone,
+            color: Colors.white,
             size: 18,
           ),
         ),
@@ -183,9 +186,9 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: EdgeInsets.only(right: 18.0),
           child: Text("Login with Phone  ",
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 13.5,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Colors.white,
               )),
         ),
       ),

@@ -5,8 +5,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Auth/auth_provider.dart';
-import '../LoginWithPhone.dart';
-import '../OTPpage.dart';
+import '../phoneLogin/LoginWithPhone.dart';
+import 'package:ecomodation/phoneLogin/OTPpage.dart';
 
 class LocationService {
 
@@ -71,7 +71,6 @@ class LocationService {
        var locations = await locationFromAddress(
           zipCode); //get the list Locations
 
-       print(locations);
        if (locations.isNotEmpty) //if the list is not empty
            {
          await uploadLocationToFirebase(locations.first.latitude, locations.first.longitude); //update the new location again to firebase

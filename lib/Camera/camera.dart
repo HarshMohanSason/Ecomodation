@@ -1,9 +1,14 @@
+
+import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:ecomodation/AddListingsUI/AddListing.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'TakePicture.dart';
+import 'dart:io';
+import 'package:croppy/croppy.dart';
+import 'package:path_provider/path_provider.dart';
+
 
 class CameraUI extends StatefulWidget {
 
@@ -17,13 +22,13 @@ class CameraUI extends StatefulWidget {
 
 class _CameraUIState extends State<CameraUI> {
 
+  final AddListing _addListing = const AddListing();
   late CameraController _cameraController; //controller for the device camera
-  bool portrait = false;
   bool isPictureTaken = false;
   late XFile pictureTaken;
   late CameraDescription _currentCamera = widget.cameras![0];
 
-//Create a type future function to initialize the camera using the camera controller
+   //Create a type future function to initialize the camera using the camera controller
   Future initCamera(CameraDescription cameraDescription) async {
     //Initialize the selected camera
 
@@ -48,6 +53,39 @@ class _CameraUIState extends State<CameraUI> {
 
   }
 
+  Future<XFile?> croppedImageToXFile(CropImageResult? image) async
+  {
+    try {
+      if (image == null) {
+        return null;
+      }
+
+      var imageData = await image.uiImage.toByteData(
+          format: ImageByteFormat.png);
+
+      if (imageData != null)
+        {
+      var unit8val = imageData.buffer.asUint8List();
+      var tempDir = await getTemporaryDirectory();
+      var timestamp = DateTime.now().millisecondsSinceEpoch;
+      var filePath = "${tempDir.path}/temp_croppedImage_$timestamp.png";
+
+      // Delete existing file if it exists
+      if (await File(filePath).exists()) {
+        await File(filePath).delete();
+      }
+      File file = await File(filePath).create();
+      file.writeAsBytesSync(unit8val);
+      return XFile(file.path);
+    }
+    }
+    catch(e)
+    {
+      rethrow;
+    }
+     return null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -65,13 +103,13 @@ class _CameraUIState extends State<CameraUI> {
   @override
   Widget build(BuildContext context) {
 
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
       child: Scaffold(
         backgroundColor: Colors.black,
         body: cameraPortrait(context),  //call the camera_portrait widget to build the camera.
 
-          //   Expanded(child: bottomIcons(context)),
+        //   Expanded(child: bottomIcons(context)),
       ),
     );
   }
@@ -81,106 +119,115 @@ class _CameraUIState extends State<CameraUI> {
   Widget bottomIcons(BuildContext context)
   {
 
- //   var sizeOfTakePicButton = screenWidth / 6.5; //Adjust the size of the picture button according to the screenWidth\
-  //  var sizeOfAddPhotoButton = screenWidth / 13; //Adjust the padding of the addphotoButton according to each screen
+    //   var sizeOfTakePicButton = screenWidth / 6.5; //Adjust the size of the picture button according to the screenWidth\
+    //  var sizeOfAddPhotoButton = screenWidth / 13; //Adjust the padding of the addphotoButton according to each screen
 
-    return   Row( // Use a row Widget to handle upload from album icon and take picture
+    return  const Row( // Use a row Widget to handle upload from album icon and take picture
       mainAxisAlignment: MainAxisAlignment.center,
       //Align everytbhing in center
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-       const Spacer(),
+        Spacer(),
       ],
     );
   }
 
 
-  //Initialize the camera in a different widget....
-
   Widget cameraPortrait(BuildContext context) {
-
- //  var boxheight = screenHeight/13;    // leng
-
     return Column(
 
       children: [
-
         SizedBox(
             width: screenWidth,
-            height: screenHeight - 130, //size for the camera.
+            height: screenHeight - 150,
+            child: Center(child: CameraPreview(_cameraController))), // Show the camera preview
 
-            child: CameraPreview(_cameraController)), // Show the camera preview
+        Padding(
+          padding: const EdgeInsets.only(top: 30),
+          child: Row(
 
-           Expanded(
-             child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
 
-               mainAxisAlignment: MainAxisAlignment.center,
-               crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30),
+                ),
+              ),
+            const Spacer(),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: InkWell(
+                  onTap: () async {
+                    pictureTaken = await _cameraController.takePicture();
 
-               children: [
+                    setState(() {
+                      isPictureTaken = true;
+                    });
+                    if(isPictureTaken && mounted) //if the picture is taken, navigate to the takepicture UI
+                        {
+                      try {
+                        Future<CropImageResult?> croppedImage = showCupertinoImageCropper(
+                          context,
+                          imageProvider: FileImage(File(pictureTaken.path)
+                          ),
+                        );
 
-                 Expanded(
-                   child: Align(
-                     alignment: const Alignment(-1,-0.3),
-                     child: IconButton(
-                       onPressed: () {
-                         Navigator.push(context, MaterialPageRoute(builder: (context) => AddListing()));
-                       },
-                       icon: Icon(Icons.arrow_back, color: Colors.white, size: 30),
-                     ),
-                   ),
-                 ),
+                       XFile? finalImage = await croppedImage.then((value) => croppedImageToXFile(value));
 
-                 Expanded(
-                   child: Align(
-                     alignment: const Alignment(0,0),
-                     child: InkWell(
-                      onTap: () async {
-                        pictureTaken = await _cameraController.takePicture();
-                        setState(() {
-                          isPictureTaken = true;
-                        });
-                        if(isPictureTaken) //if the picture is taken, navigate to the takepicture UI
-                          {
-                           Navigator.push(context, MaterialPageRoute(builder: (context) => TakePicture(picture: pictureTaken)));
-                          }
-                      },
-                      child: Icon(Icons.circle_outlined, color: Colors.white, size: 80),
+                        if (finalImage != null && mounted) {
+                        {
+
+                          setState(() {
+                            AddListing.allImages.add(finalImage.path);
+                            Navigator.pushNamed(context, 'ListingProgressBar');
+                          });
+
+                        }
+
+                        }
+                        else {
+                        //  print('Error: finalImage is null');
+                        }
+                      }
+                      catch (e) {
+                        //print('Error: $e');
+                      }
+                    }
+                  },
+                  child: const Icon(Icons.circle_sharp, color: Colors.white, size: 80),
+                ),
+              ),
+            const  Spacer(),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: IconButton(
+                  onPressed: ()
+                  {
+                    setState(() {
+                      if (_currentCamera == widget.cameras![0]) {  //if the rear camera is selected
+
+                        _currentCamera = widget.cameras![1]; //select the front camera
+                      }
+                      else{
+                        _currentCamera = widget.cameras![0];  //else select the rear camera
+                      }
+                      initCamera(_currentCamera); //initialize the camera
+                    });
+                  },
+
+                  icon: const  Icon(Icons.cameraswitch, color: Colors.white, size: 30),
+                ),
+              ),
+            ],
           ),
-                   ),
-                 ),
-
-                 Expanded(
-                   child: Align(
-                     alignment: const Alignment(1,-0.3),
-                     child: IconButton(
-                       onPressed: ()
-                       {
-
-                         setState(() {
-                           if (_currentCamera == widget.cameras![0]) {  //if the rear camera is selected
-
-                             _currentCamera = widget.cameras![1]; //select the front camera
-                           }
-                           else{
-                             _currentCamera = widget.cameras![0];  //else select the rear camera
-                           }
-                           initCamera(_currentCamera); //initialize the camera
-                         });
-                       },
-
-                       icon: Icon(Icons.cameraswitch, color: Colors.white, size: 30),
-                     ),
-                   ),
-                 ),
-
-               ],
-             ),
-           ),
-
+        ),
       ],
     );
   }
-
 }
-

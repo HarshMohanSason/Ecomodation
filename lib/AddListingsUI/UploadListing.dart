@@ -1,12 +1,11 @@
 import 'package:ecomodation/Auth/auth_provider.dart';
-import 'package:ecomodation/LoginWithPhone.dart';
+import '../phoneLogin/LoginWithPhone.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
 import 'AddDescription.dart';
 import '/AddListingsUI/AddListing.dart';
-import '../OTPpage.dart';
-import '../Camera/image_data.dart';
+import 'package:ecomodation/PhoneLogin/OTPpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'ListingPrice.dart';
 import 'dart:io';
@@ -24,8 +23,8 @@ class UploadListing{
     CollectionReference writeListingInfo = userDocument.collection('ListingInfo');  //refer to the listing Info collection
     List<Map<String, dynamic>> imageInfoList = []; // Upload the info.
 
-    for (ImageData imageData in AddListing.imagePaths) {
-      File imageFile = File(imageData.imagePath); //Get the image path
+    for (String image in AddListing.allImages) {
+      File imageFile = File(image); //Get the image path
       String imageName = basename(imageFile.path); //get the basename from the path
       String fileNameClean = imageName.split('.')[0];
       fileNameClean = fileNameClean.replaceAll(RegExp('[^a-zA-Z0-9 ]'),"");
@@ -38,7 +37,6 @@ class UploadListing{
 
         imageInfoList.add({
           'url': imageUrl,
-          'rotationAngle': imageData.rotationAngle,
         });
     }
 

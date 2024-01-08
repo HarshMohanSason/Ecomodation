@@ -1,38 +1,39 @@
 
-import 'package:ecomodation/main.dart';
+import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../main.dart';
 
-class ChatBubble extends StatelessWidget { // This class will help us create chat bubbles fo sending messages
 
-  final String text;  //Text for the message
+class ChatBubble extends StatelessWidget {
+  // This class will help us create chat bubbles fo sending messages
+
+  final String text; //Text for the message
   final bool isCurrentUser; //To check if the message sent is by the current user so we can adjust the color of the sent messages
-  const ChatBubble({Key? key, required this.text, required this.isCurrentUser}) : super(key: key);
+  final bool? isSeen;
+  const ChatBubble({Key? key, required this.text, required this.isCurrentUser, this.isSeen})
+      : super(key: key);
 
   @override
-
   Widget build(BuildContext context) {
-    return Padding(
-      padding:  const EdgeInsets.only(left: 7),
-      child: Align(
-        alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: screenWidth/1.55,
-          ),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-            color: isCurrentUser ? Colors.green : Colors.grey, // if it is the current user, then we display the color of the bubble as green
-            borderRadius: BorderRadius.circular(16), //set the border radius for the chat bubbles
-          ),
-          child: Padding(
-              padding: const EdgeInsets.all(15),
-            child: Text(
-              text, style: const TextStyle(color: Colors.black),
-             ),
-          ),),
-        ),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5.0),
+      child: BubbleNormal(
+   //   sent: isCurrentUser && !isSeen!,
+     // seen: isCurrentUser && isSeen!,
+      constraints: BoxConstraints(
+      maxWidth: screenWidth - 70
       ),
-    );
+      text: text,
+      textStyle: TextStyle(
+
+      color: isCurrentUser ? Colors.white : Colors.black,
+      fontSize: 16
+      ),
+      color: isCurrentUser ? Colors.black87  :  Colors.black26,
+      isSender: isCurrentUser ? true : false,
+      ),
+      );
+
   }
 }

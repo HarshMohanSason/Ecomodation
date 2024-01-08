@@ -4,12 +4,13 @@ import 'package:tflite_flutter/tflite_flutter.dart' as tf;
 
 class Model //class for the AI Model
 {
-  late final interpreter ;
+ // late final interpreter ;
   List<List<double>> _output = [List<double>.filled(1, 0.0)]; //list to hold the output probability predicted by the model
 
 
+
   Future<void> loadModel() async { //function to load the model
-    interpreter = await tf.Interpreter.fromAsset("assets/ImageDetectionModel.tflite"); //loading the model from the assets folder
+    //interpreter = await tf.Interpreter.fromAsset("assets/ImageDetectionModel.tflite"); //loading the model from the assets folder
   }
 
 
@@ -34,7 +35,7 @@ class Model //class for the AI Model
     });
 
     final imageInput = [normalizedImage];   //get the image input matrix
-    interpreter.run(imageInput, _output); //run the model
+    //interpreter.run(imageInput, _output); //run the model
 
     var result = _output.first;
    // print(result);

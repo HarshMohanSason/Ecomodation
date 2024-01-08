@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:ecomodation/main.dart';
 import 'package:page_view_indicators/circle_page_indicator.dart';
 import 'DetailedListingsStore.dart';
-
+import 'FullImageView.dart';
 
 class DetailedListingInfo extends StatefulWidget {
 
@@ -27,15 +27,14 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
   void initState() {
 
      super.initState();
-
   }
 
 
   @override
   Widget build(BuildContext context) {
 
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
       child: Scaffold(
           backgroundColor: Colors.white,
           body: SingleChildScrollView(
@@ -50,23 +49,13 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
                   Stack(children: [
                     _buildListing(widget.detailedListingsStore.listingInfo),
                     Padding(
-                      padding: const EdgeInsets.only(top: 60),
+                      padding: const EdgeInsets.only(top: 60, left: 10),
                       child: Align(
-                        alignment: const Alignment(-1, 0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            style: ButtonStyle(
-                              fixedSize: MaterialStateProperty.all<Size>(Size(screenWidth/10,screenWidth/10)),
-                              shape: MaterialStateProperty.all<OutlinedBorder>(const CircleBorder()),
-                              backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                            ),
-                            child: Icon(Icons.arrow_back_outlined,
-                                size: screenWidth / 16, color: Colors.black,
+                        alignment: Alignment.topLeft,
+                        child: InkWell(
+                            onTap: () => Navigator.pop(context),
+                            child: Icon(Icons.arrow_circle_left_rounded, size: screenWidth/8, color: colorTheme,))
 
-
-                            )),
                       ),
                     ),
                   ]),
@@ -80,6 +69,7 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
                           fontSize: screenWidth / 13,
                         )),
                   ),
+
                   const SizedBox(height: 20),
                   Align(
                     alignment: const Alignment(-0.9, 0),
@@ -91,6 +81,7 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
                   ),
 
                   const SizedBox(height: 20),
+
                   Align(
                     alignment: const Alignment(-0.9, 0),
                     child: Text('Description:' + ' ' +  widget.detailedListingsStore.listingInfo['Description'],
@@ -126,38 +117,42 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
 
   Widget _buildListing(Map<String, dynamic> listingDetails)
   {
-    return Container(
-      color: Colors.grey,
-      width: screenWidth,
-      height: screenHeight - 450,
-      child: PageView.builder(
-        onPageChanged:  (page)
-        {
-          setState(() {
-            _currentPageNotifier.value = page ;
-          });
-        },
-        itemCount: listingDetails['imageInfoList'].length,
-        itemBuilder: (context, index) {
-          Map<String,
-              dynamic> imageInfo = listingDetails['imageInfoList'][index];
-          String imageUrl = imageInfo['url']; // Correct the field name
-          double rotationAngle = imageInfo['rotationAngle'];
-          return buildImageWidget(imageUrl, rotationAngle);
-        },
-      )
+    return GestureDetector(
+      onTap: ()
+      {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => FullImageView(listingDetails: listingDetails)));
+      },
+      child: Container(
+        color: Colors.grey,
+        width: screenWidth,
+        height: screenHeight - 450,
+        child: PageView.builder(
+          onPageChanged:  (page)
+          {
+            setState(() {
+              _currentPageNotifier.value = page ;
+            });
+          },
+
+          itemCount: listingDetails['imageInfoList'].length,
+          itemBuilder: (context, index) {
+            Map<String,
+                dynamic> imageInfo = listingDetails['imageInfoList'][index];
+            String imageUrl = imageInfo['url']; // Correct the field name
+            return buildImageWidget(imageUrl);
+          },
+        )
+      ),
     );
+
   }
 
-  Widget buildImageWidget(String imagePath, double rotationAngle) {
+  Widget buildImageWidget(String imagePath) {
     return FittedBox(
       fit: BoxFit.cover,
-      child: Transform.rotate(
-        angle: rotationAngle,
-        child: Image.network(
-          // scale: addListingState.zoomLevel,
-          imagePath,
-        ),
+      child: Image.network(
+        // scale: addListingState.zoomLevel,
+        imagePath,
       ),
     );
   }
@@ -175,7 +170,7 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
               style: ButtonStyle(
                 fixedSize: MaterialStateProperty.all(const Size(180, 40)),
                 backgroundColor: const MaterialStatePropertyAll(
-                    colorTheme), //set the color for the continue button
+                    Colors.black), //set the color for the continue button
               ),
               onPressed: () async {
                 {
@@ -195,7 +190,7 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
                 'Ask',
                 style: TextStyle(
                   fontSize: 17 * (screenHeight / 932),
-                  color: const Color(0xFFFFFFFF),
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -225,5 +220,27 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
     );
   }
 
+
+  Widget fullImageView(context, Map<String, dynamic> listingDetails)
+  {
+    return Container(
+        color: Colors.transparent,
+        width: screenWidth,
+        height: screenHeight,
+        child: PageView.builder(
+          onPageChanged: (page) {
+            setState(() {
+              _currentPageNotifier.value = page;
+            });
+          },
+          itemCount: listingDetails['imageInfoList'].length,
+          itemBuilder: (context, index) {
+            Map<String, dynamic> imageInfo =
+                listingDetails['imageInfoList'][index];
+            String imageUrl = imageInfo['url']; // Correct the field name
+            return buildImageWidget(imageUrl);
+          },
+        ));
+  }
 }
 

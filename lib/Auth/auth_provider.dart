@@ -1,29 +1,25 @@
-import 'package:ecomodation/OTPpage.dart';
+import 'package:ecomodation/phoneLogin/OTPpage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'auth_checkifloggedin.dart';
+import '../main.dart';
 
-var googleLoginDocID = '';
-var googleUserName = ' ';
+String googleLoginDocID = ' ';
 
 bool loggedInWithGoogle = false;
 
 class Authentication  extends ChangeNotifier{
 
 
-  final writeUserInfo = FirebaseFirestore.instance.collection(
-      'userInfo'); //refer to the collection userInfo
-  final readUserInfo = FirebaseFirestore.instance.collection(
-      'userInfo'); //refer to read the data
+  final writeUserInfo = FirebaseFirestore.instance.collection('userInfo'); //refer to the collection userInfo
+  final readUserInfo = FirebaseFirestore.instance.collection('userInfo'); //refer to read the data
 
   //create an instance to write data to firebase
   static Future <FirebaseApp> initializeFirebase() async //create a async function
       {
-    FirebaseApp firebaseApp = await Firebase
-        .initializeApp(); // Use the await keyword to wait for initialization to complete
+    FirebaseApp firebaseApp = await Firebase.initializeApp(); // Use the await keyword to wait for initialization to complete
 
     return firebaseApp; //return the firebaseApp when initialized
   }
@@ -45,8 +41,10 @@ class Authentication  extends ChangeNotifier{
             .where('email', isEqualTo: gUser.email).get();
 
         if (userSnapshot.docs.isNotEmpty) {
-          // User already exists in Firestore.
-          googleLoginDocID = userSnapshot.docs.first.id;  //get the docID
+          // User already exists in Firestore
+          googleLoginDocID = userSnapshot.docs.first.id; //get the docID
+
+          await storage.write(key: 'googleLoginDocID', value: googleLoginDocID); //write this to the storage
         }
         else {
           // User doesn't exist in Firestore, create a new document.
@@ -57,14 +55,11 @@ class Authentication  extends ChangeNotifier{
             'username': gUser.displayName!,
             'email': gUser.email,
           });
-          googleLoginDocID = newGoogleUser.id;
-          await storage.write(key: 'googleLoginDocID',value: googleLoginDocID); //write this to the storage
-          googleUserName = gUser.displayName!;
-
+         googleLoginDocID = newGoogleUser.id;
+         await storage.write(key: 'googleLoginDocID',value: googleLoginDocID); //write this to the storage
         }
 
         loggedInWithGoogle = true;
-
         return await FirebaseAuth.instance.signInWithCredential(credential);
       }
     } catch (e) { //Catch any errors which occur during the sign in process.
@@ -72,31 +67,34 @@ class Authentication  extends ChangeNotifier{
       return null;
     }
   }
-      signOut() async
+
+     signOut() async
       {
         if(loggedInWithGoogle == true)
         {
-          await GoogleSignIn().signOut();
-          await FirebaseAuth.instance.signOut();
           loggedInWithGoogle = false;
-
+          storage.deleteAll();
+          await GoogleSignIn().signOut();
         }
 
         else if(loggedInWithPhone == true)
           {
-            await FirebaseAuth.instance.signOut();
             loggedInWithPhone = false;
+            storage.deleteAll();
+            await FirebaseAuth.instance.signOut();
           }
 
       }
 
 
-  signInWithApple() async {
+ /* signInWithApple() async {
 
- //   final SignInWithApple aUser = await   //Begin the Sign in with apple process.
+   final SignInWithApple aUser = await   //Begin the Sign in with apple process.
 
-    //final SignInWithApple? aUser =
+    final SignInWithApple? aUser =
   }
+
+  */
 
 }
 

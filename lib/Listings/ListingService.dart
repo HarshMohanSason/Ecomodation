@@ -1,8 +1,7 @@
 
-
 import 'package:ecomodation/Auth/auth_provider.dart';
-import 'package:ecomodation/LoginWithPhone.dart';
-import 'package:ecomodation/OTPpage.dart';
+import '../phoneLogin/LoginWithPhone.dart';
+import 'package:ecomodation/phoneLogin/OTPpage.dart';
 import 'package:ecomodation/homeScreenUI.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
@@ -37,20 +36,20 @@ class ListingService {
   }
 
   //Function to get read Distances of all users
-  Future<List<String>> getDistances() async
+  Future<List<String>> getListingsInUserDistance() async
   {
     List<String> filteredListingIDs = []; //initialize an empty list
-    late QuerySnapshot<Map<String, dynamic>> document;
+    late dynamic document;
 
     if(loggedInWithGoogle) {
-      document = await readUserInfo.where(
-          FieldPath.documentId, isNotEqualTo: googleLoginDocID)
-          .get(); //read the UserInfo from the collection
+     document = await readUserInfo.where(FieldPath.documentId, isNotEqualTo: googleLoginDocID) // Exclude current user's document
+          .get();
     }
+
     else if(loggedInWithPhone)
-      {  document = await readUserInfo.where(
-          FieldPath.documentId, isNotEqualTo: phoneLoginDocID)
-          .get(); //read the UserInfo from the collection
+      {
+       document = await readUserInfo.where(FieldPath.documentId, isNotEqualTo: phoneLoginDocID) // Exclude current user's document
+            .get();
       }
 
     final readData = await SharedPreferences.getInstance(); //instance for the shared preferences;
@@ -59,8 +58,7 @@ class ListingService {
 
     for (var snapshot in document.docs) {
       
-        Map<String, dynamic> data = snapshot
-            .data(); //get the snapshot of the data
+        Map<String, dynamic> data = snapshot.data(); //get the snapshot of the data
       
       if (data.containsKey('Latitude') && data.containsKey('Longitude')) { //if it contains latitude || longitude, return the latitude and longitude values
         double otherUserLatitude = data['Latitude']; //get the latitude
@@ -80,7 +78,7 @@ class ListingService {
   Future<Map<String, List<Map<String, dynamic>>>> getTotalListingsPerUser() async
   {
      List<String> filteredListingIDs = []; //initialize the filteredListingIDs
-     filteredListingIDs = await getDistances(); // Wait to get the entire list of doc IDs.
+     filteredListingIDs = await getListingsInUserDistance(); // Wait to get the entire list of doc IDs.
      Map<String, List<Map<String, dynamic>>> eachListing = {};
      List<Map<String, dynamic>> newListing = [];
       for (var i = 0; i < filteredListingIDs.length; i++)
@@ -94,7 +92,6 @@ class ListingService {
                }
          }
   }
-
     return eachListing;
  }
 

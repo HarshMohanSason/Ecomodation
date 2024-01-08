@@ -1,13 +1,16 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ecomodation/Messaging/MessageWidget.dart';
 import 'package:ecomodation/Messaging/NoMessageWidget.dart';
 import 'package:flutter/material.dart';
 import 'MessageService.dart';
 import 'package:ecomodation/main.dart';
 import 'MessageSenderInfo.dart';
+import 'MessageWidget.dart';
+
 
 
 class HomeScreenMessagingUI extends StatefulWidget {
+
   const HomeScreenMessagingUI({Key? key}) : super(key: key);
 
   @override
@@ -15,106 +18,91 @@ class HomeScreenMessagingUI extends StatefulWidget {
 }
 
 class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
-
+  final TextEditingController textController = TextEditingController();
   final MessageService _messageService = MessageService();
-   Set getEachMessageSenderIDs = <String>{}; //create a Map which stores the senderID's as keys and the messageDetails in a list
-
-  Set messageSendersInfo = <MessageSenderInfo>{};
+  Set getEachMessageSenderIDs = <String>{}; //create a Map which stores the senderID's as keys and the messageDetails in a list
 
   @override
-
-
   Widget build(BuildContext context)
   {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
+      body: Padding(
+        padding: const EdgeInsets.only(top: 80),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(
+              child: StreamBuilder(
+                  stream: _messageService.getEachMessageSenderID(),
+                  builder: (context, snapshot)
+                  {
+                    if (snapshot.connectionState == ConnectionState.waiting)
+                    {
+                      return Center(
+                        child: Column(
+                          children:  [
+                            SizedBox(height: screenHeight/40),
+                            Text('Loading..', style: TextStyle(
+                              fontSize: screenWidth/28,
+                            ),),
+                          ],
+                        ),
+                      );
+                    }
 
-          Padding(
-            padding: const EdgeInsets.only(top: 60),
-            child: Align(
-              alignment: const Alignment(-1,-0.6),
-              child: IconButton (
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(Icons.arrow_back_rounded, size: 35, color: Colors.black)
+                    else if (snapshot.hasError)
+                    {
+                      return Text('Error: ${snapshot.error}'); //if there is any error displaying the data, display that error
+                    }
+
+                    else if (snapshot.data!.docs.isEmpty) //if the snapshot does not have data
+                    {
+                      return const NoMessageWidget(); //return the NoMessageWidget if no messages were found
+                    }
+
+                    else //if the connection is successful, build the messageCards
+                      {
+                      for(var document in snapshot.data!.docs) //iterate through the document
+                      {
+                          var messageInfo = document.data();
+                          getEachMessageSenderIDs.add(messageInfo['senderID']);
+                      }
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                        Padding(
+                          padding: EdgeInsets.only(left: 20),
+                          child: Text('Inbox',
+                              style: TextStyle(
+                                  fontSize: screenHeight/27,
+                                  fontWeight: FontWeight.bold)),
+                        ),
+
+                         Expanded(
+                           child: ListView.builder
+                              (
+                              shrinkWrap: true,
+                              itemExtent: 80.0, //space between the items in the list
+                              itemCount: getEachMessageSenderIDs.length, //the no of cards displayed will be the same as the no of senderID's in the Map
+                              itemBuilder: (context, index)
+                              {
+                                var messageInfo = getEachMessageSenderIDs.elementAt(index);
+
+                                return displayMessageCard(messageInfo); //return the displayMessageCard widget and pass the info about each user to the card widget
+                              },
+                            ),
+                         ),
+                        ],
+                      );
+                      }
+                  }
               ),
             ),
-          ),
-
-
-          Expanded(
-            child: StreamBuilder(
-                stream: _messageService.getEachMessageSenderID(),
-                builder: (context, snapshot)
-                {
-                  if (snapshot.connectionState == ConnectionState.waiting)
-                  {
-                    return Center(
-                      child: Column(
-                        children:  [
-                          SizedBox(height: screenHeight/40),
-                          Text('Loading..', style: TextStyle(
-                            fontSize: screenWidth/28,
-                          ),),
-                        ],
-                      ),
-                    );
-                  }
-
-                  else if (snapshot.hasError)
-                  {
-                    return Text('Error: ${snapshot.error}'); //if there is any error displaying the data, display that error
-                  }
-
-                  else if (snapshot.data!.docs.isEmpty) //if the snapshot does not have data
-                  {
-                    return const NoMessageWidget(); //return the NoMessageWidget if no messages were found
-                  }
-
-                  else //if the connection is successful, build the messageCards
-                    {
-                    for(var document in snapshot.data!.docs) //iterate through the document
-                    {
-                        var messageInfo = document.data();
-                        getEachMessageSenderIDs.add(messageInfo['senderID']);
-                    }
-
-                    return Column(
-                      children: [
-                      Align(
-                      alignment: const Alignment(0,0),
-                      child: Text('Messages',
-                          style: TextStyle(
-                              fontSize: screenHeight/27,
-                              fontWeight: FontWeight.bold)),
-                        ),
-                       const Divider(color: Colors.black,thickness: 4,),
-                       Expanded(
-                         child: ListView.builder
-                            (
-                            shrinkWrap: true,
-                            itemExtent: 80.0, //space between the items in the list
-                            itemCount: getEachMessageSenderIDs.length, //the no of cards displayed will be the same as the no of senderID's in the Map
-                            itemBuilder: (context, index)
-                            {
-                              var messageInfo = getEachMessageSenderIDs.elementAt(index);
-
-                              return displayMessageCard(messageInfo); //return the displayMessageCard widget and pass the info about each user to the card widget
-                            },
-                          ),
-                       ),
-                      ],
-                    );
-                    }
-                }
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -124,15 +112,21 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
 
     var receiverID = senderID; //The senderID of the sender now becomes the receiver ID as the message will be sent back to that user
 
-    String? userName;
+    late final String userName;
+    late final String? profileImageUrl;
 
     return InkWell(
 
-      onTap: ()
-      {
-         Navigator.push(context, MaterialPageRoute(builder: (context) => MessageDisplay(receiverID: receiverID)));
-      },
-      child: Padding(
+       onTap: () {
+         Future.delayed(Duration.zero, () async {
+          //await _messageService.markMessageSeen(senderID);
+           if (mounted) {
+             Navigator.push(context, MaterialPageRoute(builder: (context) => MessageDisplay(receiverID: receiverID, userName: userName, profileURL: profileImageUrl!)));
+           }
+         });
+       },
+
+       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -146,21 +140,20 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
                    if (snapshot.connectionState == ConnectionState.waiting) {
                      return const CircularProgressIndicator();
                    } else if (snapshot.hasError || !snapshot.hasData) {
-                     userName = null;
                      return CircleAvatar(
                        radius: screenWidth / 12.5,
                        child: const Icon(Icons.person),
                      );
                    }  else {
                      userName = snapshot.data!.userName;
+                     profileImageUrl = snapshot.data!
+                         .profileURL;
                      return CircleAvatar(
                        radius: screenWidth / 12.5,
                        child: ClipOval(
-                         child: Image.network(snapshot.data!
-                             .profileURL),
+                         child: Image.network(snapshot.data!.profileURL),
                        ),
                      );
-
                    }
                  },
                ),
@@ -175,7 +168,7 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
                         FutureBuilder<MessageSenderInfo>(
                           future: _messageService.getSenderInfo(senderID),
                           builder: (BuildContext context, snapshot) {
-                                return Text( userName ?? 'No Name',style: TextStyle(
+                                return Text( snapshot.data?.userName ?? 'No Name',style: TextStyle(
                                     fontSize: screenWidth/25,
                                     fontWeight: FontWeight.bold
                                 )
@@ -203,12 +196,15 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
                               {
                                 var messageInfo = snapshotList.first.docs.first.data() as Map<String, dynamic>;
                                 storeLastMessage[messageInfo['message']] = true;
+                            //   _messageService.markMessageSeen(senderID,  snapshotList.first.docs.first.id);
                               }
-                            else
+                            else if(receivedMessageTimestamp.isBefore(sentMessageTimestamp))
                               {
                                 var messageInfo = snapshotList.last.docs.last.data() as Map<String, dynamic>;
                                 storeLastMessage[messageInfo['message']] = false;
+
                               }
+
                               var lastMessage = storeLastMessage.keys.first;
 
                             return Text(storeLastMessage.values.contains(true) ? lastMessage : "You: $lastMessage", maxLines: 1 );
@@ -217,8 +213,10 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
                         }
 
    ),
-                     const  SizedBox(height: 10),// Text for the last sentMessage by the user
-                      const Divider(color: Colors.black,),]
+                    const Padding(
+                         padding: EdgeInsets.only(top: 5),
+                         child:  Divider())// Text for the last sentMessage by the user
+                     ]
              ),
                )),
 

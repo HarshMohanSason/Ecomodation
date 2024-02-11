@@ -121,10 +121,9 @@ class _CameraUIState extends State<CameraUI> {
 
     //   var sizeOfTakePicButton = screenWidth / 6.5; //Adjust the size of the picture button according to the screenWidth\
     //  var sizeOfAddPhotoButton = screenWidth / 13; //Adjust the padding of the addphotoButton according to each screen
-
     return  const Row( // Use a row Widget to handle upload from album icon and take picture
       mainAxisAlignment: MainAxisAlignment.center,
-      //Align everytbhing in center
+      //Align everything in center
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Spacer(),
@@ -168,9 +167,14 @@ class _CameraUIState extends State<CameraUI> {
 
                     setState(() {
                       isPictureTaken = true;
+                      Transform.rotate(
+                          angle: 0,
+                        child: Image.file(File(pictureTaken.path)),
+                      );
                     });
                     if(isPictureTaken && mounted) //if the picture is taken, navigate to the takepicture UI
                         {
+                          //print(Transformation.values);
                       try {
                         Future<CropImageResult?> croppedImage = showCupertinoImageCropper(
                           context,
@@ -182,14 +186,11 @@ class _CameraUIState extends State<CameraUI> {
 
                         if (finalImage != null && mounted) {
                         {
-
                           setState(() {
                             AddListing.allImages.add(finalImage.path);
                             Navigator.pushNamed(context, 'ListingProgressBar');
                           });
-
                         }
-
                         }
                         else {
                         //  print('Error: finalImage is null');

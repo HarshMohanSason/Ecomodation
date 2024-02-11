@@ -30,21 +30,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized(); //Make sure all the widgets are intialized
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform); //Initialize firebase
 
-
   Size screenSize = WidgetsBinding.instance.window.physicalSize; //get the device pixel size
   screenWidth = screenSize.width / WidgetsBinding.instance.window.devicePixelRatio; //get the logical pixels in terms of the width
   screenHeight = screenSize.height / WidgetsBinding.instance.window.devicePixelRatio;  //get the logical pixels in terms of height
 
   runApp( const Ecomodation());
-
 }
-
-
 
 class Ecomodation extends StatelessWidget {
 
   const Ecomodation({Key? key}) : super(key: key);
-
 
   @override
   Widget build(BuildContext context) {

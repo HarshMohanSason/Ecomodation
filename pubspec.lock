@@ -33,6 +33,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.2"
+  asn1lib:
+    dependency: transitive
+    description:
+      name: asn1lib
+      sha256: c9c85fedbe2188b95133cbe960e16f5f448860f7133330e272edbbca5893ddc6
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.5.2"
   async:
     dependency: transitive
     description:
@@ -186,7 +194,7 @@ packages:
     source: hosted
     version: "0.3.3+4"
   crypto:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: crypto
       sha256: aa274aa7774f8964e4f4f38cc994db7b6158dd36e9187aaceaddc994b35c6c67
@@ -912,6 +920,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  pair:
+    dependency: "direct main"
+    description:
+      name: pair
+      sha256: "59ef7f052a9e8c1b208b0566d04c52a0e705e3e2f418255e8153a6f99687e1f6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.2"
   path:
     dependency: "direct main"
     description:
@@ -1057,13 +1073,13 @@ packages:
     source: hosted
     version: "2.1.5"
   pointycastle:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: pointycastle
-      sha256: "7c1e5f0d23c9016c5bbd8b1473d0d3fb3fc851b876046039509e18e0c7485f2c"
+      sha256: "43ac87de6e10afabc85c445745a7b799e04de84cebaa4fd7bf55a5e1e9604d29"
       url: "https://pub.dev"
     source: hosted
-    version: "3.7.3"
+    version: "3.7.4"
   provider:
     dependency: "direct main"
     description:
@@ -1080,6 +1096,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.1"
+  rsa_encrypt:
+    dependency: "direct main"
+    description:
+      name: rsa_encrypt
+      sha256: "8775dc39a9aa3043eaa67d373ca10f6a2ca57d37cc529dabf30f6d0cf35c0c17"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   rxdart:
     dependency: "direct main"
     description:

@@ -94,12 +94,11 @@ class _AddListingState extends State<AddListing> with TickerProviderStateMixin {
               alignment: Alignment.topLeft,
               child: Padding(
                 padding: const EdgeInsets.only(left: 15.0),
-                child: Text('Add an Image', style: TextStyle(
-                  fontSize: fontSize(context, screenWidth / 11),
+                child: Text('Add Your Property', style: TextStyle(
+                  fontSize: fontSize(context, screenWidth / 12),
                   fontWeight: FontWeight.bold,
                 ),),
               )),
-
           SizedBox(height: screenHeight / 15.5),
           Stack(
             children: [

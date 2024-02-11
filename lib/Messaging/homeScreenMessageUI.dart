@@ -1,13 +1,14 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecomodation/Messaging/MessageEncryption.dart';
 import 'package:ecomodation/Messaging/NoMessageWidget.dart';
 import 'package:flutter/material.dart';
+import 'package:pointycastle/asymmetric/api.dart';
+import 'package:rsa_encrypt/rsa_encrypt.dart';
 import 'MessageService.dart';
 import 'package:ecomodation/main.dart';
 import 'MessageSenderInfo.dart';
 import 'MessageWidget.dart';
-
-
 
 class HomeScreenMessagingUI extends StatefulWidget {
 
@@ -21,6 +22,23 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
   final TextEditingController textController = TextEditingController();
   final MessageService _messageService = MessageService();
   Set getEachMessageSenderIDs = <String>{}; //create a Map which stores the senderID's as keys and the messageDetails in a list
+  late RSAPrivateKey rsaPrivateKey;
+
+
+  @override
+  void initState()
+  {
+    super.initState();
+
+    initPrivateKey();
+
+  }
+  Future<void> initPrivateKey() async
+  {
+    RSAEncryption rsaEncryption = RSAEncryption();
+    rsaPrivateKey = await rsaEncryption.getPrivateKey();
+  }
+
 
   @override
   Widget build(BuildContext context)
@@ -74,7 +92,7 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                         Padding(
-                          padding: EdgeInsets.only(left: 20),
+                          padding: const EdgeInsets.only(left: 20),
                           child: Text('Inbox',
                               style: TextStyle(
                                   fontSize: screenHeight/27,
@@ -205,7 +223,7 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
 
                               }
 
-                              var lastMessage = storeLastMessage.keys.first;
+                              var lastMessage = decrypt(storeLastMessage.keys.first, rsaPrivateKey );
 
                             return Text(storeLastMessage.values.contains(true) ? lastMessage : "You: $lastMessage", maxLines: 1 );
                             //return  Text(lastSentMessages.first.length > screenWidth - 350 ? '${lastSentMessages.first.substring(0, 40)}....' : lastSentMessages.first, maxLines: 1,);

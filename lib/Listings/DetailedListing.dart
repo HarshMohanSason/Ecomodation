@@ -136,8 +136,7 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
 
           itemCount: listingDetails['imageInfoList'].length,
           itemBuilder: (context, index) {
-            Map<String,
-                dynamic> imageInfo = listingDetails['imageInfoList'][index];
+            Map<String,dynamic> imageInfo = listingDetails['imageInfoList'][index];
             String imageUrl = imageInfo['url']; // Correct the field name
             return buildImageWidget(imageUrl);
           },
@@ -178,10 +177,7 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
                       .getReceiverID(widget.detailedListingsStore.listingInfo); //get the receiverID
 
                   if(mounted) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                        builder: (context) => InitialMessageWidget(receiverID: receiverId, detailedListingsStore: widget.detailedListingsStore,)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => InitialMessageWidget(receiverID: receiverId, detailedListingsStore: widget.detailedListingsStore,)));
                   }
                 }
               },

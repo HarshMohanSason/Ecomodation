@@ -16,7 +16,6 @@ class UploadListing{
 
   Future uploadListing(var documentId) async
   {
-
     DocumentReference userDocument = FirebaseFirestore.instance.collection('userInfo').doc(documentId); //refer to the document ID.
 
     // Reference to the 'ListingInfo' collection within the user's document
@@ -54,6 +53,17 @@ class UploadListing{
 
   }
 
+  Future<bool> checkIfLocationIsUploaded() async{
+
+        var checkLocation = await FirebaseFirestore.instance.collection('userInfo').doc(loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID).get();
+
+        if(checkLocation.data()!.containsKey('Latitude') && checkLocation.data()!.containsKey('Longitude'))
+          {
+            return true;
+          }
+
+        return false;
+   }
 
   Future checkLoginMethod() async {
 
@@ -66,7 +76,6 @@ class UploadListing{
 
       } else if (loggedInWithPhone == true) { //if the user logged in via phone, upload the listing to the phone reg account
        await uploadListing(phoneLoginDocID);
-
       } //else if (signInProvider == 'apple.com') {
         // User logged in using Apple Sign-In.
         // Handle accordingly.

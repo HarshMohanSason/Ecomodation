@@ -16,7 +16,6 @@ class HomeScreenUI extends StatefulWidget {
   double get enteredDistanceRange => _currentSliderValue;
   set distanceRange(double range) =>  _currentSliderValue = range;
 
-  // final String imagePath;
    HomeScreenUI({Key? key}) : super(key: key);
 
   @override
@@ -167,7 +166,7 @@ class _HomeScreenUIState extends State<HomeScreenUI> {
               child: Column(
                 children: [
                   ElevatedButton.icon(
-                    onPressed: () async {
+                    onPressed: () async { //Whenever get my location is pressed, get the current user location using the API
                       var zipCode = await _locationService.getUserCurrentLocation();
                       setState(() {
                         enterZipCode.text = zipCode!; //fill the zipcode text box with the current  zip code
@@ -199,7 +198,7 @@ class _HomeScreenUIState extends State<HomeScreenUI> {
                   ),
 
                    Padding(
-                     padding: EdgeInsets.only(top: 10),
+                     padding: const EdgeInsets.only(top: 10),
                      child: Text('Or',
                                        style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -208,7 +207,7 @@ class _HomeScreenUIState extends State<HomeScreenUI> {
                    ),
 
                   Padding(
-                    padding: EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.only(top: 10),
                     child: SizedBox(
                       width: screenWidth/3,
                       child: Form(
@@ -245,7 +244,7 @@ class _HomeScreenUIState extends State<HomeScreenUI> {
                   ),
 
                   Padding(
-                    padding: EdgeInsets.only(top: 15, left: 15),
+                    padding: const EdgeInsets.only(top: 15, left: 15),
                     child: Align(
                         alignment: Alignment.topLeft,
                         child: Text('Distance (km)',
@@ -265,6 +264,7 @@ class _HomeScreenUIState extends State<HomeScreenUI> {
                       {
                         setState(() {
                           _mainScreen.distanceRange = value;
+                          _locationService.saveDistanceRange(value.toInt());
                         });
                       }
 
@@ -273,19 +273,31 @@ class _HomeScreenUIState extends State<HomeScreenUI> {
                   Expanded(
                     child: IconButton(
                         onPressed: () async {
-                          if(getMyLocationPressed == true) //if the user has pressed the getMyLocation, get automatic location
-                          {
-                            await _locationService.getUserCurrentLocation(); //call the getUserCurrentLocation()
-                          }
-                          else if(enterZipCode.text.isNotEmpty && _formKey.currentState!.validate()) //get the location from zipCode if manually entered
-                          {
-                            await _locationService.getLocationFromZipCode(enterZipCode.text); //call the getLocationFromZipCode
-                          }
-                           if(mounted && _formKey.currentState!.validate()) {
-                             Navigator.pop(context);
-                           }
-                        },
-                        icon:  Icon(custom_icons.MyFlutterApp.ok_circled, size: screenWidth/12,color: Colors.black,)),
+                          if(mounted && getMyLocationPressed == true && _formKey.currentState!.validate())
+                            {
+                              setState((){
+                                const DisplayListings();
+                                Navigator.pop(context);
+                              });
+                            }
+                          else if(mounted && getMyLocationPressed == false && _formKey.currentState!.validate())
+                            {
+                              await _locationService.getLocationFromZipCode(enterZipCode.text); //save the userLatitude and longitude in sharedPreferences
+                                  setState(() {
+                                   const  DisplayListings();
+                                    Navigator.pop(context);
+                                  } );
+                            }
+                          else
+                            {
+                              Navigator.pop(context);
+                            }
+                            },
+                        icon:  Icon(
+                          custom_icons.MyFlutterApp.ok_circled,
+                          size: screenWidth/12,
+                          color: Colors.black,)),
+
                   ),
                 ],
               ),
@@ -296,7 +308,5 @@ class _HomeScreenUIState extends State<HomeScreenUI> {
       );
     });
   }
-
-
 
 }

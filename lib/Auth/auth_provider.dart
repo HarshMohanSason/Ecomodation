@@ -1,3 +1,4 @@
+import 'package:ecomodation/Messaging/MessageEncryption.dart';
 import 'package:ecomodation/phoneLogin/OTPpage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -57,9 +58,12 @@ class Authentication  extends ChangeNotifier{
           });
          googleLoginDocID = newGoogleUser.id;
          await storage.write(key: 'googleLoginDocID',value: googleLoginDocID); //write this to the storage
+
         }
 
         loggedInWithGoogle = true;
+        RSAEncryption rsaEncryption = RSAEncryption();
+        await rsaEncryption.uploadKeys();
         return await FirebaseAuth.instance.signInWithCredential(credential);
       }
     } catch (e) { //Catch any errors which occur during the sign in process.

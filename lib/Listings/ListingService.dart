@@ -21,9 +21,14 @@ class ListingService {
       double otherUserLongitude) {
     const double earthRadius = 6371.0; //constant earth radius
 
-    //Calculate the distance between two locations using the Haversine formula
+    // Convert degrees to radians
+    currentUserLatitude = _degreesToRadians(currentUserLatitude);
+    currentUserLongitude = _degreesToRadians(currentUserLongitude);
+    otherUserLatitude = _degreesToRadians(otherUserLatitude);
+    otherUserLongitude = _degreesToRadians(otherUserLongitude);
 
-    double dLat = currentUserLatitude -  otherUserLatitude;
+    // Calculate the distance between two locations using the Haversine formula
+    double dLat = currentUserLatitude - otherUserLatitude;
     double dLon = currentUserLongitude - otherUserLongitude;
     double a = sin(dLat / 2) * sin(dLat / 2) +
         cos(currentUserLatitude) * cos(otherUserLatitude) * sin(dLon / 2) *
@@ -35,6 +40,9 @@ class ListingService {
     return distance;
   }
 
+  double _degreesToRadians(double degrees) {
+    return degrees * (pi / 180.0);
+  }
   //Function to get read Distances of all users
   Future<List<String>> getListingsInUserDistance() async
   {
@@ -55,6 +63,7 @@ class ListingService {
     final readData = await SharedPreferences.getInstance(); //instance for the shared preferences;
     var  userLatitude = readData.getDouble('Latitude'); //userLatitude
     var  userLongitude = readData.getDouble('Longitude'); //userLongitude
+    var  userDistance = readData.getInt('userDistance');
 
     for (var snapshot in document.docs) {
       
@@ -66,10 +75,11 @@ class ListingService {
 
         var getDistance = calculateDistance(userLatitude!, userLongitude!, otherUserLatitude, otherUserLongitude); //calculate the distance using the function above
 
-        if (getDistance >= 0 && getDistance <= _mainScreen.enteredDistanceRange) //if the distance is within the range which user entered
+        if (getDistance >= 0 && getDistance <= userDistance!) //if the distance is within the range which user entered
             {
                filteredListingIDs.add(snapshot.id); //add the Listing ID to show to display the listings
             }
+
       }
     }
     return filteredListingIDs; //return the filteredListingIDs.

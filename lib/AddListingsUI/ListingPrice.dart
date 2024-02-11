@@ -113,17 +113,17 @@ class _ListingPriceState extends State<ListingPrice> with TickerProviderStateMix
               ),
             ),
           ),
-          Spacer(),
+          const Spacer(),
           Padding(
-            padding: EdgeInsets.only(bottom: 20),
+            padding: const  EdgeInsets.only(bottom: 20),
             child: Align(
               alignment: Alignment.bottomCenter,
               child: ElevatedButton(
             onPressed: () async {
-              await verifyForm(
-                  context); //make sure the form submitted is correct
+              await verifyForm(context); //make sure the form submitted is correct
+              var isLocationUploaded = await newListing.checkIfLocationIsUploaded();
 
-              if (formValidated == true && mounted) {
+              if (formValidated == true && mounted && isLocationUploaded == true) {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
@@ -147,30 +147,43 @@ class _ListingPriceState extends State<ListingPrice> with TickerProviderStateMix
                   },
                 );
 
-                await newListing.checkLoginMethod();
+                  await newListing.checkLoginMethod();
+                  AddListing.allImages.clear();
+                  AddDescription.descriptionController
+                      .clear(); //clear the description text from the description box
+                  AddDescription.titleController
+                      .clear(); //clear the title text from the title box
+                  ListingPrice.phoneText
+                      .clear(); //clear the phone price from the textbox
 
-                AddListing.allImages.clear();
-                AddDescription.descriptionController.clear(); //clear the description text from the description box
-                AddDescription.titleController.clear(); //clear the title text from the title box
-                ListingPrice.phoneText.clear(); //clear the phone price from the textbox
+                  final pref = await SharedPreferences.getInstance();
+                  pref.setDouble('LinearBarVal', 0.0);
+                  pref.setInt('Index', 0);
 
-                final pref = await SharedPreferences.getInstance();
-                pref.setDouble('LinearBarVal', 0.0);
-                pref.setInt('Index', 0);
+                  if (mounted) {
+                    Navigator.pushNamed(context,
+                        'HomeScreen'); //Navigate back to the home screen once the listing has been uploaded to the database
 
-                if (mounted) {
-                  Navigator.pushNamed(context,
-                      'HomeScreen'); //Navigate back to the home screen once the listing has been uploaded to the database
-
+                    Fluttertoast.showToast(
+                      msg: 'Your listing has been uploaded',
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      backgroundColor: Colors.white,
+                      textColor: Colors.black,
+                    );
+                  }
+                }
+              else
+                {
                   Fluttertoast.showToast(
-                    msg: 'Your listing has been uploaded',
-                    toastLength: Toast.LENGTH_SHORT,
+                    msg: 'No location found for the user. Need user location to upload a listing. Use the location button in the HomeScreen to get your location',
+                    toastLength: Toast.LENGTH_LONG,
+                    timeInSecForIosWeb: 4,
                     gravity: ToastGravity.CENTER,
                     backgroundColor: Colors.white,
                     textColor: Colors.black,
                   );
                 }
-              }
             },
             style: ButtonStyle(
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(

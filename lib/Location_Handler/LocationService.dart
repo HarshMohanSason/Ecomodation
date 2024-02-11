@@ -46,13 +46,12 @@ class LocationService {
         Position position = await Geolocator.getCurrentPosition(); //get the current position
         await uploadLocationToFirebase(position.latitude, position.longitude); //upload the location to firebase
 
-        await storeLocationSharedPref(position.latitude, position.longitude); //store the loaction in sharedPreferences
+        await storeLocationSharedPref(position.latitude, position.longitude); //store the location in sharedPreferences
 
         //list to get the placeMarks
         List<Placemark> placeMarks = await placemarkFromCoordinates(position.latitude, position.longitude);
 
         Placemark zipcode = placeMarks[0]; //get the Zipcode
-
         return zipcode.postalCode; //return the zipCode
       }
       catch (e) { //catch any errors found
@@ -67,9 +66,8 @@ class LocationService {
  Future<dynamic> getLocationFromZipCode(String zipCode) async
  {
    try {
-     if (zipCode.length == 6 || zipCode.length == 5) { // Make sure a valid zipCode is entered
-       var locations = await locationFromAddress(
-          zipCode); //get the list Locations
+     if (zipCode.length == 6) { // Make sure a valid zipCode is entered
+       var locations = await locationFromAddress(zipCode); //get the list Locations
 
        if (locations.isNotEmpty) //if the list is not empty
            {
@@ -124,11 +122,25 @@ class LocationService {
 
    await storeData.setDouble('Latitude', latitude!); //set the latitude value to sharedPref
    await storeData.setDouble('Longitude', longitude!); //set the longitude value to sharedPref
+
     }
  catch(e)
    {
      rethrow;
    }
+ }
+
+ Future<void> saveDistanceRange(int distance) async
+ {
+   final storeData = await SharedPreferences.getInstance(); //get the sharedPref Instance
+
+   storeData.setInt('userDistance', distance); //save the entered the distance locally.
+
+ }
+
+ Future<int?> loadDistance() async {
+   final storeData = await SharedPreferences.getInstance(); // Get the sharedPref Instance
+   return storeData.getInt('userDistance') ?? 5; //return 5 if not distance is or key is present by default
  }
 
 }

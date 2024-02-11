@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:ecomodation/Listings/DetailedListingsStore.dart';
 import '../Listings/AskButtonState.dart';
@@ -36,9 +37,16 @@ class _InitialMessageWidgetState extends State<InitialMessageWidget> {
 
   void sendMessage() async
   {
-    if(_messageController.text.isNotEmpty)
+    try {
+      if (_messageController.text.isNotEmpty) {
+
+        await _messageSerivce.sendMessage(widget.receiverID, _messageController.text);
+        await _messageSerivce.createIsOnlineVal(widget.receiverID);
+      }
+    }
+    catch(e)
     {
-      await _messageSerivce.sendMessage(widget.receiverID, _messageController.text,);
+      print(e);
     }
   }
 
@@ -94,27 +102,12 @@ class _InitialMessageWidgetState extends State<InitialMessageWidget> {
                 if(mounted)
                   {
                     Navigator.pushNamed(context, 'HomeScreen');
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        duration: const Duration(seconds: 1),
-                        backgroundColor: Colors.black,
-                        content: Padding(
-                            padding: EdgeInsets.only(left: screenWidth/13),
-                            child: Text(
-                              "Your Message has been sent",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: screenWidth/30
-                              ),
-                            )),
-                        behavior: SnackBarBehavior.floating,
-                        margin: EdgeInsets.all(screenWidth / 18),
-                        shape: const StadiumBorder(),
-                        action: SnackBarAction(
-                          label: '',
-                          onPressed: () {},
-                        ),
-                      ),
+                    Fluttertoast.showToast(
+                      msg: 'Your Initial Message has been sent!',
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      backgroundColor: Colors.white,
+                      textColor: Colors.black,
                     );
                   }
               }

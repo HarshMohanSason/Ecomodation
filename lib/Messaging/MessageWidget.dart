@@ -1,13 +1,14 @@
 
 import 'dart:async';
-import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomodation/Messaging/MessageService.dart';
 import 'package:ecomodation/Messaging/messageSounds.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
-import '../Camera/camera.dart';
+import 'package:pointycastle/asymmetric/api.dart';
+import 'package:rsa_encrypt/rsa_encrypt.dart';
 import 'chatBubble.dart';
+import 'MessageEncryption.dart';
 
 
 class MessageDisplay extends StatefulWidget {
@@ -30,18 +31,34 @@ class _MessageDisplayState extends State<MessageDisplay> {
   List<dynamic> thisUserMessages = []; //local list to hold messages for the current user
   final MessageSound _messageSound = MessageSound(); //instance for message sound class
   final ScrollController _scrollController = ScrollController(); //manage scrolling of messages
-
   bool checkIfEmpty = false;
-
+  bool isOtherUserOnline = false;
+  late RSAPrivateKey rsaPrivateKey;
   late Stream<List<QuerySnapshot>> allMessagesStream; //stream to get all the messages
 
   @override
 
   void initState() {
+
     super.initState();
-    // Initialize the stream to receive all messages
-    allMessagesStream =  _messageService.getAllMessagesStream(widget.receiverID);
-  }
+    initPrivateKey();
+    _messageService.markAllMessagesSeen(widget.receiverID);
+    _messageService.markOtherUserOnline(widget.receiverID);
+    allMessagesStream =  _messageService.getAllMessagesStream(widget.receiverID);    // Initialize the stream to receive all messages
+    var getStream =  _messageService.getIsOnlineStream(widget.receiverID);
+    getStream.listen((event) {
+      if(mounted){
+      setState(() {
+            if(event.docs.isNotEmpty) {
+              isOtherUserOnline =  event.docs.first.data()['isOnline'];
+            }
+            else
+              {
+                isOtherUserOnline = false;
+              }
+      });}
+    });
+    }
 
   @override
   void dispose()
@@ -50,12 +67,18 @@ class _MessageDisplayState extends State<MessageDisplay> {
     _messageController.dispose();
     _messageService.dispose();
     _scrollController.dispose();
+
   }
 
+  Future<void> initPrivateKey() async
+  {
+     RSAEncryption rsaEncryption = RSAEncryption();
+     rsaPrivateKey = await rsaEncryption.getPrivateKey();
+  }
 
   void sendMessage() async
   {
-    _messageService.sendMessage(widget.receiverID, _messageController.text); //sent the message to database
+    _messageService.sendMessage(widget.receiverID, _messageController.text, isOtherUserOnline); //sent the message to database
 
       _scrollController.animateTo(_scrollController.position.minScrollExtent,
             duration: const Duration(milliseconds: 300),
@@ -67,7 +90,6 @@ class _MessageDisplayState extends State<MessageDisplay> {
 
   @override
   Widget build(BuildContext context) {
-
 
     return PopScope(
       canPop: false,
@@ -82,33 +104,33 @@ class _MessageDisplayState extends State<MessageDisplay> {
               icon: const Icon(Icons.arrow_back_rounded, size: 35, color: Colors.black)
           ),
           title:
-            Row(
-              children: [
+          Row(
+            children: [
 
-                CircleAvatar(
-              radius: screenWidth / 16.5,
-              child: ClipOval(
-                child: Image.network(widget.profileURL ?? "",errorBuilder: (BuildContext context, Object exception, StackTrace? stacktrace)
-                {
-                  return  CircleAvatar(
-                    child: Icon(
-                      Icons.person, // Display a default icon when imageUrl is null
-                      color: Colors.white,
-                      size: screenWidth/20,
-                    )
-                  );
-                },fit: BoxFit.fitWidth),
-              )
-            ),
+              CircleAvatar(
+                  radius: screenWidth / 16.5,
+                  child: ClipOval(
+                    child: Image.network(widget.profileURL ?? "",errorBuilder: (BuildContext context, Object exception, StackTrace? stacktrace)
+                    {
+                      return  CircleAvatar(
+                          child: Icon(
+                            Icons.person, // Display a default icon when imageUrl is null
+                            color: Colors.white,
+                            size: screenWidth/20,
+                          )
+                      );
+                    },fit: BoxFit.fitWidth),
+                  )
+              ),
 
-            Padding(
-              padding: const EdgeInsets.only(left: 15),
-                child:  Text(widget.userName, style: TextStyle(
-                  color: Colors.black,
-                  fontSize: screenWidth /21,
-                ))),
-              ],
-            ),
+              Padding(
+                  padding: const EdgeInsets.only(left: 15),
+                  child:  Text(widget.userName, style: TextStyle(
+                    color: Colors.black,
+                    fontSize: screenWidth /21,
+                  ))),
+            ],
+          ),
 
         ),
         resizeToAvoidBottomInset: true,
@@ -117,10 +139,10 @@ class _MessageDisplayState extends State<MessageDisplay> {
           children: [
             Expanded(child: _buildMessageList()),
             Padding(
-                padding: const EdgeInsets.only(right: 13),
+                padding: const EdgeInsets.only(bottom: 10),
                 child: Center(child: _buildMessageInput())),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
@@ -132,68 +154,81 @@ class _MessageDisplayState extends State<MessageDisplay> {
     return StreamBuilder<List<QuerySnapshot>>(
       stream: allMessagesStream,
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
+
+        if (snapshot.hasError)
+        {
           return Text('Error ${snapshot.error}');
         }
+
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Text('Loading');
         }
-
         // Check if snapshot.data is not null before accessing its properties
         if (snapshot.data != null) {
 
         List<QuerySnapshot> snapshots = snapshot.data!;
+
           thisUserMessages.clear();
 
         for (var document in snapshots) {
-          var messages = document.docs.map((element) => element.data() as Map<String, dynamic>).toList();
+
+          if(document.docs.isNotEmpty){
+          var messages = document.docs.map((element) => element.data() as Map<String, dynamic>);
+
           thisUserMessages.addAll(messages); // add messages to the list
+        }
+
         }
 
         thisUserMessages.sort((a, b) => (b['Timestamp'] as Timestamp).compareTo(a['Timestamp'] as Timestamp)); //sort all the messages by their timestamp
 
-         return ListView.builder(
-           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-           reverse: true,
-           controller: _scrollController,
-            itemCount: thisUserMessages.length,
-            itemBuilder: (context, index) {
-              //build the messages
+        return ListView.builder(
+          shrinkWrap: true,
+          scrollDirection: Axis.vertical,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          reverse: true,
+          controller: _scrollController,
+          itemCount: thisUserMessages.length,
+          itemBuilder: (context, index) {
 
-              return _buildMessageItem(thisUserMessages[index]);
-            },
-          );
-
+            return _buildMessageItem(thisUserMessages[index]);
+          },
+        );
         } else {
           // Handle the case where snapshot.data is null (no data available)
-          return const Text('No new Messages');
+          return  Text('No new Messages');
         }
       },
     );
   }
 
-
   Widget _buildMessageItem(Map<String, dynamic> messageData) {
 
-  var alignment = messageData['senderID'] == widget.receiverID; //check if the message sent by the user matches with that receiverID.
+    var alignment = messageData['senderID'] == widget.receiverID;
+    String timeStamp = _messageService.formatMessageTime(messageData['Timestamp']);
 
-  return ChatBubble(
-      text: messageData['message'],
+    var decryptedMessage = decrypt(messageData['message'], rsaPrivateKey);
+
+    // Return ChatBubble widget with decrypted message
+    return ChatBubble(
+      text: decryptedMessage,
       isCurrentUser: alignment ? false : true,
       isSeen: messageData['isSeen'],
+      timeStamp: timeStamp,
     );
-}
+
+  }
 
 
 
   Widget _buildMessageInput()
   {
 
-    return Row(
-      children: [
-        Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 20, bottom: 30),
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, bottom: 10),
+      child: Row(
+        children: [
+          Expanded(
               child: Form(
                 key: sendMessageKey,
                 child: TextFormField(
@@ -205,11 +240,10 @@ class _MessageDisplayState extends State<MessageDisplay> {
                    decoration: InputDecoration(
                    prefixIcon: IconButton(
                    icon: Icon(
-                     Icons.add,
+                     Icons.location_on_outlined,
                      size: screenWidth/14,
                      color: Colors.black,
-                   ), onPressed: () async{
-                     uploadOrTakeImage(context);
+                   ), onPressed: () {
                    },
                    ),
                    hintText: 'Enter your message here',
@@ -223,112 +257,23 @@ class _MessageDisplayState extends State<MessageDisplay> {
                   ) ,
                 ),
 
-            ),
+                            ),
               ),
           ),
-        ),
 
-            Padding(
-                padding: const EdgeInsets.only(bottom: 45, right: 10), child:
-            IconButton(onPressed: ()
-             {
-              if (_messageController.text.isNotEmpty && _messageController.text.contains(RegExp(r'\S'))) {
-                sendMessage();
-              }
-              _messageController.clear(); //clear the sent Text
-            }, icon: const Icon(Icons.send, size: 45, color: Colors.black,))),
-      ],
+              Padding(
+                padding: const EdgeInsets.only(bottom: 5.0),
+                child: IconButton(onPressed: ()
+                 {
+                  if (_messageController.text.isNotEmpty && _messageController.text.contains(RegExp(r'\S'))) {
+                    sendMessage();
+                  }
+                  _messageController.clear(); //clear the sent Text
+                }, icon: const Icon(Icons.send, size: 45, color: Colors.black,)),
+              ),
+        ],
+      ),
     );
-  }
-
-  Future uploadOrTakeImage(BuildContext context) //Widget to display the option to display and upload image
-  {
-    var boxHeight = screenHeight / 5; //Adjust the size
-    var cameraIconSize = boxHeight / 2.9; //Adjust the size of the Icons
-    var textSize = cameraIconSize / 2.9; //Size for the text
-    // var gapBetweenIcons = boxHeight;  //gap between two icons
-
-
-    return showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return Container(
-              color: Colors.white,
-              height: screenHeight, //height of the container to each device
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  InkWell(
-                    onTap: () async {
-                      try {
-                        await availableCameras().then((value) =>
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) =>
-                                    CameraUI(cameras: value))));
-                      } catch (e) //Handle the case when no camera can be loaded
-                          {
-                        const Text(
-                            'Unable to load the camera from the device'
-                            //display an error on the screen
-                            ,
-                            style: TextStyle(
-                                color: Colors
-                                    .red //Set the color of the text to red.
-                            ));
-                      }
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 5),
-                      child: Row(
-                        //Using a row Widget to place each icon in a row fashion
-                        children: [
-                          IconButton(
-                              onPressed: null,
-                              icon: Icon(Icons.camera_alt,
-                                  size: cameraIconSize, color: Colors.black87)),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 5),
-                            child: Text(
-                              'Camera',
-                              style: TextStyle(
-                                fontSize: textSize,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Divider(thickness: 2, indent: screenWidth /30),
-                  InkWell(
-                    onTap: () {},
-                    child: Row(
-                        children: [
-                          IconButton(
-                              onPressed: null,
-                              icon: Icon(Icons.image_rounded,
-                                  size: cameraIconSize,
-                                  color: Colors.black87)),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 5),
-                            child: Text(
-                              'Gallery',
-                              style: TextStyle(
-                                fontSize: textSize,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ]),
-                  ),
-                  Divider(thickness: 2, indent: screenWidth / 30),
-                ],
-              ));
-        });
-
   }
 
 }

@@ -1,5 +1,6 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecomodation/AppSettings/YourListings.dart';
 import 'package:ecomodation/Auth/auth_provider.dart';
 import '../phoneLogin/LoginWithPhone.dart';
 import 'package:ecomodation/phoneLogin/OTPpage.dart';
@@ -99,8 +100,8 @@ class _AppSettingsState extends State<AppSettings> {
                   ClipOval(
                     child: Container(
                       color: Colors.lightBlueAccent,
-                      width: screenWidth / 2.4,
-                      height: screenHeight / 5.17,
+                      width: screenWidth /4,
+                      height: screenHeight /9,
                       child: Image.network(
                         snapshot.data!.profileImage != null ? snapshot.data!
                             .profileImage! : "",
@@ -173,6 +174,12 @@ class _AppSettingsState extends State<AppSettings> {
           const SizedBox(height: 20),
 
           ListTile(
+            onTap: ()
+              {
+                if(mounted) {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => YourListing()));
+                }
+              },
               leading: Icon(Icons.home, size: 30),
               tileColor: Colors.white,
               title: Text("Your Listings", style: TextStyle(
@@ -180,8 +187,8 @@ class _AppSettingsState extends State<AppSettings> {
               )),
               dense: true
           ),
-          SizedBox(height: 20),
-          ListTile(
+          const SizedBox(height: 20),
+          const ListTile(
               leading: Icon(Icons.favorite, size: 30),
               tileColor: Colors.white,
               title: Text("Saved Listings", style: TextStyle(
@@ -203,9 +210,9 @@ class _AppSettingsState extends State<AppSettings> {
         onTap: () {
       null;
     },
-    leading: Icon(Icons.info, size: 30),
+    leading: const Icon(Icons.info, size: 30),
     tileColor: Colors.white,
-    title: Text("About us", style: TextStyle(
+    title: const Text("About us", style: TextStyle(
     fontSize: 14,
     )),
     dense: true
@@ -232,9 +239,9 @@ class _AppSettingsState extends State<AppSettings> {
                 }
               },
 
-              leading: Icon(Icons.logout, size: 30),
+              leading: const Icon(Icons.logout, size: 30),
               tileColor: Colors.white,
-              title: Text("Sign out", style: TextStyle(
+              title: const Text("Sign out", style: TextStyle(
                 fontSize: 14,
               )),
               dense: true

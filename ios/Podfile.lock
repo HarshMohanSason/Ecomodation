@@ -651,6 +651,8 @@ PODS:
     - nanopb (< 2.30910.0, >= 2.30908.0)
   - croppy (0.0.1):
     - Flutter
+  - fast_rsa (0.6.0):
+    - Flutter
   - Firebase/Auth (10.18.0):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 10.18.0)
@@ -871,6 +873,9 @@ PODS:
     - Flutter
   - smart_auth (0.0.1):
     - Flutter
+  - sqflite (0.0.3):
+    - Flutter
+    - FlutterMacOS
   - SwiftProtobuf (1.25.1)
   - TensorFlowLiteC (2.12.0):
     - TensorFlowLiteC/Core (= 2.12.0)
@@ -901,6 +906,7 @@ DEPENDENCIES:
   - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - croppy (from `.symlinks/plugins/croppy/ios`)
+  - fast_rsa (from `.symlinks/plugins/fast_rsa/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_ml_model_downloader (from `.symlinks/plugins/firebase_ml_model_downloader/ios`)
@@ -920,6 +926,7 @@ DEPENDENCIES:
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sign_in_with_apple (from `.symlinks/plugins/sign_in_with_apple/ios`)
   - smart_auth (from `.symlinks/plugins/smart_auth/ios`)
+  - sqflite (from `.symlinks/plugins/sqflite/darwin`)
   - tflite_flutter (from `.symlinks/plugins/tflite_flutter/ios`)
 
 SPEC REPOS:
@@ -966,6 +973,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   croppy:
     :path: ".symlinks/plugins/croppy/ios"
+  fast_rsa:
+    :path: ".symlinks/plugins/fast_rsa/ios"
   firebase_auth:
     :path: ".symlinks/plugins/firebase_auth/ios"
   firebase_core:
@@ -1004,6 +1013,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/sign_in_with_apple/ios"
   smart_auth:
     :path: ".symlinks/plugins/smart_auth/ios"
+  sqflite:
+    :path: ".symlinks/plugins/sqflite/darwin"
   tflite_flutter:
     :path: ".symlinks/plugins/tflite_flutter/ios"
 
@@ -1015,6 +1026,7 @@ SPEC CHECKSUMS:
   camera_avfoundation: 3125e8cd1a4387f6f31c6c63abb8a55892a9eeeb
   cloud_firestore: 20bb019115acfc53278ed4c8bc5ddda77fc673bb
   croppy: b6199bc8d56bd2e03cc11609d1c47ad9875c1321
+  fast_rsa: 90fe93095f3d80eb8702a547ffff4fb59ccfc546
   Firebase: 414ad272f8d02dfbf12662a9d43f4bba9bec2a06
   firebase_auth: 88053a759923970e580789d167a43b6031568ef5
   firebase_core: 29d66baf806970cda37c93621b27cd369b27db1b
@@ -1059,6 +1071,7 @@ SPEC CHECKSUMS:
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
   sign_in_with_apple: f3bf75217ea4c2c8b91823f225d70230119b8440
   smart_auth: 4bedbc118723912d0e45a07e8ab34039c19e04f2
+  sqflite: 673a0e54cc04b7d6dba8d24fb8095b31c3a99eec
   SwiftProtobuf: 69f02cd54fb03201c5e6bf8b76f687c5ef7541a3
   TensorFlowLiteC: 20785a69299185a379ba9852b6625f00afd7984a
   TensorFlowLiteSwift: 3a4928286e9e35bdd3e17970f48e53c80d25e793

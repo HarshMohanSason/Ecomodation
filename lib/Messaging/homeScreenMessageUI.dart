@@ -156,7 +156,7 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
                  builder: (BuildContext context, snapshot) {
 
                    if (snapshot.connectionState == ConnectionState.waiting) {
-                     return const CircularProgressIndicator();
+                     return  Icon(Icons.person,size: screenWidth / 12.5);
                    } else if (snapshot.hasError || !snapshot.hasData) {
                      return CircleAvatar(
                        radius: screenWidth / 12.5,

@@ -168,8 +168,8 @@ class _ListingPriceState extends State<ListingPrice> with TickerProviderStateMix
                       msg: 'Your listing has been uploaded',
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.CENTER,
-                      backgroundColor: Colors.white,
-                      textColor: Colors.black,
+                      backgroundColor: Colors.green,
+                      textColor: Colors.white,
                     );
                   }
                 }
@@ -180,8 +180,8 @@ class _ListingPriceState extends State<ListingPrice> with TickerProviderStateMix
                     toastLength: Toast.LENGTH_LONG,
                     timeInSecForIosWeb: 4,
                     gravity: ToastGravity.CENTER,
-                    backgroundColor: Colors.white,
-                    textColor: Colors.black,
+                    backgroundColor: Colors.red,
+                    textColor: Colors.white,
                   );
                 }
             },

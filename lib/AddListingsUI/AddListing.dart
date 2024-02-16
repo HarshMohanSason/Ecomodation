@@ -189,13 +189,24 @@ class _AddListingState extends State<AddListing> with TickerProviderStateMixin {
 
 /* Widget to build the Image */
   Widget buildImageWidget(String imagePath) {
-    return FittedBox(
-      fit: BoxFit.contain,
+    if (imagePath.contains('https')) {
+      return FittedBox(
+        fit: BoxFit.contain,
+        child: Image.network(
+          // scale: addListingState.zoomLevel,
+            imagePath
+        ),
+      );
+    }
+    else {
+      return FittedBox(
+        fit: BoxFit.contain,
         child: Image.file(
           // scale: addListingState.zoomLevel,
           File(imagePath),
         ),
-    );
+      );
+    }
   }
 
   Widget addImageButton() {

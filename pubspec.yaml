@@ -65,6 +65,9 @@ dependencies:
   pair: ^0.1.2
   rsa_encrypt: ^2.0.0
   pointycastle: ^3.7.4
+  cached_network_image: ^3.1.0
+  fast_rsa: ^3.6.1
+  flutter_styled_toast: ^2.2.1
 
 
   # The following adds the Cupertino Icons font to your application.

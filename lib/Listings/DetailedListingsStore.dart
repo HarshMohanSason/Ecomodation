@@ -8,4 +8,10 @@ class DetailedListingsStore {
   final Map<String, dynamic> listingInfo;
 
   DetailedListingsStore(this.docID, this.listingInfo);
+
+  Map<String, dynamic> toMap() {
+    listingInfo['docID'] = docID;
+
+    return listingInfo;
+  }
 }

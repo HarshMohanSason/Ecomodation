@@ -53,9 +53,8 @@ class _FullImageViewState extends State<FullImageView> {
 
                   itemCount: widget.listingDetails['imageInfoList'].length,
                   itemBuilder: (context, index) {
-                    Map<String,
-                        dynamic> imageInfo = widget.listingDetails['imageInfoList'][index];
-                    String imageUrl = imageInfo['url']; // Correct the field name
+                    List<dynamic> imageUrls = widget.listingDetails['imageInfoList'];
+                    String imageUrl = imageUrls[index]; // Correct the field name
                     return buildImageWidget(imageUrl);
                   },
                 )

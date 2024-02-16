@@ -1,10 +1,12 @@
 
+import 'package:ecomodation/AppSettings/AppSettingsService.dart';
 import 'package:ecomodation/Listings/DetailedListing.dart';
 import 'package:ecomodation/Listings/DetailedListingsStore.dart';
 import 'package:flutter/material.dart';
 import '../Auth/InternetChecker.dart';
 import '../main.dart';
 import 'ListingService.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
 
 class DisplayListings extends StatefulWidget {
@@ -113,6 +115,36 @@ class _DisplayListingsState extends State<DisplayListings> {
                        {
                           Navigator.push(context, MaterialPageRoute(builder: (context) => DetailedListingInfo(detailedListingsStore: detailedListingsStore)));
                        },
+                      onDoubleTap: () async
+                      {
+                        showToastWidget(
+                          Container(
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.favorite, size: screenWidth/5.5, color: Colors.redAccent),
+                              ],
+                            ),
+                          ),
+
+                          context: context,
+
+                          animation: StyledToastAnimation.fade,
+                          reverseAnimation: StyledToastAnimation.fade,
+                          position: StyledToastPosition.center,
+                          animDuration: Duration(seconds: 1),
+                          duration: Duration(seconds: 2),
+                        );
+
+                        AppSettingsService().saveListing(detailedListingsStore);
+                        },
+
                      child: Column(
                        children: [
                          buildListingWidget(listings[index]),
@@ -128,6 +160,7 @@ class _DisplayListingsState extends State<DisplayListings> {
   }
 
   Widget buildListingWidget(Map<String, dynamic> listingInfo) {
+    List<dynamic> imageUrls = listingInfo['imageInfoList'];
     return Column(
       children: [
         Padding(
@@ -138,10 +171,9 @@ class _DisplayListingsState extends State<DisplayListings> {
               width: screenWidth - 30,
               height: screenHeight - 500,
               child: PageView.builder(
-                itemCount: listingInfo['imageInfoList'].length,
+                itemCount: imageUrls.length,
                 itemBuilder: (context, index) {
-                  Map<String, dynamic> imageInfo = listingInfo['imageInfoList'][index];
-                  String imageUrl = imageInfo['url'];
+                  String imageUrl = imageUrls[index];
                   return buildImageWidget(imageUrl);
                 },
               )
@@ -176,7 +208,6 @@ class _DisplayListingsState extends State<DisplayListings> {
     );
   }
 
-
-
+  
 }
 

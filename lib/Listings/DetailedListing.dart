@@ -1,4 +1,5 @@
 
+import 'package:ecomodation/Auth/auth_provider.dart';
 import 'package:ecomodation/Messaging/InitialMessage.dart';
 import 'package:ecomodation/Messaging/MessageService.dart';
 import 'package:flutter/material.dart';
@@ -117,6 +118,7 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
 
   Widget _buildListing(Map<String, dynamic> listingDetails)
   {
+    List<dynamic> imageUrls = listingDetails['imageInfoList'];
     return GestureDetector(
       onTap: ()
       {
@@ -134,10 +136,9 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
             });
           },
 
-          itemCount: listingDetails['imageInfoList'].length,
+          itemCount: imageUrls.length,
           itemBuilder: (context, index) {
-            Map<String,dynamic> imageInfo = listingDetails['imageInfoList'][index];
-            String imageUrl = imageInfo['url']; // Correct the field name
+            String imageUrl = imageUrls[index]; // Correct the field name
             return buildImageWidget(imageUrl);
           },
         )
@@ -159,8 +160,10 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
   Future<Widget> sendMessageButton() async {
 
      var isInitialMessageSent = await _messageService.checkInitialMessageSent(widget.detailedListingsStore);
+     var receiverId = await _messageService
+         .getReceiverID(widget.detailedListingsStore.listingInfo); //get the receiverID
 
-     if(isInitialMessageSent == false) {
+     if(isInitialMessageSent == false ) {
        return Padding(
         padding: const EdgeInsets.only(bottom: 25),
         child: Align(
@@ -173,9 +176,6 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
               ),
               onPressed: () async {
                 {
-                  var receiverId = await _messageService
-                      .getReceiverID(widget.detailedListingsStore.listingInfo); //get the receiverID
-
                   if(mounted) {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => InitialMessageWidget(receiverID: receiverId, detailedListingsStore: widget.detailedListingsStore,)));
                   }
@@ -219,6 +219,7 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
 
   Widget fullImageView(context, Map<String, dynamic> listingDetails)
   {
+    List<dynamic> imageUrls = listingDetails['imageInfoList'];
     return Container(
         color: Colors.transparent,
         width: screenWidth,
@@ -229,11 +230,9 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
               _currentPageNotifier.value = page;
             });
           },
-          itemCount: listingDetails['imageInfoList'].length,
+          itemCount: imageUrls.length,
           itemBuilder: (context, index) {
-            Map<String, dynamic> imageInfo =
-                listingDetails['imageInfoList'][index];
-            String imageUrl = imageInfo['url']; // Correct the field name
+            String imageUrl = imageUrls[index]; // Correct the field name
             return buildImageWidget(imageUrl);
           },
         ));

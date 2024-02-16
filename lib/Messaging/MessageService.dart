@@ -15,7 +15,6 @@ import 'package:collection/collection.dart';
 import 'MessageSenderInfo.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart';
 
-
 class MessageService extends ChangeNotifier {
 
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
@@ -80,15 +79,7 @@ class MessageService extends ChangeNotifier {
     catch (e) {
       //print(messageStatus.isMessageSent);
     }
-    /*  else if(loggedinWithApple == true)
-      {
 
-      }
-
-   */
-    //construct a chatroom id from current user id and receiver id (Improve uniqueness)
-
-    //add new message to the database
   }
 
 

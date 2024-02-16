@@ -105,6 +105,7 @@ class ListingService {
     return eachListing;
  }
 
+
 }
 
 

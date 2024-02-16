@@ -46,6 +46,7 @@ class Authentication  extends ChangeNotifier{
           googleLoginDocID = userSnapshot.docs.first.id; //get the docID
 
           await storage.write(key: 'googleLoginDocID', value: googleLoginDocID); //write this to the storage
+
         }
         else {
           // User doesn't exist in Firestore, create a new document.
@@ -77,14 +78,14 @@ class Authentication  extends ChangeNotifier{
         if(loggedInWithGoogle == true)
         {
           loggedInWithGoogle = false;
-          storage.deleteAll();
+          storage.delete(key: 'googleLoginDocID');
           await GoogleSignIn().signOut();
         }
 
         else if(loggedInWithPhone == true)
           {
             loggedInWithPhone = false;
-            storage.deleteAll();
+            storage.delete(key: 'phoneLoginDocID');
             await FirebaseAuth.instance.signOut();
           }
 

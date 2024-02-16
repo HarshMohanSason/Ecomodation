@@ -1,6 +1,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ecomodation/AppSettings/YourListings.dart';
+import 'package:ecomodation/AppSettings/SavedListings.dart';
+import 'package:ecomodation/AppSettings/YourListings/YourListings.dart';
 import 'package:ecomodation/Auth/auth_provider.dart';
 import '../phoneLogin/LoginWithPhone.dart';
 import 'package:ecomodation/phoneLogin/OTPpage.dart';
@@ -188,19 +189,13 @@ class _AppSettingsState extends State<AppSettings> {
               dense: true
           ),
           const SizedBox(height: 20),
-          const ListTile(
+           ListTile(
               leading: Icon(Icons.favorite, size: 30),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => SavedListings()));
+              },
               tileColor: Colors.white,
-              title: Text("Saved Listings", style: TextStyle(
-                fontSize: 14,
-              )),
-              dense: true
-          ),
-          const SizedBox(height: 20),
-          const ListTile(
-              leading: Icon(Icons.how_to_reg, size: 30),
-              tileColor: Colors.white,
-              title: Text("Listings Contacted", style: TextStyle(
+              title: const Text("Saved Listings", style: TextStyle(
                 fontSize: 14,
               )),
               dense: true
@@ -239,9 +234,9 @@ class _AppSettingsState extends State<AppSettings> {
                 }
               },
 
-              leading: const Icon(Icons.logout, size: 30),
+              leading: const Icon(Icons.delete_forever, size: 30),
               tileColor: Colors.white,
-              title: const Text("Sign out", style: TextStyle(
+              title: const Text("Delete Account", style: TextStyle(
                 fontSize: 14,
               )),
               dense: true
@@ -251,9 +246,6 @@ class _AppSettingsState extends State<AppSettings> {
       ),
     );
   }
-
-
-
 
   Future<CurrentUserInfo?> getCurrentUserInfo() async{ //function to get the current userInfo
 

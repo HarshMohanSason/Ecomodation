@@ -8,7 +8,6 @@ import 'package:ecomodation/AppSettings/YourListings/DisplayOwnListing.dart';
 import 'package:ecomodation/Listings/DetailedListingsStore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import '../../main.dart';
 
 class YourListing extends StatefulWidget{
@@ -108,215 +107,188 @@ class _YourListingState extends State<YourListing> {
     );
   }
 
-Widget listingsDisplay(Map<String, dynamic> listingDetails, String docID)
-{
-   if(listingDetails.isNotEmpty)
-   {
+  Widget listingsDisplay(Map<String, dynamic> listingDetails, String docID) {
 
-    return InkWell(
-      onTap: ()
-      {
-        DetailedListingsStore detailedListingsStore = DetailedListingsStore(docID, listingDetails);
-        Navigator.push(context, MaterialPageRoute(builder: (context) => DisplayOwnListing(detailedListingsStore: detailedListingsStore)));
-      },
+    if (listingDetails.isNotEmpty) {
 
-      child: Padding(
-
-        padding: const EdgeInsets.only(top: 30, left: 20),
-
-        child: Column(
-          children: [
-            Row(
-
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              children: [
-
-
-              SizedBox(
-              width: screenWidth / 6.5,
-              child: ClipRect(
-                child: CachedNetworkImage(imageUrl: listingDetails['imageInfoList'].first.toString()),
+      return InkWell(
+        onTap: () {
+          DetailedListingsStore detailedListingsStore = DetailedListingsStore(docID, listingDetails);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => DisplayOwnListing(detailedListingsStore: detailedListingsStore)));
+        },
+        child: Card(
+          color: Colors.black,
+          elevation: 8,
+          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  width: 80,
+                  height: 120,
+                  child: CachedNetworkImage(
+                    imageUrl: listingDetails['imageInfoList'].first.toString(),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-            ),
-
-                Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: Text(
-                          listingDetails['Title'],
-                          style: TextStyle(
-                            fontSize: screenWidth/28,
-                          ),
+              title: Text(
+                listingDetails['Title'],
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 30),
+                  if (listingDetails['Rented'] == false)
+                    InkWell(
+                      onTap: () {
+                        if (mounted) {
+                          markAsRentedOrCancel(context);
+                        }
+                      },
+                      child: const Text(
+                        'Mark Rented',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
                       ),
-                      const SizedBox(height: 40),
-                      if(listingDetails['Rented'] == false) ...[
-                      InkWell(
-                        onTap: () async
-                          {
-                            if(mounted)
-                              {
-                                markAsRentedOrCancel(context);
-                              }
-
-                            },
-                          child: const Text(
-                            'Mark Rented',
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                      ),
-
-                              ]
-                    ],
-                  ),
-
-                ),
-               const Spacer(),
-                Padding(
-                    padding: const EdgeInsets.only(right: 5),
-
-                    child: InkWell(
-                        onTap: () {
-
-                          if(mounted)
-                            {
-                              List<dynamic> dynamicList = listingDetails['imageInfoList'];
-                              AddDescription.descriptionController.text = listingDetails['Description'];
-                              AddDescription.titleController.text = listingDetails['Title'];
-                              ListingPrice.phoneText.text = listingDetails['Price'];
-                              AddListing.allImages = List<String>.from(dynamicList); // Convert dynamicList to a List<String>
-                              Navigator.pushNamed(context, 'ListingProgressBar');
-                            }
-
-                        },
-                        child: const Icon(Icons.edit,))),
-              ],
-
+                    ),
+                ],
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.edit, color: Colors.white,),
+                onPressed: () {
+                  if (mounted) {
+                    List<dynamic> dynamicList = listingDetails['imageInfoList'];
+                    AddDescription.descriptionController.text = listingDetails['Description'];
+                    AddDescription.titleController.text = listingDetails['Title'];
+                    ListingPrice.phoneText.text = listingDetails['Price'];
+                    AddListing.allImages = List<String>.from(dynamicList);
+                    Navigator.pushNamed(context, 'ListingProgressBar');
+                  }
+                },
+              ),
             ),
-            const Divider(),
-          ],
-        ),
-      ),
+          ),
 
-    );
-}
-   else
-     {
-       return const Center(child: Text("You do not have any listings yet. Upload some listings first"));
-     }
+        ),
+      );
+    } else {
+      return Center(child: Text("You do not have any listings yet. Upload some listings first"));
+    }
   }
 
-  /* Widget to make the mark rented or cancel popup */
   Future markAsRentedOrCancel(BuildContext context) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           content: SizedBox(
-            height: screenHeight / 6,
-            child: Center(
-              child: Column(
-                children: [
-                  const Text(
-                    'Are you sure you want to mark this listing as rented? Note this action cannot be undone',
-                    style: TextStyle(fontSize: 13),
+            height: 150,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text(
+                  'Mark Listing as Rented?',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 23),
-                    child: Row(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context); //get out of the widget
-                            },
-                            style: ButtonStyle(
-                              backgroundColor:
-                              MaterialStateProperty.all(Colors.grey),
-                              fixedSize: MaterialStateProperty.all(
-                                Size(screenWidth / 3.3, screenWidth / 43.2),
-                              ),
-                            ),
-                            child: const Text(
-                              'Cancel',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10,
-                              ),
-                            ),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  'Are you sure you want to mark this listing as rented? This action cannot be undone.',
+                  style: TextStyle(fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Close the dialog
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.grey),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        const Spacer(),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: ElevatedButton(
-                            onPressed: () async{
-                              if(mounted)
-                                {
-                                  bool markRented = await  AppSettingsService().updateMarkRented(true); //mark the listing rented
-
-                                  if(markRented == true) //if successful
-                                    {
-                                      Fluttertoast.showToast( //display toast to user showing that the listing wasmarked rented
-                                        msg: 'Your listing was marked rented!',
-                                        toastLength: Toast.LENGTH_LONG,
-                                        timeInSecForIosWeb: 3,
-                                        gravity: ToastGravity.CENTER,
-                                        backgroundColor: Colors.green,
-                                        textColor: Colors.white,
-                                      );
-                                      if(mounted) {
-                                        Navigator.pop(context);
-                                      }
-                                    }
-                                  else
-                                    {
-                                      Fluttertoast.showToast( //display toast to user showing that the listing wasmarked rented
-                                        msg: 'Could not Mark Listing Rented, try again!',
-                                        toastLength: Toast.LENGTH_LONG,
-                                        timeInSecForIosWeb: 4,
-                                        gravity: ToastGravity.CENTER,
-                                        backgroundColor: Colors.red,
-                                        textColor: Colors.white,
-                                      );
-                                    }
-
-                                };
-                            },
-                            style: ButtonStyle(
-                              backgroundColor:
-                              MaterialStateProperty.all(Colors.red),
-                              fixedSize: MaterialStateProperty.all(
-                                Size(screenWidth / 3.3, screenWidth / 43.2),
-                              ),
-                            ),
-                            child: const Text(
-                              'Mark Rented',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ),
+                      ),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (mounted) {
+                          bool markRented = await AppSettingsService().updateMarkRented(true);
+                          if (markRented) {
+                            Fluttertoast.showToast(
+                              msg: 'Your listing was marked as rented!',
+                              toastLength: Toast.LENGTH_LONG,
+                              timeInSecForIosWeb: 3,
+                              gravity: ToastGravity.CENTER,
+                              backgroundColor: Colors.green,
+                              textColor: Colors.white,
+                            );
+                            Navigator.pop(context); // Close the dialog
+                          } else {
+                            Fluttertoast.showToast(
+                              msg: 'Could not mark listing as rented. Please try again.',
+                              toastLength: Toast.LENGTH_LONG,
+                              timeInSecForIosWeb: 4,
+                              gravity: ToastGravity.CENTER,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                            );
+                          }
+                        }
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.red),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'Mark Rented',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         );

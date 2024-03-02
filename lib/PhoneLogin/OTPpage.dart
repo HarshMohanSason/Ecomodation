@@ -87,9 +87,9 @@ class _OtpUIState extends State<OtpUI> {
               padding: const EdgeInsets.only(top: 100),
               child: AnimatedTextKit(
                 animatedTexts: [
-                  TyperAnimatedText('Enter your Verification Code',
-                    textStyle : const TextStyle(
-                      fontSize: 24,
+                  TyperAnimatedText('Enter Your Verification Code',
+                    textStyle : TextStyle(
+                      fontSize: screenWidth/16.5,
                       fontWeight: FontWeight.bold,
                     ),
                     speed: const Duration(milliseconds: 100),
@@ -102,17 +102,14 @@ class _OtpUIState extends State<OtpUI> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(top: 100),
-            child: Align(
-                alignment: Alignment.center,
-                child: _pinInputUI(context),
-            ),
+            padding: EdgeInsets.only(top: screenWidth/2),
+            child: Center(child: _pinInputUI(context)),
           ),
 
           Spacer(),
 
           Padding(
-              padding: EdgeInsets.only(bottom: 20),
+              padding: const EdgeInsets.only(bottom: 20),
               child: _submitButton(context)),
         ],
       )
@@ -124,41 +121,53 @@ class _OtpUIState extends State<OtpUI> {
 
   /*------------------------ Widget for building the Pinput UI ------------------------------*/
 
-  Widget _pinInputUI(BuildContext context)
-  {
+
+  Widget _pinInputUI(BuildContext context) {
+
     return SizedBox(
-
       width: screenWidth - 20,
-      child: Center(
-        child: Pinput(
-
-            controller: otpPin,
-            length: 6, //Length for the OTP being entered
-            defaultPinTheme: defaultPinTheme, //Pinput theme
-            validator: (value)
-            {
-              final nonNumericRegExp = RegExp(r'^[0-9]');
-              if(value!.isEmpty == true)
-              {
-                return 'OTP cannot be empty';
-              }
-              //check if the number isWithin 0-9 and is lowercase
-              else  if (!nonNumericRegExp.hasMatch(value))
-              {
-
-                return 'OTP can only contain digits';  //return error if it doesn't match the REGEXP
-              }
-              else if  (value.length < 6)
-              {
-                return 'OTP should be 6 digit number';
-              }
-              return null;
+      child: Pinput(
+          controller: otpPin,
+          length: 6, // Length for the OTP being entered
+          defaultPinTheme: PinTheme(
+            width: 80,
+            height: 70,
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(
+                  21), // Adjust the border radius as needed
+            ),
+            textStyle: TextStyle(
+              fontSize: screenWidth / 14.5,
+              color: Colors.black, // White text color for better visibility
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          errorTextStyle: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+          onSubmitted: (value)
+          {
+            setState(() {
+              value = otpPin.text;
+            });
+          },
+          validator: (value) {
+            final nonNumericRegExp = RegExp(r'^[0-9]');
+            if (value!.isEmpty == true) {
+              return 'OTP cannot be empty';
             }
-        ),
-      ),
+            //check if the number isWithin 0-9 and is lowercase
+            else if (!nonNumericRegExp.hasMatch(value)) {
+              return 'OTP can only contain digits'; //return error if it doesn't match the REGEXP
+            } else if (value.length < 6) {
+              return 'OTP should be 6 digit number';
+            }
+            return null;
+          }),
     );
   }
-
 
 
   /*------------------------------Widget for building the submit button ----------------------*/
@@ -169,18 +178,18 @@ class _OtpUIState extends State<OtpUI> {
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
         foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-        fixedSize: MaterialStateProperty.all(const Size(260,55)),
+        fixedSize: MaterialStateProperty.all( Size(screenWidth/1.5, screenHeight/16)),
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
+              borderRadius: BorderRadius.circular(12.0),
             )
         ),
         elevation: MaterialStateProperty.all(18),
         shadowColor: MaterialStateProperty.all<Color>(Colors.black),
       ),
-      child: const Text('Submit',
+      child:  Text('Submit',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: screenWidth/22,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           )),

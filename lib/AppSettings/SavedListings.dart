@@ -179,10 +179,7 @@ class _SavedListingState extends State<SavedListings> {
         )
     );
   }
-
-
-  Widget displaySavedListings(Map<String, dynamic> map)
-  {
+  Widget displaySavedListings(Map<String, dynamic> map) {
     if (map.isNotEmpty) {
       return InkWell(
         onTap: () {
@@ -191,68 +188,78 @@ class _SavedListingState extends State<SavedListings> {
           Navigator.push(context, MaterialPageRoute(builder: (context) =>
               DetailedListingInfo(detailedListingsStore: detailedListingsStore)));
         },
-
         child: Padding(
-
-          padding: const EdgeInsets.only(top: 30, left: 20),
-
-          child: Column(
-            children: [
-              Row(
-
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-
-                children: [
-                  if(isEditing) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(right: 20),
-                      child: SizedBox(
-                        width: screenWidth/12,
-                        height: screenWidth/12,
-                        child: createSelectButtons(),
-                      ),
-                    ),
-                  ],
-                  Container(
-                    width: screenWidth / 6.5,
-                    child: ClipRect(
-                      child: CachedNetworkImage(
-                          imageUrl: map['imageInfoList'].first
-                              .toString()),
+          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: Offset(0, 3), // changes position of shadow
+                ),
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (isEditing)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child: SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: createSelectButtons(),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: Text(
-                            map['Title'],
-                            style:  TextStyle(
-                                fontSize: screenWidth/28,
-                            ),
-                          ),
-                        ),
-                      ],
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: SizedBox(
+                    width: 100,
+                    child: CachedNetworkImage(
+                      imageUrl: map['imageInfoList'].first.toString(),
+                      fit: BoxFit.cover,
                     ),
-
-                  )
-                ],
-              ),
-              const Divider(),
-            ],
+                  ),
+                ),
+                SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 20),
+                      Text(
+                        map['Title'],
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
-
+      );
+    } else {
+      return Center(
+        child: Text(
+          "You do not have any saved listings here. Double tap on a listing to save it",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey,
+          ),
+        ),
       );
     }
-    else {
-      return const Center(child: Text(
-          "You do not have any saved listings here. Double tap on a listing to save it"));
-    }
   }
+
 
 
   Widget createSelectButtons( )
@@ -312,114 +319,107 @@ class _SavedListingState extends State<SavedListings> {
        }
   }
 
-
   Future deleteSavedListing() {
-
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
-          content: SizedBox(
-            height: screenHeight / 8,
-            child: Center(
-              child: Column(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          contentPadding: EdgeInsets.all(20),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Delete the following saved Listings?',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  const Text(
-                    'Delete the following saved Listings?',
-                    style: TextStyle(fontSize: 13),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 23),
-                    child: Row(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context); //get out of the widget
-                              toggleEdit(false);
-                              boxBorderColor = Colors.grey;
-                              boxColor = Colors.white;
-                            },
-                            style: ButtonStyle(
-                              backgroundColor:
-                              MaterialStateProperty.all(Colors.grey),
-                              fixedSize: MaterialStateProperty.all(
-                                Size(screenWidth / 4, screenWidth / 43.2),
-                              ),
-                            ),
-                            child: const Text(
-                              'Cancel',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Close the dialog
+                      toggleEdit(false);
+                      boxBorderColor = Colors.grey;
+                      boxColor = Colors.white;
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.grey),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        const Spacer(),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              if(mounted)
-                              {
-                                await appSettingsService.deleteSavedListings(selectedItems);
-                                 setState(() {
-                              for (int i = savedListings.length - 1; i >= 0; i--) {
-                              if (selectedItems.length > i && selectedItems[i] == savedListings[i]) {
+                      ),
+                    ),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (mounted) {
+                        await appSettingsService.deleteSavedListings(selectedItems);
+                        setState(() {
+                          for (int i = savedListings.length - 1; i >= 0; i--) {
+                            if (selectedItems.length > i && selectedItems[i] == savedListings[i]) {
                               savedListings.removeAt(i);
                               selectedItems.removeAt(i);
-                              }}
-                                   isEditing = false;
-                                   boxColor = Colors.white;
-                                   boxBorderColor = Colors.grey;
-                                   selectedItems.clear();
-
-                                 });
-
-                                  Fluttertoast.showToast( //display toast to user showing that the listing wasmarked rented
-                                    msg: 'Saved Listings removed',
-                                    toastLength: Toast.LENGTH_LONG,
-                                    timeInSecForIosWeb: 3,
-                                    gravity: ToastGravity.CENTER,
-                                    backgroundColor: Colors.green,
-                                    textColor: Colors.white,
-                                  );
-                                  if(mounted) {
-                                    Navigator.pop(context);
-                                  }
-                                }
-                              },
-                            style: ButtonStyle(
-                              backgroundColor:
-                              MaterialStateProperty.all(Colors.red),
-                              fixedSize: MaterialStateProperty.all(
-                                Size(screenWidth / 4, screenWidth / 43.2),
-                              ),
-                            ),
-                            child: const Text(
-                              'Delete',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ),
+                            }
+                          }
+                          isEditing = false;
+                          boxColor = Colors.white;
+                          boxBorderColor = Colors.grey;
+                          selectedItems.clear();
+                        });
+                        Fluttertoast.showToast(
+                          msg: 'Saved Listings removed',
+                          toastLength: Toast.LENGTH_LONG,
+                          timeInSecForIosWeb: 3,
+                          gravity: ToastGravity.CENTER,
+                          backgroundColor: Colors.green,
+                          textColor: Colors.white,
+                        );
+                        Navigator.pop(context); // Close the dialog
+                      }
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.red),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ],
+                      ),
+                    ),
+                    child: Text(
+                      'Delete',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
+            ],
           ),
         );
       },
     );
   }
+
 }
 

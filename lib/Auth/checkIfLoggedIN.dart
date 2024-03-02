@@ -1,10 +1,8 @@
 
 
-import 'package:ecomodation/Auth/auth_provider.dart';
 import 'package:ecomodation/homeScreenUI.dart';
-import 'package:ecomodation/loginpage.dart';
 import 'package:flutter/material.dart';
-import '../main.dart';
+import '../IntorLoginPage.dart';
 import 'getUserIDandFlag.dart';
 
 class CheckIfLoggedIn extends StatefulWidget {

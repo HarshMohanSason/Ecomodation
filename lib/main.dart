@@ -1,10 +1,12 @@
 
 import 'package:ecomodation/AddListingsUI/AddDescription.dart';
+import 'package:ecomodation/AppSettings/AboutUs.dart';
 import 'package:ecomodation/AppSettings/AppSettings.dart';
 import 'package:ecomodation/AddListingsUI/ListingPrice.dart';
 import 'package:ecomodation/Listings/DisplayListings.dart';
 import 'AddListingsUI/ListingProgressIndicatorBar.dart';
 import 'Auth/checkIfLoggedIN.dart';
+import 'IntorLoginPage.dart';
 import 'phoneLogin/LoginWithPhone.dart';
 import 'package:ecomodation/Messaging/NoMessageWidget.dart';
 import 'package:ecomodation/Messaging/homeScreenMessageUI.dart';
@@ -13,7 +15,6 @@ import 'package:ecomodation/homeScreenUI.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import './loginpage.dart';
 import 'firebase_options.dart';
 
 
@@ -44,7 +45,7 @@ class Ecomodation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-            home: const CheckIfLoggedIn(),
+            home: CheckIfLoggedIn(),
             routes:
             {
               'LoginPage': (context) => const LoginScreen(),
@@ -58,7 +59,8 @@ class Ecomodation extends StatelessWidget {
               'NoMessageWidget': (context) => const NoMessageWidget(),
               'AppSettings':(context)=> const AppSettings(),
               'DisplayListings': (context) => const DisplayListings(),
-              'HomeScreenMessagingUI': (context) => const HomeScreenMessagingUI()
+              'HomeScreenMessagingUI': (context) => const HomeScreenMessagingUI(),
+              'AboutUsScreen': (context) => const AboutUsPage(),
             }
         );
   }

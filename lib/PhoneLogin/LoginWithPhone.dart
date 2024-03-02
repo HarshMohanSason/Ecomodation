@@ -141,55 +141,75 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
 
 
   /*--------------------- Build the text field form for entering the phone number----------------- */
-
-  Widget phoneTextForm(BuildContext context)
-  {
+  Widget phoneTextForm(BuildContext context) {
     return SizedBox(
       width: screenWidth - 20,
       child: TextFormField(
-          keyboardType: TextInputType.number, //Make sure the keyboard opened is the number
-          maxLength: 10,
-          cursorColor: colorTheme,
-          cursorWidth: 4,
-          controller: phone, //keyboardType: TextInputType.text,
-          decoration:  InputDecoration(//For decorating the TextForm box
-            hintStyle: const TextStyle(
-              fontSize: 18, // Size of the hintText
-            ),
-
-            helperText: 'Enter your phone number ', //hintText
-
-              border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(5),
-              borderSide: const BorderSide(   //decorate the border of the box
-                width: 8,
-                style: BorderStyle.solid,
-                //style of the border
-                color: Color(0x000000FF),  //color of the borderlines
-              ),
+        keyboardType: TextInputType.number,
+        maxLength: 10,
+        cursorColor: Colors.black,
+        cursorWidth: 2,
+        controller: phone,
+        style: TextStyle(
+          fontSize: screenWidth/20,
+          color: Colors.black, // Change the text color to your preference
+        ),
+        decoration: InputDecoration(
+          hintText: '+91',
+          hintStyle: TextStyle(
+            fontSize: screenWidth/20,
+            color: Colors.grey, // Change the hint text color to your preference
+          ),
+          helperText: 'Phone Number',
+          helperStyle: TextStyle(
+            fontSize: screenWidth/25,
+            color: Colors.grey, // Change the helper text color to your preference
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5),
+            borderSide: BorderSide(
+              color: Colors.grey.withOpacity(0.5), // Change the border color to your preference
             ),
           ),
-
-          validator: (text) {
-
-            final nonNumericRegExp = RegExp(r'^[0-9]+$'); //RegExp to match the phone number
-            if (text!.isEmpty) { //return an error if the textform is not empty
-              return 'Please enter a valid phone number';
-            }
-            //check if the number isWithin 0-9.
-            if (!nonNumericRegExp.hasMatch(text)) {
-              return 'Phone number must contain only digits'; //
-            }
-            if (text.length < 10) //Make sure the number is a total of 10 digits.
-                {
-              return 'Number should be a ten digit number';
-            }
-
-            return null;
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5),
+            borderSide: BorderSide(
+              color: Colors.grey.withOpacity(0.5), // Change the focused border color to your preference
+              width: 2,
+            ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5),
+            borderSide: BorderSide(
+              color: Colors.red, // Change the error border color to your preference
+              width: 2,
+            ),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5),
+            borderSide: BorderSide(
+              color: Colors.red, // Change the focused error border color to your preference
+              width: 2,
+            ),
+          ),
+        ),
+        validator: (text) {
+          final nonNumericRegExp = RegExp(r'^[0-9]+$');
+          if (text!.isEmpty) {
+            return 'Please enter a valid phone number';
           }
+          if (!nonNumericRegExp.hasMatch(text)) {
+            return 'Phone number must contain only digits';
+          }
+          if (text.length < 10) {
+            return 'Number should be a ten digit number';
+          }
+          return null;
+        },
       ),
     );
   }
+
 
   /*--------------------- Build the login button ----------------- */
 
@@ -198,9 +218,9 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
     return ElevatedButton(
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),
             )),
-        fixedSize: MaterialStateProperty.all(const Size(160, 45)),
+        fixedSize: MaterialStateProperty.all(Size(screenWidth/1.5, screenHeight/18)),
         backgroundColor: const MaterialStatePropertyAll(
             Colors.black), //set the color for the continue button
       ),
@@ -210,7 +230,7 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
       child: Text(
         'Login',
         style: TextStyle(
-          fontSize: 18 * (screenHeight/ 932),
+          fontSize: screenWidth/23,
           color: const Color(0xFFFFFFFF),
           fontWeight: FontWeight.bold,
         ),

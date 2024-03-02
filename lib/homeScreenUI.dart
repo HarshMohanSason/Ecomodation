@@ -67,12 +67,12 @@ class _HomeScreenUIState extends State<HomeScreenUI> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             if (index == 0) ...[
-              const Padding(padding: EdgeInsets.only(top: 50)),
+              const Padding(padding: EdgeInsets.only(top: 25)),
               _locationWidget(),
               Align(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  'Listings near you',
+                  'Listings nearby',
                   style: TextStyle(
                     fontSize: screenWidth / 17,
                     fontWeight: FontWeight.bold,

@@ -133,55 +133,72 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
                   icon: const Icon(Icons.arrow_back_rounded, size: 35, color: Colors.black)
               ),
             ),
-
-            AnimatedTextKit(
-              animatedTexts: [
-                TyperAnimatedText('Let\'s get you started',
-                  textStyle : const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  speed: const Duration(milliseconds: 100),
+          Padding(
+            padding: EdgeInsets.only(left: 10),
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                'Create an Account',
+                style: TextStyle(
+                  fontSize: screenWidth/12.5,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black, // Change the color to your preference
                 ),
-              ],
-              totalRepeatCount: 1,
-              displayFullTextOnTap: true,
-              stopPauseOnTap: true,
+              ),
             ),
+          ),
+          const SizedBox(height: 50),
+          SizedBox(
+            width: screenWidth - 20,
+            child: TextFormField(
+              controller: _usernameController,
+              maxLength: 18,
+              cursorColor: Colors.black,
+              cursorWidth: 2,
+              style: const TextStyle(
+                fontSize: 20,
+                color: Colors.black, // Change the text color to your preference
+              ),
+              decoration: InputDecoration(
+                hintText: 'Enter a username',
+                hintStyle: TextStyle(
+                  fontSize: screenWidth/20,
+                  color: Colors.grey, // Change the hint text color to your preference
+                ),
+                helperText: 'Username', // Modify the helper text
+                helperStyle: TextStyle(
+                  fontSize: screenWidth/25,
+                  color: Colors.grey, // Change the helper text color to your preference
+                ),
 
-            const SizedBox(height: 60),
-
-            const Padding(
-              padding: EdgeInsets.only(left: 15, bottom : 15),
-              child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text('Create an Account', style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                  ),)),
-            ),
-
-            SizedBox(
-              width: screenWidth - 20,
-              child: TextFormField(
-                  controller: _usernameController,
-                  maxLength: 18,
-                  cursorColor: Colors.black,
-                  cursorWidth: 2,
-                  decoration:  InputDecoration(   //For decorating the TextForm box
-                    hintStyle: const TextStyle(
-                      fontSize: 18, // Size of the hintText
-                    ),
-                    helperText: 'Enter your username ', //hintText
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(   //decorate the border of the box
-                        width: 10,
-                        style: BorderStyle.solid,  //style of the border
-                        color: Color(0xFF0BC25F),  //color of the borderlines
-                      ),
-                    ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Colors.grey.withOpacity(0.5), // Change the border color to your preference
                   ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Colors.grey.withOpacity(0.5), // Change the focused border color to your preference
+                    width: 2,
+                  ),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: Colors.red, // Change the error border color to your preference
+                    width: 2,
+                  ),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: Colors.red, // Change the focused error border color to your preference
+                    width: 2,
+                  ),
+                ),
+              ),
                   validator: (text ) {
                     if (text!.isEmpty) {
                       return 'Please enter a valid username';
@@ -203,32 +220,58 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
             ),
             const SizedBox(height: 20),
 
-            SizedBox(
-              width: screenWidth - 20,
-              child: TextFormField(
-                  keyboardType: TextInputType.number, //Make sure the keyboard opened is the number
-                  maxLength: 10,
-                  cursorColor: Colors.black,
-                  cursorWidth: 2,
-                  controller: _phoneNoController,
-                  //keyboardType: TextInputType.text,
-                  decoration:  InputDecoration(//For decorating the TextForm box
-                    hintStyle: const TextStyle(
-                      fontSize: 18, // Size of the hintText
-                    ),
-                    helperText: 'Enter your phone number ', //hintText
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(   //decorate the border of the box
-                        width: 8,
-                        style: BorderStyle.solid,
-                        //style of the border
-                        color: Color(0x000000FF),  //color of the borderlines
-                      ),
-                    ),
+          SizedBox(
+            width: screenWidth - 20,
+            child: TextFormField(
+              keyboardType: TextInputType.number,
+              maxLength: 10,
+              cursorColor: Colors.black,
+              cursorWidth: 2,
+              controller: _phoneNoController,
+              style: TextStyle(
+                fontSize: screenWidth/20,
+                color: Colors.black, // Change the text color to your preference
+              ),
+              decoration: InputDecoration(
+                hintText: 'Enter your phone number',
+                hintStyle: TextStyle(
+                  fontSize: screenWidth/20,
+                  color: Colors.grey, // Change the hint text color to your preference
+                ),
+                helperText: 'Phone Number',
+                helperStyle: TextStyle(
+                  fontSize: screenWidth/25,
+                  color: Colors.grey, // Change the helper text color to your preference
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Colors.grey.withOpacity(0.5), // Change the border color to your preference
                   ),
-              
-                  validator: (text) {
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Colors.grey.withOpacity(0.5), // Change the focused border color to your preference
+                    width: 2,
+                  ),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: Colors.red, // Change the error border color to your preference
+                    width: 2,
+                  ),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: Colors.red, // Change the focused error border color to your preference
+                    width: 2,
+                  ),
+                ),
+              ),
+          validator: (text) {
                     final nonNumericRegExp = RegExp(r'^[0-9]+$'); //RegExp to match the phone number
                     if (text!.isEmpty) { //return an error if the textform is not empty
                       return 'Please enter a valid phone number';
@@ -265,15 +308,15 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),
                       )),
-                  fixedSize: MaterialStateProperty.all(const Size(180,40)),
+                  fixedSize: MaterialStateProperty.all( Size(screenWidth/1.5, screenHeight/15)),
                   backgroundColor: MaterialStateProperty.all(Colors.black), //set the color for the continue button
                 ),
 
                 onPressed: () => navigateToOTPUI(context), //Once added, navigate to the OTP screen to get the OTP
-                child: const Text(
+                child: Text(
                   'Create Account',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: screenWidth/24,
                     color: colorTheme,
                     fontWeight: FontWeight.bold,
                   ),

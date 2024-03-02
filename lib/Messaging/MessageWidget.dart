@@ -207,11 +207,11 @@ class _MessageDisplayState extends State<MessageDisplay> {
     var alignment = messageData['senderID'] == widget.receiverID;
     String timeStamp = _messageService.formatMessageTime(messageData['Timestamp']);
 
-    var decryptedMessage = decrypt(messageData['message'], rsaPrivateKey);
+    //var decryptedMessage = decrypt(messageData['message'], rsaPrivateKey);
 
     // Return ChatBubble widget with decrypted message
     return ChatBubble(
-      text: decryptedMessage,
+      text: messageData['message'],
       isCurrentUser: alignment ? false : true,
       isSeen: messageData['isSeen'],
       timeStamp: timeStamp,

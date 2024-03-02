@@ -27,30 +27,27 @@ class MessageService extends ChangeNotifier {
 
     //get the current user info
 
-    final String currentUserID = loggedInWithGoogle
-        ? googleLoginDocID
-        : phoneLoginDocID;
+    final String currentUserID = loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID;
     final Timestamp timestamp = Timestamp.now();
-
     RSAEncryption rsaEncryption = RSAEncryption();
 
-    var getPublicKey = await rsaEncryption.getReceiverPublicKey(receiverID); //get the public key
+   // var getPublicKey = await rsaEncryption.getReceiverPublicKey(receiverID); //get the public key
 
-    var encryptedMessage = encrypt(message, getPublicKey); //encrypt the message by passing the public key:
+   // var encryptedMessage = encrypt(message, getPublicKey); //encrypt the message by passing the public key:
 
     Message newMessage = Message(senderID: currentUserID,
         receiverID: receiverID,
-        message: encryptedMessage,
+        message: message,
         timestamp: timestamp,
         isSeen: isSeen ?? false);
 
-    var getOwnPublicKey = await rsaEncryption.getOwnPublicKey();
+    //var getOwnPublicKey = await rsaEncryption.getOwnPublicKey();
 
-    var ownEncryptedMessage = encrypt(message, getOwnPublicKey);
+    //var ownEncryptedMessage = encrypt(message, getOwnPublicKey);
 
     Message ownMessage = Message(senderID: currentUserID,
         receiverID: receiverID,
-        message: ownEncryptedMessage,
+        message: message,
         timestamp: timestamp,
         isSeen: false);
 
@@ -77,7 +74,7 @@ class MessageService extends ChangeNotifier {
       }
     }
     catch (e) {
-      //print(messageStatus.isMessageSent);
+      print(e);
     }
 
   }

@@ -41,7 +41,7 @@ class _InitialMessageWidgetState extends State<InitialMessageWidget> {
       if (_messageController.text.isNotEmpty) {
 
         await _messageSerivce.sendMessage(widget.receiverID, _messageController.text);
-        await _messageSerivce.createIsOnlineVal(widget.receiverID);
+       await _messageSerivce.createIsOnlineVal(widget.receiverID);
       }
     }
     catch(e)

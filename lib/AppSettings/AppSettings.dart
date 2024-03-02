@@ -1,5 +1,6 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecomodation/AppSettings/PrivacyPolicy.dart';
 import 'package:ecomodation/AppSettings/SavedListings.dart';
 import 'package:ecomodation/AppSettings/YourListings/YourListings.dart';
 import 'package:ecomodation/Auth/auth_provider.dart';
@@ -185,6 +186,7 @@ class _AppSettingsState extends State<AppSettings> {
               tileColor: Colors.white,
               title: Text("Your Listings", style: TextStyle(
                 fontSize: 14,
+                  fontWeight: FontWeight.bold
               )),
               dense: true
           ),
@@ -197,31 +199,53 @@ class _AppSettingsState extends State<AppSettings> {
               tileColor: Colors.white,
               title: const Text("Saved Listings", style: TextStyle(
                 fontSize: 14,
+                  fontWeight: FontWeight.bold
               )),
               dense: true
           ),
           const SizedBox(height: 20),
         ListTile(
         onTap: () {
-      null;
+      Navigator.pushNamed(context, 'AboutUsScreen');
     },
     leading: const Icon(Icons.info, size: 30),
     tileColor: Colors.white,
     title: const Text("About us", style: TextStyle(
     fontSize: 14,
+   fontWeight: FontWeight.bold
     )),
     dense: true
     ),
           const SizedBox(height: 20),
-          const ListTile(
-              leading: Icon(Icons.policy, size: 30),
+          ListTile(
+              onTap: ()
+              {
+                null;
+              },
+              leading: Icon(Icons.book, size: 30),
               tileColor: Colors.white,
-              title: Text("Privacy Policy", style: TextStyle(
+              title: Text("Terms and Conditions", style: TextStyle(
                 fontSize: 14,
+                fontWeight: FontWeight.bold
               )),
               dense: true
           ),
           const SizedBox(height: 20),
+            ListTile(
+            onTap: ()
+            {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> PrivacyPolicy()));
+            },
+              leading: Icon(Icons.policy, size: 30),
+              tileColor: Colors.white,
+              title: Text("Privacy Policy", style: TextStyle(
+                fontSize: 14,
+                  fontWeight: FontWeight.bold
+              )),
+              dense: false,
+          ),
+          const SizedBox(height: 20),
+
           ListTile(
               onTap: () async {
                 await instance.signOut();
@@ -238,6 +262,7 @@ class _AppSettingsState extends State<AppSettings> {
               tileColor: Colors.white,
               title: const Text("Delete Account", style: TextStyle(
                 fontSize: 14,
+                  fontWeight: FontWeight.bold
               )),
               dense: true
           ),

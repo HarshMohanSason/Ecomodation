@@ -41,16 +41,21 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Explanation on why the camera access is needed.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Ecomodation needs your location to show you nearby listings</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Ecomodation needs your location to show you nearby listings</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Ecomodation needs your location to show you nearby listings</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Explanation on why the microphone access is needed.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app requires to access your photo library to show image on profile and send via chat</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

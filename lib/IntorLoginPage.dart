@@ -1,3 +1,4 @@
+import 'package:ecomodation/PhoneLogin/OTPpage.dart';
 import 'package:ecomodation/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -44,53 +45,56 @@ class _LoginScreenState extends State<LoginScreen> {
     double animatedPadding = topPaddingEcom/2;  //Adjust padding accordingly between top text and animated text
     double getStartedPadding = topPaddingEcom*2; //adjust padding accordingly between the top of the phone and get started button
 
-    return  Scaffold(
+    return  PopScope(
+      canPop: false,
+      child: Scaffold(
 
-        backgroundColor: Colors.white,
+          backgroundColor: Colors.white,
 
-        body: Column(
-            children: <Widget>[
-          Padding(padding: EdgeInsets.only(top: topPaddingEcom)),
-          Text(
-            "Ecomodation ", //Name of the app displayed on top
-            textAlign: TextAlign.center, //center the name
-            style: TextStyle(   //Some styling for the text
-              color: Colors.black,
-              fontSize: textSizeEcomodation,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'LibreBaskerville',
+          body: Column(
+              children: <Widget>[
+            Padding(padding: EdgeInsets.only(top: topPaddingEcom)),
+            Text(
+              "Ecomodation ", //Name of the app displayed on top
+              textAlign: TextAlign.center, //center the name
+              style: TextStyle(   //Some styling for the text
+                color: Colors.black,
+                fontSize: textSizeEcomodation,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'LibreBaskerville',
+              ),
             ),
-          ),
 
-          SizedBox(height: animatedPadding), //Padding after the name
+            SizedBox(height: animatedPadding), //Padding after the name
 
-          Container(
-            alignment: const Alignment(0, -0.6), //Align the animated text
-            child: AnimatedTextKit(  //Using the animated textkit from packages
-              animatedTexts: [
-                TyperAnimatedText(
-                  'Accomodation made easier for you',  //Text to be displayed
-                  textStyle: TextStyle( //style the text
-                    fontSize: textSizeAnimated, //Adjust the size of the text
-                    fontWeight: FontWeight.bold,
+            Container(
+              alignment: const Alignment(0, -0.6), //Align the animated text
+              child: AnimatedTextKit(  //Using the animated textkit from packages
+                animatedTexts: [
+                  TyperAnimatedText(
+                    'Accomodation made easier for you',  //Text to be displayed
+                    textStyle: TextStyle( //style the text
+                      fontSize: textSizeAnimated, //Adjust the size of the text
+                      fontWeight: FontWeight.bold,
+                    ),
+                    speed: const Duration(milliseconds: 80), //How fast the animation runs
                   ),
-                  speed: const Duration(milliseconds: 100), //How fast the animation runs
-                ),
-              ],
-              totalRepeatCount: 1,   //Repeat once
-              displayFullTextOnTap: true, //Display full text when tapped on it
-              stopPauseOnTap: true, //Pause it on tap, set it on true
+                ],
+                totalRepeatCount: 10,   //Repeat once
+                displayFullTextOnTap: true, //Display full text when tapped on it
+                stopPauseOnTap: true, //Pause it on tap, set it on true
+              ),
             ),
-          ),
 
-           SizedBox(height: getStartedPadding),
+             SizedBox(height: getStartedPadding),
 
-          buildGetStartedButton(), //Get started Button
+            buildGetStartedButton(), //Get started Button
 
-          buildAllLoginButtons(), //Calling the build all login butotns
-          //fontStyle:
-        ]),
+            buildAllLoginButtons(), //Calling the build all login butotns
+            //fontStyle:
+          ]),
 
+      ),
     );
 
   }
@@ -101,37 +105,40 @@ class _LoginScreenState extends State<LoginScreen> {
 /*----------------- BUTTON IMPLEMENTATIONS -----------------------------------*/
 
   Widget buildGetStartedButton() {
-
-    var getStartedWidth = screenWidth - 130; //get the desired button width on each device.
-    var getStartedHeight = (screenHeight / 2.19) / 5.31; //To get the desired getstartedbutton height.
-    var getStartedcircularradius = getStartedHeight/4.00; //To set the desired radius of the button according to its height
-    double getStartedText = fontSize(context, 23); //size for getstarted button text
+    var getStartedWidth = screenWidth - 130;
+    var getStartedHeight = (screenHeight / 2.19) / 5.31;
+    double getStartedTextSize = fontSize(context, 23);
 
     return ElevatedButton(
-
       onPressed: () {
-        handleLoginButtonPress(context); //if get started is pressed, navigate to the signup info
+        handleLoginButtonPress(context);
       },
-      style: ButtonStyle( //Styling the buttons
-        backgroundColor: MaterialStateProperty.all<Color>(Colors.black), //set the background color of the button
-        foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
-        fixedSize:
-            MaterialStateProperty.all(Size(getStartedWidth, getStartedHeight)), //adjust the size of the button accordingly
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(getStartedcircularradius),
-        )),
-        elevation: MaterialStateProperty.all(18),
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+        elevation: MaterialStateProperty.all(30),
         shadowColor: MaterialStateProperty.all<Color>(Colors.black),
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+        ),
       ),
-
-      child:  Text("Get Started", //Style the text
+      child: Container(
+        width: getStartedWidth,
+        height: getStartedHeight,
+        alignment: Alignment.center,
+        child: Text(
+          "Get Started",
           style: TextStyle(
-            fontSize: getStartedText,
+            fontSize: getStartedTextSize,
             fontWeight: FontWeight.bold,
             color: Colors.white,
-          )),
+          ),
+        ),
+      ),
     );
   }
+
 
   Widget buildGoogleButton() {
 
@@ -164,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Align(
       alignment: const Alignment(0, 0.9),
       child: ElevatedButton.icon(
-        onPressed: () { Navigator.pushNamed(context, 'LoginWithPhone');
+        onPressed: () { Navigator.pushNamed(context, "LoginWithPhone");
         },//Navigate to the loginWithPhone
         style: ButtonStyle(
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -196,6 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget buildAllLoginButtons() {
+
     double aftergetStartedPadding = screenHeight / 4; //adjust padding accordingly after the get started button
     double paddingotherbuttons = screenHeight / 37.28; //adjust the padding between other buttons accordingly to the screenHeight;
 

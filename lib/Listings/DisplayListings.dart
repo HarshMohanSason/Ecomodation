@@ -158,46 +158,64 @@ class _DisplayListingsState extends State<DisplayListings> {
         }
     );
   }
-
   Widget buildListingWidget(Map<String, dynamic> listingInfo) {
     List<dynamic> imageUrls = listingInfo['imageInfoList'];
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 15, left: 15, right: 15),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.all(Radius.circular(15)),
-            child: SizedBox(
-              width: screenWidth - 30,
-              height: screenHeight - 500,
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 3), // changes position of shadow
+              ),
+            ],
+          ),
+          child: SizedBox(
+            width: screenWidth - 30,
+            height: screenHeight * 0.425,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
               child: PageView.builder(
                 itemCount: imageUrls.length,
                 itemBuilder: (context, index) {
                   String imageUrl = imageUrls[index];
                   return buildImageWidget(imageUrl);
                 },
-              )
+              ),
             ),
           ),
         ),
-    Padding(
-      padding: const EdgeInsets.only(top:10, left: 25.0),
-      child: Align(
-          alignment: Alignment.topLeft,
-          child: Text(listingInfo['Title'], style:
-          const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),),
-      ),
-    ),
-    Padding(
-      padding: const EdgeInsets.only(top:2, left: 25.0),
-      child: Align(
-          alignment: Alignment.topLeft,
-          child: Text(listingInfo['Price']+ '/mo')),
-    ),],
+        Padding(
+          padding: const EdgeInsets.only(left: 25.0),
+          child: Text(
+            listingInfo['Title'],
+            style:  TextStyle(
+              fontSize: screenWidth/19,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 25.0),
+          child: Text(
+            '${listingInfo['Price']} /mo',
+            style: TextStyle(
+              fontSize: screenWidth/25,
+              color: Colors.black
+            ),
+          ),
+        ),
+      ],
     );
   }
+
 
   Widget buildImageWidget(String imagePath) {
     return FittedBox(

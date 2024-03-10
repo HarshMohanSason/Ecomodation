@@ -1,5 +1,5 @@
 
-import 'package:ecomodation/Auth/auth_provider.dart';
+
 import 'package:ecomodation/Messaging/InitialMessage.dart';
 import 'package:ecomodation/Messaging/MessageService.dart';
 import 'package:flutter/material.dart';
@@ -170,9 +170,14 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
             alignment: const Alignment(0, 0.5),
             child: ElevatedButton(
               style: ButtonStyle(
-                fixedSize: MaterialStateProperty.all(const Size(180, 40)),
+                fixedSize: MaterialStateProperty.all(Size(screenWidth-20,screenHeight/18)),
                 backgroundColor: const MaterialStatePropertyAll(
-                    Colors.black), //set the color for the continue button
+                    Colors.black),
+               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                 RoundedRectangleBorder(
+                   borderRadius: BorderRadius.circular(10.0),
+                 ),
+               ),//set the color for the continue button
               ),
               onPressed: () async {
                 {
@@ -185,7 +190,7 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
               child: Text(
                 'Ask',
                 style: TextStyle(
-                  fontSize: 17 * (screenHeight / 932),
+                  fontSize: screenWidth/20,
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),

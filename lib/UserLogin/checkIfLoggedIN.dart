@@ -2,8 +2,8 @@
 
 import 'package:ecomodation/homeScreenUI.dart';
 import 'package:flutter/material.dart';
-import '../IntorLoginPage.dart';
-import 'getUserIDandFlag.dart';
+import 'IntroLoginPageUI.dart';
+import '../main.dart';
 
 class CheckIfLoggedIn extends StatefulWidget {
   const CheckIfLoggedIn({Key? key}) : super(key: key);
@@ -14,37 +14,38 @@ class CheckIfLoggedIn extends StatefulWidget {
 
 
 class _CheckIfLoggedInState extends State<CheckIfLoggedIn> {
-  late final GetUserIDAndFlag _getUserIDAndFlag;
+
 
   @override
   void initState() {
+
     super.initState();
-   _getUserIDAndFlag = GetUserIDAndFlag();
+    checkIfLoggedIn();
   }
 
   @override
   void dispose()
   {
     super.dispose();
-   _getUserIDAndFlag.dispose();
   }
+
+  Future<void> initFuture() async {
+    await checkIfLoggedIn();
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(
-          future: _getUserIDAndFlag.getCurrentDocID(),
+          future: checkIfLoggedIn(),
           builder: (context, snapshot) {
 
             if(snapshot.connectionState == ConnectionState.waiting)
               {
                 return const CircularProgressIndicator();
               }
-            else if(snapshot.hasError)
-              {
-                return const Center(child: Text("Error logging in, Please try again"));
-              }
-            else if(snapshot.hasData)
+            else if(snapshot.data == true)
               {
                 return HomeScreenUI();
               }
@@ -55,6 +56,20 @@ class _CheckIfLoggedInState extends State<CheckIfLoggedIn> {
           }
       ),
     );
+  }
+
+
+  Future<bool> checkIfLoggedIn() async
+  {
+    try {
+      if ((await storage.containsKey(key: 'LoggedIn'))) {
+        return true;
+      }
+    }
+    catch (e) {
+      rethrow;
+    }
+    return false;
   }
 
 }

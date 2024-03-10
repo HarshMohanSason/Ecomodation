@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../phoneLogin/OTPpage.dart';
+import '../phoneLogin/OTPpageUI.dart';
 
 String phoneLoginDocID = ' '; //Get the documentID for the PhoneLogin
 

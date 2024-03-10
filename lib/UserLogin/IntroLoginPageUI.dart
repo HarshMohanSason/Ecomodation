@@ -1,12 +1,16 @@
-import 'package:ecomodation/PhoneLogin/OTPpage.dart';
+
 import 'package:ecomodation/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import '../InternetChecker.dart';
+import  'package:ecomodation/homeScreenUI.dart';
 import 'phoneLogin/PhoneSignupUI.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'dart:io';
-import 'Auth/auth_provider.dart';
+import 'GoogleLogin/GoogleAuthService.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -102,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
 
-/*----------------- BUTTON IMPLEMENTATIONS -----------------------------------*/
+/*----------------- INTRO LOGIN BUTTON IMPLEMENTATIONS -----------------------------------*/
 
   Widget buildGetStartedButton() {
     var getStartedWidth = screenWidth - 130;
@@ -140,19 +144,28 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
 
+
   Widget buildGoogleButton() {
 
-    //Using it as a separate widget to make the main build widget cleaner
-    //Button for google sign in
     return SignInButton(
       Buttons.Google,
-      onPressed: () {
-        Authentication().signInWithGoogle().then((userCred) {
-          //If Login is successful, then
-          if (userCred != null) {
-            Navigator.pushNamed(context, 'HomeScreen' ); //Navigate to the home screen.
-          }
-        });
+      onPressed: () async {
+        try {
+          await handleGoogleLogin();
+        }
+        catch(e)
+        {
+          print(e);
+        }
+        // Check if the user is signed in with Google and then navigate to HomeScreen
+        if (mounted && context.read<GoogleAuthentication>().isSignedInWithGoogle == true) {
+          const CircularProgressIndicator();
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) => HomeScreenUI(),
+          ));
+        } else {
+          return;
+        }
       },
     );
   }
@@ -204,22 +217,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget buildAllLoginButtons() {
 
-    double aftergetStartedPadding = screenHeight / 4; //adjust padding accordingly after the get started button
-    double paddingotherbuttons = screenHeight / 37.28; //adjust the padding between other buttons accordingly to the screenHeight;
+    double afterGetStartedPadding = screenHeight / 4; //adjust padding accordingly after the get started button
+    double paddingOtherButtons = screenHeight / 37.28; //adjust the padding between other buttons accordingly to the screenHeight;
 
     if (Platform.isIOS) //If the platform is IOS, return all three buttons
     {
       return Expanded(
         child: Column(children: [
-          SizedBox(height: aftergetStartedPadding),
+          SizedBox(height: afterGetStartedPadding),
           //Button for google sign in
           buildGoogleButton(),
 
-          SizedBox(height: paddingotherbuttons),
+          SizedBox(height: paddingOtherButtons),
           //Button for apple sign in
           buildAppleButton(),
 
-          SizedBox(height: paddingotherbuttons),
+          SizedBox(height: paddingOtherButtons),
           buildLoginPhoneButton(),
           //Button for phone login
           // fontStyle:]
@@ -230,14 +243,47 @@ class _LoginScreenState extends State<LoginScreen> {
     {
       return Expanded(
         child: Column(children: [
-          SizedBox(height: aftergetStartedPadding),
+          SizedBox(height: afterGetStartedPadding),
           //Button for google sign in
           buildGoogleButton(),
-          SizedBox(height: paddingotherbuttons),
+          SizedBox(height: paddingOtherButtons),
           buildLoginPhoneButton(),
         ]),
       );
     }
     return Container(); //Returns an empty container if the platform is neither IOS or Android.
   }
+
+
+
+  //Function to handle login via Google
+  Future<void> handleGoogleLogin() async {
+
+    final sp = context.read<GoogleAuthentication>();
+    final ip = context.read<InternetProvider>();
+
+    await ip.checkInternetConnection(); // Check internet connection
+
+    if (!ip.hasInternet) {
+      // Display a toast message if there is no internet connection
+      Fluttertoast.showToast(
+        msg: 'Check your Internet Connection',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.white,
+        textColor: Colors.black,
+      );
+    }
+    else {
+      try {
+        // Attempt sign in with Google
+        await sp.signInWithGoogle();
+        await storage.write(key: 'LoggedIn', value: "true");
+      } catch (e) {
+        rethrow;
+      }
+    }
+  }
+
+
 }

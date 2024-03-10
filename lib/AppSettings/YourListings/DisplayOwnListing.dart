@@ -3,6 +3,9 @@ import 'package:ecomodation/Messaging/MessageService.dart';
 import 'package:flutter/material.dart';
 import 'package:ecomodation/main.dart';
 import 'package:page_view_indicators/circle_page_indicator.dart';
+import '../../AddListingsUI/AddDescription.dart';
+import '../../AddListingsUI/AddListing.dart';
+import '../../AddListingsUI/ListingPrice.dart';
 import '../../Listings/DetailedListingsStore.dart';
 import '../../Listings/FullImageView.dart';
 
@@ -90,6 +93,27 @@ class _DisplayOwnListingState extends State<DisplayOwnListing> {
                   ),
 
                   const Spacer(),
+
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: IconButton(
+                    icon:  Icon(Icons.edit, color: Colors.black,
+                    size: screenWidth/9),
+                    onPressed: () {
+                      if (mounted) {
+                        List<dynamic> dynamicList = widget.detailedListingsStore.listingInfo['imageInfoList'];
+                        AddDescription.descriptionController.text =  widget.detailedListingsStore.listingInfo['Description'];
+                        AddDescription.titleController.text =  widget.detailedListingsStore.listingInfo['Title'];
+                        ListingPrice.phoneText.text =  widget.detailedListingsStore.listingInfo['Price'];
+                        AddListing.allImages = List<String>.from(dynamicList);
+                        Navigator.pushNamed(context, 'ListingProgressBar');
+                      }
+                    },
+                                  ),
+                  ),
+                ),
+
                 ],
               ),
             ),

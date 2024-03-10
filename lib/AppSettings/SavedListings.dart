@@ -43,7 +43,6 @@ class _SavedListingState extends State<SavedListings> {
   }
 
 
-
   void toggleEdit(bool setValue)
   {
     setState(() {
@@ -56,7 +55,7 @@ class _SavedListingState extends State<SavedListings> {
   Widget build(BuildContext context)
   {
     return Scaffold(
-
+      backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Text("Saved Listings",
               style: TextStyle(
@@ -143,7 +142,25 @@ class _SavedListingState extends State<SavedListings> {
                         itemCount: savedListings.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
-                          return displaySavedListings(savedListings[index]);
+
+                          return InkWell(
+                              onTap: ()
+                              {
+                                if(isEditing) {
+                                  setState(() {
+                                    if (boxColor == Colors.blueAccent) {
+                                      boxColor = Colors.white;
+                                      boxBorderColor = Colors.grey;
+                                    }
+                                    else {
+                                      boxBorderColor = Colors.blueAccent;
+                                      boxColor = Colors.blueAccent;
+                                      selectedItems.add(savedListings[index]);
+                                    }
+                                  });
+                                }
+                              },
+                              child: displaySavedListings(savedListings[index], index));
                         }
                     );
                   }
@@ -179,66 +196,96 @@ class _SavedListingState extends State<SavedListings> {
         )
     );
   }
-  Widget displaySavedListings(Map<String, dynamic> map) {
+  Widget displaySavedListings(Map<String, dynamic> map, int index) {
+
     if (map.isNotEmpty) {
       return InkWell(
         onTap: () {
-          DetailedListingsStore detailedListingsStore = DetailedListingsStore(
-              map['docID'], map);
-          Navigator.push(context, MaterialPageRoute(builder: (context) =>
-              DetailedListingInfo(detailedListingsStore: detailedListingsStore)));
+          if(!isEditing)
+            {
+            DetailedListingsStore detailedListingsStore = DetailedListingsStore(
+                map['docID'], map);
+            Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                DetailedListingInfo(
+                    detailedListingsStore: detailedListingsStore)));
+          }
         },
+
         child: Padding(
-          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+          padding: const EdgeInsets.all(15),
           child: Container(
+            height: screenHeight/7,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(10),
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.5),
                   spreadRadius: 2,
                   blurRadius: 5,
-                  offset: Offset(0, 3), // changes position of shadow
+                  offset: const Offset(0, 3), // changes position of shadow
                 ),
               ],
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (isEditing)
+                if (isEditing) ...[
                   Padding(
                     padding: const EdgeInsets.only(right: 20),
                     child: SizedBox(
-                      width: 50,
-                      height: 50,
+                      width: screenWidth/15,
+                      height: screenWidth/15,
                       child: createSelectButtons(),
                     ),
                   ),
+                ],
                 ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: SizedBox(
-                    width: 100,
-                    child: CachedNetworkImage(
-                      imageUrl: map['imageInfoList'].first.toString(),
+                    child: Image.network(
+                      map['imageInfoList'].first.toString(),
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
-                SizedBox(width: 20),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: VerticalDivider( // Vertical line
+                    color: Colors.grey.withOpacity(0.8),
+                    thickness: 2,
+                    width: 1,
+                    indent: 10, // Adjust the space from the top
+                    endIndent: 10, // Adjust the space from the bottom
+                  ),
+                ),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 20),
-                      Text(
-                        map['Title'],
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        Text(
+                          map['Title'],
+                          style:  TextStyle(
+                            fontSize: screenWidth/25,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
+                        const Spacer(),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: Text(
+                            map['Price'],
+                            style:  TextStyle(
+                              fontSize: screenWidth/30,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 )
               ],
@@ -247,7 +294,7 @@ class _SavedListingState extends State<SavedListings> {
         ),
       );
     } else {
-      return Center(
+      return const Center(
         child: Text(
           "You do not have any saved listings here. Double tap on a listing to save it",
           textAlign: TextAlign.center,
@@ -261,57 +308,23 @@ class _SavedListingState extends State<SavedListings> {
   }
 
 
-
-  Widget createSelectButtons( )
+  Widget createSelectButtons()
   {
      if(isEditing) {
-
-       return ListView.builder(
-
-           scrollDirection: Axis.vertical,
-           itemCount: savedListings.length,
-           shrinkWrap: true,
-
-           itemBuilder: (context, index) {
-
-             return InkWell(
-
-               onTap: ()
-               {
-                 setState(()
-                 {
-                   if(boxColor == Colors.blueAccent)
-                     {
-                        boxColor = Colors.white;
-                        boxBorderColor = Colors.grey;
-                     }
-                   else
-                   {
-                       boxBorderColor = Colors.blueAccent;
-                       boxColor = Colors.blueAccent;
-                       selectedItems.add(savedListings[index]);
-                   }
-                 });
-               },
-               child: Padding(
-                 padding: const EdgeInsets.only(top: 10),
-                 child: Container(
-                   width: screenWidth/22,
-                   height: screenWidth/22,
-                   margin: const EdgeInsets.symmetric(horizontal: 4),
-                   decoration: BoxDecoration(
-                     color: boxColor,
-                     shape: BoxShape.circle,
-                     border: Border.all(
-                       color: boxBorderColor,
-                       width: 2,
-                     ),
+             return Padding(
+               padding: const EdgeInsets.only(top: 10),
+               child: Container(
+                 margin: const EdgeInsets.symmetric(horizontal: 4),
+                 decoration: BoxDecoration(
+                   color: boxColor,
+                   shape: BoxShape.circle,
+                   border: Border.all(
+                     color: boxBorderColor,
+                     width: 2,
                    ),
                  ),
                ),
              );
-           }
-       );
      }
      else
        {
@@ -319,102 +332,131 @@ class _SavedListingState extends State<SavedListings> {
        }
   }
 
-  Future deleteSavedListing() {
+  Future deleteSavedListing()
+  {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          elevation: 5,
+          shadowColor: Colors.black,
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(12), // Adjust the circular border radius
           ),
-          contentPadding: EdgeInsets.all(20),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Delete the following saved Listings?',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          contentPadding: const EdgeInsets.all(20),
+          content: SafeArea(
+            child: SizedBox(
+              height: screenHeight / 4,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Close the dialog
-                      toggleEdit(false);
-                      boxBorderColor = Colors.grey;
-                      boxColor = Colors.white;
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.grey),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
+                  Icon( Icons.error_outline,
+                      color: Colors.red,
+                      size: screenWidth/5.5),
+                  Padding(
+                    padding:  EdgeInsets.only(top: screenWidth/27),
                     child: Text(
-                      'Cancel',
+                      'Delete the selected saved Listings?',
                       style: TextStyle(
-                        color: Colors.black,
+                        fontSize: screenWidth/28,
                         fontWeight: FontWeight.bold,
-                        fontSize: 14,
                       ),
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (mounted) {
-                        await appSettingsService.deleteSavedListings(selectedItems);
-                        setState(() {
-                          for (int i = savedListings.length - 1; i >= 0; i--) {
-                            if (selectedItems.length > i && selectedItems[i] == savedListings[i]) {
-                              savedListings.removeAt(i);
-                              selectedItems.removeAt(i);
-                            }
-                          }
-                          isEditing = false;
-                          boxColor = Colors.white;
-                          boxBorderColor = Colors.grey;
-                          selectedItems.clear();
-                        });
-                        Fluttertoast.showToast(
-                          msg: 'Saved Listings removed',
-                          toastLength: Toast.LENGTH_LONG,
-                          timeInSecForIosWeb: 3,
-                          gravity: ToastGravity.CENTER,
-                          backgroundColor: Colors.green,
-                          textColor: Colors.white,
-                        );
-                        Navigator.pop(context); // Close the dialog
-                      }
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.red),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                  const Spacer(),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: screenWidth / 17),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context); // Close the dialog
+                            toggleEdit(false);
+                            boxBorderColor = Colors.grey;
+                            boxColor = Colors.white;
+                          },
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                side: const BorderSide(
+                                  color: Colors.red, // Red border color
+                                  width: 1.0, // Adjust the border width as needed
+                                ),
+                              ),
+                            ),
+                            backgroundColor: MaterialStateProperty.all<Color>(Colors.white), // White background color
+                            fixedSize: MaterialStateProperty.all<Size>(
+                              Size(screenWidth / 3.5, screenWidth / 43.2),
+                            ),
+                          ),
+                          child: const Text(
+                            'Cancel',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    child: Text(
-                      'Delete',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            if (mounted) {
+                              await appSettingsService.deleteSavedListings(selectedItems);
+                              setState(() {
+                                for (int i = savedListings.length - 1; i >= 0; i--) {
+                                  if (selectedItems.length > i && selectedItems[i] == savedListings[i]) {
+                                    savedListings.removeAt(i);
+                                    selectedItems.removeAt(i);
+                                  }
+                                }
+                                isEditing = false;
+                                boxColor = Colors.white;
+                                boxBorderColor = Colors.grey;
+                                selectedItems.clear();
+                              });
+                              Fluttertoast.showToast(
+                                msg: 'Saved Listings removed',
+                                toastLength: Toast.LENGTH_LONG,
+                                timeInSecForIosWeb: 3,
+                                gravity: ToastGravity.CENTER,
+                                backgroundColor: Colors.green,
+                                textColor: Colors.white,
+                              );
+                              if(mounted) {
+                                Navigator.pop(context); // Close the dialog
+                              }
+                            }
+                          },
+
+                          style: ButtonStyle(
+                            fixedSize: MaterialStateProperty.all<Size>(
+                              Size(screenWidth / 3.5, screenWidth / 43.2)),
+                            backgroundColor: MaterialStateProperty.all(Colors.red),
+                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                          child: const Text(
+                            'Delete',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         );
       },
@@ -422,4 +464,3 @@ class _SavedListingState extends State<SavedListings> {
   }
 
 }
-

@@ -1,17 +1,19 @@
 
 import 'dart:async';
-import 'package:ecomodation/Auth/auth_provider.dart';
 import 'package:ecomodation/Listings/DetailedListingsStore.dart';
 import 'package:ecomodation/Listings/ListingService.dart';
 import 'package:ecomodation/Messaging/MessageEncryption.dart';
 import 'package:ecomodation/Messaging/MessageSentSeenStatus.dart';
-import '../phoneLogin/LoginWithPhone.dart';
-import 'package:ecomodation/Messaging/Message.dart';
-import 'package:ecomodation/phoneLogin/OTPpage.dart';
+
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:collection/collection.dart';
+import '../UserLogin/GoogleLogin/GoogleAuthService.dart';
+import '../UserLogin/PhoneLogin/LoginWithPhoneUI.dart';
+import '../UserLogin/PhoneLogin/OTPpageUI.dart';
+import 'Message.dart';
 import 'MessageSenderInfo.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart';
 

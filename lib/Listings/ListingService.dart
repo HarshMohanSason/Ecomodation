@@ -1,16 +1,16 @@
 
-import 'package:ecomodation/Auth/auth_provider.dart';
-import '../phoneLogin/LoginWithPhone.dart';
-import 'package:ecomodation/phoneLogin/OTPpage.dart';
+
 import 'package:ecomodation/homeScreenUI.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../UserLogin/GoogleLogin/GoogleAuthService.dart';
+import '../UserLogin/PhoneLogin/LoginWithPhoneUI.dart';
+import '../UserLogin/PhoneLogin/OTPpageUI.dart';
 
 class ListingService {
 
   final HomeScreenUI _mainScreen = HomeScreenUI(); //instance of HomescreenUI
-
 
   var readUserInfo = FirebaseFirestore.instance.collection('userInfo'); //Collection reference to collection UserInfo
 

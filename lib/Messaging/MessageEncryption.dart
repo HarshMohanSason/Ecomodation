@@ -1,11 +1,12 @@
 
-import 'package:ecomodation/Auth/auth_provider.dart';
-import 'package:ecomodation/PhoneLogin/LoginWithPhone.dart';
 import 'package:ecomodation/main.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart';
 import 'package:pointycastle/pointycastle.dart' as crypto;
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../UserLogin/GoogleLogin/GoogleAuthService.dart';
+import '../UserLogin/PhoneLogin/LoginWithPhoneUI.dart';
 
 /*
     * Generate a public key and a private key

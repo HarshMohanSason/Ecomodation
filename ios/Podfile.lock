@@ -649,6 +649,9 @@ PODS:
     - firebase_core
     - Flutter
     - nanopb (< 2.30910.0, >= 2.30908.0)
+  - connectivity_plus (0.0.1):
+    - Flutter
+    - ReachabilitySwift
   - croppy (0.0.1):
     - Flutter
   - fast_rsa (0.6.0):
@@ -865,6 +868,7 @@ PODS:
   - permission_handler_apple (9.1.1):
     - Flutter
   - PromisesObjC (2.3.1)
+  - ReachabilitySwift (5.0.0)
   - RecaptchaInterop (100.0.0)
   - shared_preferences_foundation (0.0.1):
     - Flutter
@@ -877,34 +881,13 @@ PODS:
     - Flutter
     - FlutterMacOS
   - SwiftProtobuf (1.25.1)
-  - TensorFlowLiteC (2.12.0):
-    - TensorFlowLiteC/Core (= 2.12.0)
-  - TensorFlowLiteC/Core (2.12.0)
-  - TensorFlowLiteC/CoreML (2.12.0):
-    - TensorFlowLiteC/Core
-  - TensorFlowLiteC/Metal (2.12.0):
-    - TensorFlowLiteC/Core
-  - TensorFlowLiteSwift (2.12.0):
-    - TensorFlowLiteSwift/Core (= 2.12.0)
-  - TensorFlowLiteSwift/Core (2.12.0):
-    - TensorFlowLiteC (= 2.12.0)
-  - TensorFlowLiteSwift/CoreML (2.12.0):
-    - TensorFlowLiteC/CoreML (= 2.12.0)
-    - TensorFlowLiteSwift/Core (= 2.12.0)
-  - TensorFlowLiteSwift/Metal (2.12.0):
-    - TensorFlowLiteC/Metal (= 2.12.0)
-    - TensorFlowLiteSwift/Core (= 2.12.0)
-  - tflite_flutter (0.0.1):
-    - Flutter
-    - TensorFlowLiteSwift (= 2.12.0)
-    - TensorFlowLiteSwift/CoreML (= 2.12.0)
-    - TensorFlowLiteSwift/Metal (= 2.12.0)
   - Toast (4.0.0)
 
 DEPENDENCIES:
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
   - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
+  - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - croppy (from `.symlinks/plugins/croppy/ios`)
   - fast_rsa (from `.symlinks/plugins/fast_rsa/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
@@ -927,7 +910,6 @@ DEPENDENCIES:
   - sign_in_with_apple (from `.symlinks/plugins/sign_in_with_apple/ios`)
   - smart_auth (from `.symlinks/plugins/smart_auth/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/darwin`)
-  - tflite_flutter (from `.symlinks/plugins/tflite_flutter/ios`)
 
 SPEC REPOS:
   trunk:
@@ -958,10 +940,9 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - PromisesObjC
+    - ReachabilitySwift
     - RecaptchaInterop
     - SwiftProtobuf
-    - TensorFlowLiteC
-    - TensorFlowLiteSwift
     - Toast
 
 EXTERNAL SOURCES:
@@ -971,6 +952,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/camera_avfoundation/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
+  connectivity_plus:
+    :path: ".symlinks/plugins/connectivity_plus/ios"
   croppy:
     :path: ".symlinks/plugins/croppy/ios"
   fast_rsa:
@@ -1015,8 +998,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/smart_auth/ios"
   sqflite:
     :path: ".symlinks/plugins/sqflite/darwin"
-  tflite_flutter:
-    :path: ".symlinks/plugins/tflite_flutter/ios"
 
 SPEC CHECKSUMS:
   abseil: 926fb7a82dc6d2b8e1f2ed7f3a718bce691d1e46
@@ -1025,6 +1006,7 @@ SPEC CHECKSUMS:
   BoringSSL-GRPC: 3175b25143e648463a56daeaaa499c6cb86dad33
   camera_avfoundation: 3125e8cd1a4387f6f31c6c63abb8a55892a9eeeb
   cloud_firestore: 20bb019115acfc53278ed4c8bc5ddda77fc673bb
+  connectivity_plus: bf0076dd84a130856aa636df1c71ccaff908fa1d
   croppy: b6199bc8d56bd2e03cc11609d1c47ad9875c1321
   fast_rsa: 90fe93095f3d80eb8702a547ffff4fb59ccfc546
   Firebase: 414ad272f8d02dfbf12662a9d43f4bba9bec2a06
@@ -1067,15 +1049,13 @@ SPEC CHECKSUMS:
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
+  ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
   sign_in_with_apple: f3bf75217ea4c2c8b91823f225d70230119b8440
   smart_auth: 4bedbc118723912d0e45a07e8ab34039c19e04f2
   sqflite: 673a0e54cc04b7d6dba8d24fb8095b31c3a99eec
   SwiftProtobuf: 69f02cd54fb03201c5e6bf8b76f687c5ef7541a3
-  TensorFlowLiteC: 20785a69299185a379ba9852b6625f00afd7984a
-  TensorFlowLiteSwift: 3a4928286e9e35bdd3e17970f48e53c80d25e793
-  tflite_flutter: 9433d086a3060431bbc9f3c7c20d017db0e72d08
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
 
 PODFILE CHECKSUM: 6ecfbe5317766bb8dccb2558eadd5bcaf70aac11

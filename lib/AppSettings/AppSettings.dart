@@ -3,10 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomodation/AppSettings/PrivacyPolicy.dart';
 import 'package:ecomodation/AppSettings/SavedListings.dart';
 import 'package:ecomodation/AppSettings/YourListings/YourListings.dart';
-import 'package:ecomodation/Auth/auth_provider.dart';
-import '../phoneLogin/LoginWithPhone.dart';
-import 'package:ecomodation/phoneLogin/OTPpage.dart';
+import 'package:ecomodation/UserLogin/GoogleLogin/GoogleAuthService.dart';
+import 'package:ecomodation/UserLogin/PhoneLogin/PhoneAuthService.dart';
+import 'package:ecomodation/UserLogin/PhoneLogin/PhoneSignupUI.dart';
 import 'package:ecomodation/main.dart';
+import '../UserLogin/PhoneLogin/LoginWithPhoneUI.dart';
+import '../UserLogin/PhoneLogin/OTPpageUI.dart';
 import 'currentUserInfo.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +24,7 @@ class AppSettings extends StatefulWidget {
 
 class _AppSettingsState extends State<AppSettings> {
 
-  Authentication instance = Authentication();
+  GoogleAuthentication instance = GoogleAuthentication();
 
   @override
   void initState() {
@@ -36,7 +38,7 @@ class _AppSettingsState extends State<AppSettings> {
         backgroundColor: Colors.white,
 
         body: Padding(
-          padding: EdgeInsets.only(top: screenHeight / 14),
+          padding: const EdgeInsets.only(top: 30),
           child: SingleChildScrollView(
 
             child: SizedBox(
@@ -50,7 +52,6 @@ class _AppSettingsState extends State<AppSettings> {
 
                   Row(
                     children: [
-
                       const Spacer(),
                       Align(
                         alignment: Alignment.topRight,
@@ -65,10 +66,9 @@ class _AppSettingsState extends State<AppSettings> {
                       ),
                     ],
                   ),
-                  SizedBox(height: screenHeight / 15),
+                  const SizedBox(height: 20),
                   displayProfilePicture(),
                   const SizedBox(height: 20),
-
                   displaySettingOptions(),
                 ],
               ),
@@ -142,7 +142,7 @@ class _AppSettingsState extends State<AppSettings> {
               colorTheme), //set the color for the continue button
         ),
         onPressed: () async {
-          await instance.signOut();
+          await instance.googleSignOut();
           //oogleLoginDocID.clear();
           try {
             if (mounted) {
@@ -248,7 +248,7 @@ class _AppSettingsState extends State<AppSettings> {
 
           ListTile(
               onTap: () async {
-                await instance.signOut();
+                await instance.googleSignOut();
 
                 if (loggedInWithGoogle == false && mounted) {
                   Navigator.pushNamed(context, 'AppIntroUI');

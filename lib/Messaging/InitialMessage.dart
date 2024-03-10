@@ -91,16 +91,14 @@ class _InitialMessageWidgetState extends State<InitialMessageWidget> {
 
           Padding(
             padding: const EdgeInsets.only(bottom: 40),
-            child: ElevatedButton(onPressed: () async {
+            child: IconButton(
+              onPressed: () async {
+                if (sendMessageKey.currentState!.validate()) {
+                  sendMessage(); // Send the message to the user
 
-              if(sendMessageKey.currentState!.validate())
-              {
-                sendMessage();//send the message to the user
+                  await _messageSerivce.sendInitialMessageInfo(widget.detailedListingsStore); // Update the Listing
 
-                await  _messageSerivce.sendInitialMessageInfo(widget.detailedListingsStore); //update the Listing
-
-                if(mounted)
-                  {
+                  if (mounted) {
                     Navigator.pushNamed(context, 'HomeScreen');
                     Fluttertoast.showToast(
                       msg: 'Your Initial Message has been sent!',
@@ -110,23 +108,15 @@ class _InitialMessageWidgetState extends State<InitialMessageWidget> {
                       textColor: Colors.black,
                     );
                   }
-              }
-            },
-                style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0), // Adjust the radius as needed
-                      )),
-                  fixedSize: MaterialStateProperty.all( Size(screenWidth - 60,40)),
-                  backgroundColor: const MaterialStatePropertyAll(Colors.black),
-                  foregroundColor: const MaterialStatePropertyAll(Colors.white),
-                ),
-                child: Text('Send',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: screenWidth/24,
-                  ),)
+                }
+              },
+              icon: Icon(
+                Icons.send, // Icon for sending
+                size: screenWidth/7.5, // Adjust the icon size as needed
+              ),
+              color: Colors.black, // Adjust the icon color
             ),
+
           ),
         ],
       ),
@@ -146,20 +136,40 @@ class _InitialMessageWidgetState extends State<InitialMessageWidget> {
             child: Form(
               key: sendMessageKey,
               child: TextFormField(
+                cursorColor: Colors.black,
                 maxLength: 200,
                 maxLines: 5,
                 controller: _messageController,
                 obscureText: false,
                 decoration: InputDecoration(
                   hintText: 'Enter your message here',
-                  border: OutlineInputBorder(
+                  enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(   //decorate the border of the box
-                      width: 8,
-                      style: BorderStyle.solid,  //style of the border
-                      color: Color(0x000000FF),  //color of the borderlines
+                    borderSide: BorderSide(
+                      color: Colors.grey.withOpacity(0.5), // Change the border color to your preference
                     ),
-                  ) ,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.grey.withOpacity(0.5), // Change the focused border color to your preference
+                      width: 2,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(
+                      color: Colors.red, // Change the error border color to your preference
+                      width: 2,
+                    ),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(
+                      color: Colors.red, // Change the focused error border color to your preference
+                      width: 2,
+                    ),
+                  ),
                 ),
                 validator: (value) {
                   if(value?.isEmpty == true)

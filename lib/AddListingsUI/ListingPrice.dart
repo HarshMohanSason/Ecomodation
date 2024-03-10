@@ -74,8 +74,8 @@ class _ListingPriceState extends State<ListingPrice> with TickerProviderStateMix
             child: SizedBox(
               width: screenWidth - 70,
               child: TextFormField(
-                cursorColor: colorTheme,
-                cursorWidth: 4,
+                cursorColor: Colors.black,
+                cursorWidth: 2,
                 keyboardType: TextInputType.number,
                 textAlign: TextAlign.center,
                 controller: ListingPrice.phoneText,
@@ -97,9 +97,32 @@ class _ListingPriceState extends State<ListingPrice> with TickerProviderStateMix
                     fontSize: fontSize(context, 60),
                   ),
 
-                  border: OutlineInputBorder(
-                    borderSide: const BorderSide(width: 2.0),
-                    borderRadius: BorderRadius.circular(5),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.grey.withOpacity(0.5), // Change the border color to your preference
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.grey.withOpacity(0.5), // Change the focused border color to your preference
+                      width: 2,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(
+                      color: Colors.red, // Change the error border color to your preference
+                      width: 2,
+                    ),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(
+                      color: Colors.red, // Change the focused error border color to your preference
+                      width: 2,
+                    ),
                   ),
                 ),
                 validator: (value) {
@@ -120,6 +143,7 @@ class _ListingPriceState extends State<ListingPrice> with TickerProviderStateMix
               alignment: Alignment.bottomCenter,
               child: ElevatedButton(
             onPressed: () async {
+
               await verifyForm(context); //make sure the form submitted is correct
               var isLocationUploaded = await newListing.checkIfLocationIsUploaded();
 
@@ -188,9 +212,9 @@ class _ListingPriceState extends State<ListingPrice> with TickerProviderStateMix
             style: ButtonStyle(
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                   RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
+                    borderRadius: BorderRadius.circular(10.0),
                   )),
-              fixedSize: MaterialStateProperty.all(Size(screenWidth - 50, screenHeight/19)),
+              fixedSize: MaterialStateProperty.all(Size(screenWidth - 20, screenHeight/19)),
               backgroundColor: const MaterialStatePropertyAll(
                   Colors.black), //set the color for the continue button
             ),
@@ -199,7 +223,7 @@ class _ListingPriceState extends State<ListingPrice> with TickerProviderStateMix
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: fontSize(context, 18),
+                fontSize: screenWidth/20,
               ),
             ),
               ),

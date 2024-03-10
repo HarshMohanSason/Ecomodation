@@ -1,10 +1,10 @@
 
-import 'LoginWithPhone.dart';
+import 'LoginWithPhoneUI.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'OTPpage.dart';
+import 'OTPpageUI.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 
@@ -71,7 +71,7 @@ class _UserInfoDetails extends State<PhoneSignupInfo> {  //create stateful class
 
               verificationCompleted: (PhoneAuthCredential credential) async {   //if verification is completed, sign in
                 await auth.signInWithCredential(credential).then((value) => {
-                  // print("You are logged in"),
+
                 });
               },
 

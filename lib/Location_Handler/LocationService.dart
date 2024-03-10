@@ -4,9 +4,10 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../Auth/auth_provider.dart';
-import '../phoneLogin/LoginWithPhone.dart';
-import 'package:ecomodation/phoneLogin/OTPpage.dart';
+
+import '../UserLogin/GoogleLogin/GoogleAuthService.dart';
+import '../UserLogin/PhoneLogin/LoginWithPhoneUI.dart';
+import '../UserLogin/PhoneLogin/OTPpageUI.dart';
 
 class LocationService {
 

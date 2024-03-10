@@ -56,7 +56,7 @@ class _YourListingState extends State<YourListing> {
             child: FutureBuilder(
                future: futureYourListingInfo,
                 builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-            
+
                  if(snapshot.connectionState == ConnectionState.waiting)
                    {
                      return Center(
@@ -116,74 +116,89 @@ class _YourListingState extends State<YourListing> {
           DetailedListingsStore detailedListingsStore = DetailedListingsStore(docID, listingDetails);
           Navigator.push(context, MaterialPageRoute(builder: (context) => DisplayOwnListing(detailedListingsStore: detailedListingsStore)));
         },
-        child: Card(
-          color: Colors.black,
-          elevation: 8,
-          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
-                  width: 80,
-                  height: 120,
-                  child: CachedNetworkImage(
-                    imageUrl: listingDetails['imageInfoList'].first.toString(),
-                    fit: BoxFit.cover,
-                  ),
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Container(
+            height: screenHeight/7,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: const Offset(0, 3), // changes position of shadow
                 ),
-              ),
-              title: Text(
-                listingDetails['Title'],
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 30),
-                  if (listingDetails['Rented'] == false)
-                    InkWell(
-                      onTap: () {
-                        if (mounted) {
-                          markAsRentedOrCancel(context);
-                        }
-                      },
-                      child: const Text(
-                        'Mark Rented',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+              ],
+            ),
+           child: Row(
+              children: [
+                ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: SizedBox(
+                      child: CachedNetworkImage(
+                        imageUrl: listingDetails['imageInfoList'].first.toString(),
+                        fit: BoxFit.contain,
                       ),
                     ),
-                ],
-              ),
-              trailing: IconButton(
-                icon: const Icon(Icons.edit, color: Colors.white,),
-                onPressed: () {
-                  if (mounted) {
-                    List<dynamic> dynamicList = listingDetails['imageInfoList'];
-                    AddDescription.descriptionController.text = listingDetails['Description'];
-                    AddDescription.titleController.text = listingDetails['Title'];
-                    ListingPrice.phoneText.text = listingDetails['Price'];
-                    AddListing.allImages = List<String>.from(dynamicList);
-                    Navigator.pushNamed(context, 'ListingProgressBar');
-                  }
-                },
-              ),
-            ),
-          ),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: VerticalDivider( // Vertical line
+                    color: Colors.grey.withOpacity(0.8),
+                    thickness: 2,
+                    width: 1,
+                    indent: 10, // Adjust the space from the top
+                    endIndent: 10, // Adjust the space from the bottom
+                  ),
+                ),
+               Expanded(
+                 child: Padding(
+                   padding: EdgeInsets.only(left: 10),
+                   child: Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: [
+                       Padding(
+                         padding: EdgeInsets.only(top: 15),
+                         child: Text(
+                          listingDetails['Title'],
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                                       ),
+                       ),
+                       Spacer(),
+                       if (listingDetails['Rented'] == false)
+                         Center(
+                           child: Padding(
+                             padding: EdgeInsets.only(bottom: 10),
+                             child: InkWell(
+                               onTap: () {
+                                 if (mounted) {
+                                   markAsRentedOrCancel(context);
+                                 }
+                               },
+                               child: const Text(
+                                 'Mark Rented',
+                                 style: TextStyle(
+                                   color: Colors.red,
+                                   fontWeight: FontWeight.bold,
+                                   fontSize: 16,
+                                 ),
+                               ),
+                             ),
+                           ),
+                         ), ],
+                   ),
+                 ),
+               ),
 
+           ] ),
+
+          ),
         ),
       );
     } else {
@@ -201,50 +216,48 @@ class _YourListingState extends State<YourListing> {
             borderRadius: BorderRadius.circular(20),
           ),
           content: SizedBox(
-            height: 150,
+            height: screenWidth/1.5,
+            width: screenWidth - 10,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  'Mark Listing as Rented?',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                Icon( Icons.error_outline,
+                    color: Colors.red,
+                    size: screenWidth/5.5),
+                Padding(
+                  padding:  EdgeInsets.only(top: screenWidth/27),
+                  child: Text(
+                    'Mark Listing as Rented?',
+                    style: TextStyle(
+                      fontSize: screenWidth/20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
-                Text(
+                const SizedBox(height: 10),
+                const Text(
                   'Are you sure you want to mark this listing as rented? This action cannot be undone.',
                   style: TextStyle(fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
+                const SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    ElevatedButton(
+                    IconButton(
                       onPressed: () {
                         Navigator.pop(context); // Close the dialog
                       },
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.grey),
-                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
+                      icon: Icon(
+                        Icons.close_outlined, // Using the close icon
+                        color: Colors.red, // Red color for the icon
+                        size: screenWidth/9, // Adjust the size of the icon as needed
                       ),
                     ),
-                    ElevatedButton(
-                      onPressed: () async {
+                    IconButton(
+                      onPressed: () async
+                      {
                         if (mounted) {
                           bool markRented = await AppSettingsService().updateMarkRented(true);
                           if (markRented) {
@@ -268,24 +281,11 @@ class _YourListingState extends State<YourListing> {
                             );
                           }
                         }
-                      },
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.red),
-                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        'Mark Rented',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
+
+                      }, icon: Icon(Icons.done,
+                    color: Colors.green,
+                    size: screenWidth/9,),
+                    )
                   ],
                 ),
               ],

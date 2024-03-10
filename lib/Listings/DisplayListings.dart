@@ -3,7 +3,6 @@ import 'package:ecomodation/AppSettings/AppSettingsService.dart';
 import 'package:ecomodation/Listings/DetailedListing.dart';
 import 'package:ecomodation/Listings/DetailedListingsStore.dart';
 import 'package:flutter/material.dart';
-import '../Auth/InternetChecker.dart';
 import '../main.dart';
 import 'ListingService.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
@@ -25,21 +24,9 @@ class _DisplayListingsState extends State<DisplayListings> {
   void initState() {
 
     super.initState();
-    checkInternet();
   }
 
-  Future<void> checkInternet() async {
-    CheckInternet checkInternet = CheckInternet();
-    bool isConnected = await checkInternet.checkInternet();
 
-    if (!isConnected) {
-     const  Text("No internet connection");
-    }
-    else
-    {
-     const Text("internet connection found");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

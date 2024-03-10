@@ -2,7 +2,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomodation/Messaging/MessageService.dart';
-import 'package:ecomodation/Messaging/messageSounds.dart';
 import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:pointycastle/asymmetric/api.dart';
@@ -29,7 +28,6 @@ class _MessageDisplayState extends State<MessageDisplay> {
   final MessageService _messageService = MessageService();
   final GlobalKey<FormState> sendMessageKey = GlobalKey<FormState>();
   List<dynamic> thisUserMessages = []; //local list to hold messages for the current user
-  final MessageSound _messageSound = MessageSound(); //instance for message sound class
   final ScrollController _scrollController = ScrollController(); //manage scrolling of messages
   bool checkIfEmpty = false;
   bool isOtherUserOnline = false;
@@ -83,8 +81,6 @@ class _MessageDisplayState extends State<MessageDisplay> {
       _scrollController.animateTo(_scrollController.position.minScrollExtent,
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut); //scroll to the new Message once the messages is sent
-
-       _messageSound.playSound('assets/messageSentSound.mp3'); //play the sound whenever the message is sent
   }
 
 
@@ -246,15 +242,21 @@ class _MessageDisplayState extends State<MessageDisplay> {
                    ), onPressed: () {
                    },
                    ),
+
                    hintText: 'Enter your message here',
-                   border: OutlineInputBorder(
-                   borderRadius: BorderRadius.circular(35),
-                   borderSide: const BorderSide(   //decorate the border of the box
-                   width: 8,
-                   style: BorderStyle.solid,  //style of the border
-                   color: Color(0x000000FF),  //color of the borderlines
-                    ),
-                  ) ,
+                     enabledBorder: OutlineInputBorder(
+                       borderRadius: BorderRadius.circular(20),
+                       borderSide: BorderSide(
+                         color: Colors.grey.withOpacity(0.5), // Change the border color to your preference
+                       ),
+                     ),
+                     focusedBorder: OutlineInputBorder(
+                       borderRadius: BorderRadius.circular(20),
+                       borderSide: BorderSide(
+                         color: Colors.grey.withOpacity(0.5), // Change the focused border color to your preference
+                         width: 2,
+                       ),
+                     ),
                 ),
 
                             ),

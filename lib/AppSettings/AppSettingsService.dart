@@ -1,9 +1,11 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ecomodation/Auth/auth_provider.dart';
 import 'package:ecomodation/Listings/DetailedListingsStore.dart';
-import 'package:ecomodation/PhoneLogin/LoginWithPhone.dart';
+
 import 'package:flutter/cupertino.dart';
+
+import '../UserLogin/GoogleLogin/GoogleAuthService.dart';
+import '../UserLogin/PhoneLogin/LoginWithPhoneUI.dart';
 
 class AppSettingsService {
 

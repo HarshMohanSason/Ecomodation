@@ -1,11 +1,13 @@
-import 'package:ecomodation/Auth/auth_provider.dart';
-import '../phoneLogin/LoginWithPhone.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
+import '../UserLogin/GoogleLogin/GoogleAuthService.dart';
+import '../UserLogin/PhoneLogin/LoginWithPhoneUI.dart';
+import '../UserLogin/PhoneLogin/OTPpageUI.dart';
 import 'AddDescription.dart';
 import '/AddListingsUI/AddListing.dart';
-import 'package:ecomodation/PhoneLogin/OTPpage.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'ListingPrice.dart';
 import 'dart:io';

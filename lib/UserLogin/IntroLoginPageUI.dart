@@ -6,10 +6,9 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../InternetChecker.dart';
-import  'package:ecomodation/homeScreenUI.dart';
-import 'phoneLogin/PhoneSignupUI.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'dart:io';
+import '../homeScreenUI.dart';
 import 'GoogleLogin/GoogleAuthService.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -25,11 +24,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuth auth = FirebaseAuth.instance; //create instance for firebase sign in
 
 
-  void handleLoginButtonPress(BuildContext context) //Function to handle LoginButtonPress
-  {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const PhoneSignupInfo()),);
-  }
-
   double fontSize(BuildContext context, double baseFontSize) //Handle the FontSizes according to the respective screen Sizes
   {
     //Using the size of text on the Emulator as the baseFontSize.
@@ -43,12 +37,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
 
-    double textSizeEcomodation = fontSize(context, 45); //size for Ecomodation (heading)
-    double textSizeAnimated = fontSize(context, 20); //size for Animated text on top
-    double topPaddingEcom = screenHeight/11.65; //Adjust padding accordingly for top text
-    double animatedPadding = topPaddingEcom/2;  //Adjust padding accordingly between top text and animated text
-    double getStartedPadding = topPaddingEcom*2; //adjust padding accordingly between the top of the phone and get started button
-
     return  PopScope(
       canPop: false,
       child: Scaffold(
@@ -57,19 +45,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
           body: Column(
               children: <Widget>[
-            Padding(padding: EdgeInsets.only(top: topPaddingEcom)),
+            const Padding(padding: EdgeInsets.only(top: 50)),
             Text(
               "Ecomodation ", //Name of the app displayed on top
               textAlign: TextAlign.center, //center the name
               style: TextStyle(   //Some styling for the text
                 color: Colors.black,
-                fontSize: textSizeEcomodation,
+                fontSize: screenWidth/10,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'LibreBaskerville',
               ),
             ),
 
-            SizedBox(height: animatedPadding), //Padding after the name
+            const SizedBox(height: 20), //Padding after the name
 
             Container(
               alignment: const Alignment(0, -0.6), //Align the animated text
@@ -78,8 +66,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   TyperAnimatedText(
                     'Accomodation made easier for you',  //Text to be displayed
                     textStyle: TextStyle( //style the text
-                      fontSize: textSizeAnimated, //Adjust the size of the text
+                      fontSize: screenWidth/25, //Adjust the size of the text
                       fontWeight: FontWeight.bold,
+                      fontFamily: 'LibreBaskerville',
                     ),
                     speed: const Duration(milliseconds: 80), //How fast the animation runs
                   ),
@@ -89,12 +78,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 stopPauseOnTap: true, //Pause it on tap, set it on true
               ),
             ),
-
-             SizedBox(height: getStartedPadding),
-
-            buildGetStartedButton(), //Get started Button
-
-            buildAllLoginButtons(), //Calling the build all login butotns
+                Padding(
+                    padding: const EdgeInsets.only(top: 50),
+                    child: Center(child: Image.asset("assets/images/Logo.png", scale: screenWidth/95,))),
+            const Spacer(),
+            Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: buildAllLoginButtons()), //Calling the build all login butotns
             //fontStyle:
           ]),
 
@@ -106,48 +96,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
 
-/*----------------- INTRO LOGIN BUTTON IMPLEMENTATIONS -----------------------------------*/
-
-  Widget buildGetStartedButton() {
-    var getStartedWidth = screenWidth - 130;
-    var getStartedHeight = (screenHeight / 2.19) / 5.31;
-    double getStartedTextSize = fontSize(context, 23);
-
-    return ElevatedButton(
-      onPressed: () {
-        handleLoginButtonPress(context);
-      },
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
-        elevation: MaterialStateProperty.all(30),
-        shadowColor: MaterialStateProperty.all<Color>(Colors.black),
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-        ),
-      ),
-      child: Container(
-        width: getStartedWidth,
-        height: getStartedHeight,
-        alignment: Alignment.center,
-        child: Text(
-          "Get Started",
-          style: TextStyle(
-            fontSize: getStartedTextSize,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
+/*----------------- LOGIN BUTTONS IMPLEMENTATIONS -----------------------------------*/
 
 
 
   Widget buildGoogleButton() {
 
-    return SignInButton(
+    final sp = context.watch<GoogleAuthentication>();
+
+    return sp.isLoading ? const CircularProgressIndicator(color: Colors.black, strokeWidth: 6,) : SignInButton(
       Buttons.Google,
       onPressed: () async {
         try {
@@ -155,10 +112,10 @@ class _LoginScreenState extends State<LoginScreen> {
         }
         catch(e)
         {
-          print(e);
+         throw e.toString();
         }
         // Check if the user is signed in with Google and then navigate to HomeScreen
-        if (mounted && context.read<GoogleAuthentication>().isSignedInWithGoogle == true) {
+        if (mounted && context.read<GoogleAuthentication>().isSignedIn == true) {
           const CircularProgressIndicator();
           Navigator.push(context, MaterialPageRoute(
             builder: (context) => HomeScreenUI(),
@@ -192,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
               )),
           backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
           foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
-          fixedSize: MaterialStateProperty.all(const Size(220, 25)),
+          fixedSize: MaterialStateProperty.all(const Size(220, 20)),
         ),
         icon: const Padding(
           padding: EdgeInsets.only(left: 0, right: 8),
@@ -217,36 +174,29 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget buildAllLoginButtons() {
 
-    double afterGetStartedPadding = screenHeight / 4; //adjust padding accordingly after the get started button
-    double paddingOtherButtons = screenHeight / 37.28; //adjust the padding between other buttons accordingly to the screenHeight;
-
     if (Platform.isIOS) //If the platform is IOS, return all three buttons
     {
-      return Expanded(
-        child: Column(children: [
-          SizedBox(height: afterGetStartedPadding),
-          //Button for google sign in
-          buildGoogleButton(),
+      return Column(children: [
+        buildGoogleButton(),
 
-          SizedBox(height: paddingOtherButtons),
-          //Button for apple sign in
-          buildAppleButton(),
+        const SizedBox(height: 20),
+        //Button for apple sign in
+        buildAppleButton(),
 
-          SizedBox(height: paddingOtherButtons),
-          buildLoginPhoneButton(),
-          //Button for phone login
-          // fontStyle:]
-        ]),
-      );
+        const SizedBox(height: 20),
+        buildLoginPhoneButton(),
+        //Button for phone login
+        // fontStyle:]
+      ]);
     }
     else if (Platform.isAndroid) //If platform is Android, return all buttons except the apple sign in
     {
       return Expanded(
         child: Column(children: [
-          SizedBox(height: afterGetStartedPadding),
+          const SizedBox(height: 20),
           //Button for google sign in
           buildGoogleButton(),
-          SizedBox(height: paddingOtherButtons),
+          const SizedBox(height: 20),
           buildLoginPhoneButton(),
         ]),
       );

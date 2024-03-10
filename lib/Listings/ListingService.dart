@@ -1,24 +1,20 @@
 
-
-import 'package:ecomodation/homeScreenUI.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../UserLogin/GoogleLogin/GoogleAuthService.dart';
-import '../UserLogin/PhoneLogin/LoginWithPhoneUI.dart';
-import '../UserLogin/PhoneLogin/OTPpageUI.dart';
+
 
 class ListingService {
-
-  final HomeScreenUI _mainScreen = HomeScreenUI(); //instance of HomescreenUI
 
   var readUserInfo = FirebaseFirestore.instance.collection('userInfo'); //Collection reference to collection UserInfo
 
   //Function to get the listings within the user's entered location and distance
   //Takes the currentUser Latitude and Longitude and will return listings within a certain distance (km)
 
-  double calculateDistance(double currentUserLatitude, double currentUserLongitude, double otherUserLatitude,
-      double otherUserLongitude) {
+  double calculateDistance(double currentUserLatitude, double currentUserLongitude,
+      double otherUserLatitude, double otherUserLongitude) {
+
     const double earthRadius = 6371.0; //constant earth radius
 
     // Convert degrees to radians
@@ -47,18 +43,8 @@ class ListingService {
   Future<List<String>> getListingsInUserDistance() async
   {
     List<String> filteredListingIDs = []; //initialize an empty list
-    late dynamic document;
-
-    if(loggedInWithGoogle) {
-     document = await readUserInfo.where(FieldPath.documentId, isNotEqualTo: googleLoginDocID) // Exclude current user's document
-          .get();
-    }
-
-    else if(loggedInWithPhone)
-      {
-       document = await readUserInfo.where(FieldPath.documentId, isNotEqualTo: phoneLoginDocID) // Exclude current user's document
-            .get();
-      }
+    final document = await readUserInfo.where(FieldPath.documentId, isNotEqualTo: FirebaseAuth.instance.currentUser!.uid) // Exclude current user's document
+         .get();
 
     final readData = await SharedPreferences.getInstance(); //instance for the shared preferences;
     var  userLatitude = readData.getDouble('Latitude'); //userLatitude

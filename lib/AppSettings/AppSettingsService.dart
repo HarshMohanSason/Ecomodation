@@ -1,6 +1,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomodation/Listings/DetailedListingsStore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/cupertino.dart';
 
@@ -15,7 +16,7 @@ class AppSettingsService {
     try {
       var snapshot = await FirebaseFirestore.instance.collection('userInfo')
           .doc(
-          loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID).collection(
+          FirebaseAuth.instance.currentUser!.uid).collection(
           'ListingInfo')
           .get();
 
@@ -35,7 +36,7 @@ class AppSettingsService {
 
     try {
       var snapshot = await FirebaseFirestore.instance.collection('userInfo')
-          .doc(loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID)
+          .doc(FirebaseAuth.instance.currentUser!.uid)
           .collection('InitialMessageSent')
           .get();
 
@@ -56,7 +57,7 @@ class AppSettingsService {
   {
     try {
       await FirebaseFirestore.instance.collection('userInfo').doc(
-          loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID).collection(
+          FirebaseAuth.instance.currentUser!.uid).collection(
           'ListingInfo').doc().update(
           {'Rented': markRented});
 
@@ -83,7 +84,7 @@ class AppSettingsService {
       // Check if a listing with the same 'imageInfoList' already exists
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('userInfo')
-          .doc(loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID)
+          .doc(FirebaseAuth.instance.currentUser!.uid)
           .collection('savedListings')
           .where('imageInfoList',
           isEqualTo: detailedListingsStore.listingInfo['imageInfoList'])
@@ -93,7 +94,7 @@ class AppSettingsService {
         // No matching listing found, proceed to add the new listing
         await FirebaseFirestore.instance
             .collection('userInfo')
-            .doc(loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID)
+            .doc(FirebaseAuth.instance.currentUser!.uid)
             .collection('savedListings')
             .add(detailedListingsStore.toMap());
       }
@@ -108,7 +109,7 @@ class AppSettingsService {
     List<Map<String, dynamic>> savedListings = [];
     try {
       var snapshot = await FirebaseFirestore.instance.collection('userInfo')
-          .doc(loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID)
+          .doc(FirebaseAuth.instance.currentUser!.uid)
           .collection('savedListings')
           .get();
       for (var element in snapshot.docs) {
@@ -126,7 +127,7 @@ class AppSettingsService {
     try {
       var snapshot = await FirebaseFirestore.instance.collection('userInfo')
           .doc(
-          loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID).collection(
+          FirebaseAuth.instance.currentUser!.uid).collection(
           'savedListings')
           .get();
 

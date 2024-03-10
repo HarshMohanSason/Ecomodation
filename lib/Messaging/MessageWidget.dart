@@ -39,7 +39,6 @@ class _MessageDisplayState extends State<MessageDisplay> {
   void initState() {
 
     super.initState();
-    initPrivateKey();
     _messageService.markAllMessagesSeen(widget.receiverID);
     _messageService.markOtherUserOnline(widget.receiverID);
     allMessagesStream =  _messageService.getAllMessagesStream(widget.receiverID);    // Initialize the stream to receive all messages
@@ -66,12 +65,6 @@ class _MessageDisplayState extends State<MessageDisplay> {
     _messageService.dispose();
     _scrollController.dispose();
 
-  }
-
-  Future<void> initPrivateKey() async
-  {
-     RSAEncryption rsaEncryption = RSAEncryption();
-     rsaPrivateKey = await rsaEncryption.getPrivateKey();
   }
 
   void sendMessage() async

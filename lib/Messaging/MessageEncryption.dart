@@ -1,5 +1,6 @@
 
 import 'package:ecomodation/main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart';
 import 'package:pointycastle/pointycastle.dart' as crypto;
@@ -56,8 +57,7 @@ class RSAEncryption {
 
         FirebaseFirestore.instance.collection(
             'userInfo') //get the reference to the userCollection
-            .doc( // upload the public key to the user document
-            loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID)
+            .doc(FirebaseAuth.instance.currentUser!.uid)
             .update({'publicKey': uploadPublicKeyObject});
       }
       }
@@ -78,7 +78,7 @@ class RSAEncryption {
 
   Future<RSAPublicKey> getOwnPublicKey() async
   {
-    var getPublicKey = await FirebaseFirestore.instance.collection('userInfo').doc(loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID).get().then((value) => value.data()?['publicKey']);
+    var getPublicKey = await FirebaseFirestore.instance.collection('userInfo').doc(FirebaseAuth.instance.currentUser!.uid).get().then((value) => value.data()?['publicKey']);
 
     RSAPublicKey getNewPublicKey = RSAPublicKey(BigInt.parse(getPublicKey['n']), BigInt.parse(getPublicKey['E']));
 

@@ -4,9 +4,9 @@ import 'package:ecomodation/AppSettings/PrivacyPolicy.dart';
 import 'package:ecomodation/AppSettings/SavedListings.dart';
 import 'package:ecomodation/AppSettings/YourListings/YourListings.dart';
 import 'package:ecomodation/UserLogin/GoogleLogin/GoogleAuthService.dart';
-import 'package:ecomodation/UserLogin/PhoneLogin/PhoneAuthService.dart';
-import 'package:ecomodation/UserLogin/PhoneLogin/PhoneSignupUI.dart';
 import 'package:ecomodation/main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import '../UserLogin/PhoneLogin/LoginWithPhoneUI.dart';
 import '../UserLogin/PhoneLogin/OTPpageUI.dart';
 import 'currentUserInfo.dart';
@@ -248,19 +248,18 @@ class _AppSettingsState extends State<AppSettings> {
 
           ListTile(
               onTap: () async {
-                await instance.googleSignOut();
+                final sp = context.read<GoogleAuthentication>();
+                await sp.googleSignOut();
 
-                if (loggedInWithGoogle == false && mounted) {
-                  Navigator.pushNamed(context, 'AppIntroUI');
-                }
-                else if (loggedInWithPhone == false && mounted) {
-                  Navigator.pushNamed(context, 'AppIntroUI');
-                }
+                  if(mounted) {
+                    Navigator.pushNamed(context, 'AppIntroUI');
+                  }
+
               },
 
-              leading: const Icon(Icons.delete_forever, size: 30),
+              leading: const Icon(Icons.logout, size: 30),
               tileColor: Colors.white,
-              title: const Text("Delete Account", style: TextStyle(
+              title: const Text("Sign Out", style: TextStyle(
                 fontSize: 14,
                   fontWeight: FontWeight.bold
               )),
@@ -275,25 +274,17 @@ class _AppSettingsState extends State<AppSettings> {
   Future<CurrentUserInfo?> getCurrentUserInfo() async{ //function to get the current userInfo
 
     try{
-      if(loggedInWithGoogle == true) {
         var document = await FirebaseFirestore.instance.collection('userInfo')
-            .doc(googleLoginDocID).get();
+            .doc(FirebaseAuth.instance.currentUser!.uid).get();
         var info = document.data() as Map<String, dynamic>;
-      return CurrentUserInfo(profileImage: info['photoURL'] , userName: info['username'] , contact: info['email']);
-      }
-      else if(loggedInWithPhone == true)
-      {
-        var document = await FirebaseFirestore.instance.collection('userInfo')
-            .doc(phoneLoginDocID).get();
-        var info = document.data() ;
-       return CurrentUserInfo(profileImage: info!['photoURL'] , userName: info['username'] , contact: info['phonenumber']);
-      }
+      return CurrentUserInfo(profileImage: info['imageURL'] , userName: info['username'] , contact: info['email']);
+
     }
     catch(e)
     {
       rethrow;
     }
-return null;
+
   }
 
 }

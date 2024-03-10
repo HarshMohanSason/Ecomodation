@@ -22,7 +22,6 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
   final TextEditingController textController = TextEditingController();
   final MessageService _messageService = MessageService();
   Set getEachMessageSenderIDs = <String>{}; //create a Map which stores the senderID's as keys and the messageDetails in a list
-  late RSAPrivateKey rsaPrivateKey;
 
 
   @override
@@ -30,16 +29,8 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
   {
     super.initState();
 
-    initPrivateKey();
 
   }
-  Future<void> initPrivateKey() async
-  {
-    RSAEncryption rsaEncryption = RSAEncryption();
-    rsaPrivateKey = await rsaEncryption.getPrivateKey();
-  }
-
-
   @override
   Widget build(BuildContext context)
   {
@@ -223,7 +214,7 @@ class _HomeScreenMessagingUIState extends State<HomeScreenMessagingUI> {
 
                               }
 
-                              var lastMessage = decrypt(storeLastMessage.keys.first, rsaPrivateKey );
+                              var lastMessage = storeLastMessage.keys.first;
 
                             return Text(storeLastMessage.values.contains(true) ? lastMessage : "You: $lastMessage", maxLines: 1 );
                             //return  Text(lastSentMessages.first.length > screenWidth - 350 ? '${lastSentMessages.first.substring(0, 40)}....' : lastSentMessages.first, maxLines: 1,);

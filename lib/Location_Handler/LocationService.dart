@@ -1,13 +1,11 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../UserLogin/GoogleLogin/GoogleAuthService.dart';
-import '../UserLogin/PhoneLogin/LoginWithPhoneUI.dart';
-import '../UserLogin/PhoneLogin/OTPpageUI.dart';
 
 class LocationService {
 
@@ -92,19 +90,10 @@ class LocationService {
 
    try {
 
-     if (loggedInWithPhone == true) {
-       await FirebaseFirestore.instance.collection('userInfo').doc(phoneLoginDocID).update({
+       await FirebaseFirestore.instance.collection('userInfo').doc(FirebaseAuth.instance.currentUser!.uid).update({
          'Latitude': latitude!,
          'Longitude': longitude!,
        });
-     }
-
-     else if (loggedInWithGoogle == true) {
-       await FirebaseFirestore.instance.collection('userInfo').doc(googleLoginDocID).update({
-         'Latitude': latitude,
-         'Longitude': longitude,
-       });
-     }
 
      // Handle success, if needed
    } catch (e) {

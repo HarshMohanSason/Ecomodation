@@ -6,9 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../main.dart';
 
-String googleLoginDocID = ' ';
-
-bool loggedInWithGoogle = false;
 
 class GoogleAuthentication extends ChangeNotifier {
 
@@ -18,6 +15,9 @@ class GoogleAuthentication extends ChangeNotifier {
   String? _errorCode;
   String? get errorCode => _errorCode;
 
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
   bool? _isSignedInWithGoogle;
   bool? get isSignedInWithGoogle => _isSignedInWithGoogle;
 
@@ -26,6 +26,9 @@ class GoogleAuthentication extends ChangeNotifier {
 
   String? _provider;
   String? get provider => _provider;
+
+  bool? _isSignedIn;
+  bool? get isSignedIn => _isSignedIn;
 
   String? _uid;
   String? get uid => _uid;
@@ -41,6 +44,10 @@ class GoogleAuthentication extends ChangeNotifier {
 
   //Function for Google Login
   Future signInWithGoogle() async {
+
+    _isLoading = true;
+    notifyListeners();
+
     final GoogleSignInAccount? gUser = await googleSignIn.signIn();
 
     if (gUser != null) {
@@ -61,24 +68,30 @@ class GoogleAuthentication extends ChangeNotifier {
         _uid = userDetails.uid;
         _provider = "GOOGLE";
         _isSignedInWithGoogle = true;
+        _isSignedIn = true;
         await saveIfLoggedToLocalStorage(); //save that the user has logged in successfully
         notifyListeners();
 
         if (!await checkUserExists()) {
           await saveDataToFirestore();  //Save data to firestore if doesn't exist in the db
         }
+        _isLoading = false;
+        notifyListeners();
+
       } on FirebaseAuthException catch (e) {
         switch (e.code) {
           case "account-exists-with-different-credential":
             _errorCode =
                 "You already have an account with us. Use correct provider";
             _hasError = true;
+            _isLoading = false;
             notifyListeners();
             break;
 
           case "null":
             _errorCode = "Some unexpected error came while trying to sign in";
             _hasError = true;
+            _isLoading = false;
             //print("nothing");
             notifyListeners();
             break;
@@ -86,11 +99,13 @@ class GoogleAuthentication extends ChangeNotifier {
           default:
             _errorCode = e.toString();
             _hasError = true;
+            _isLoading = false;
             notifyListeners();
         }
       }
     } else {
       _hasError = true;
+      _isLoading = false;
       notifyListeners();
     }
   }
@@ -98,10 +113,13 @@ class GoogleAuthentication extends ChangeNotifier {
 
   Future googleSignOut() async {
 
-      loggedInWithGoogle = false;
+
+      _isLoading = false;
+      _isSignedIn = false;
       storage.deleteAll();
       await googleSignIn.signOut();
       await FirebaseAuth.instance.signOut();
+      notifyListeners();
     }
 
   //check if the userExists already

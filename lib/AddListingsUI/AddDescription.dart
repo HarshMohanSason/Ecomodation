@@ -2,7 +2,7 @@ import 'package:ecomodation/main.dart';
 import 'package:flutter/material.dart';
 
 class AddDescription extends StatefulWidget {
-  AddDescription({Key? key}) : super(key: key);
+  const AddDescription({Key? key}) : super(key: key);
 
   @override
   State<AddDescription> createState() => _AddDescriptionState();

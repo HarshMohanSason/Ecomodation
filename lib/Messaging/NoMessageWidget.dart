@@ -20,7 +20,7 @@ class NoMessageWidget extends StatelessWidget {
             children: [
               Align(
                 alignment: Alignment.center,
-                child: Image.asset('assets/5783800.jpg',
+                child: Image.asset('assets/images/NoMessageImage.jpg',
                   scale: 4,
                 ),
               ),

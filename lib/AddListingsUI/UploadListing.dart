@@ -2,53 +2,41 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
-import '../UserLogin/GoogleLogin/GoogleAuthService.dart';
-import '../UserLogin/PhoneLogin/LoginWithPhoneUI.dart';
-import '../UserLogin/PhoneLogin/OTPpageUI.dart';
 import 'AddDescription.dart';
 import '/AddListingsUI/AddListing.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'ListingPrice.dart';
 import 'dart:io';
 
-
 class UploadListing {
 
+  DocumentReference userDocument = FirebaseFirestore.instance.collection('userInfo').doc(FirebaseAuth.instance.currentUser!.uid); //refer to the document ID.
 
-  Future uploadListing(var documentId) async
-  {
-    DocumentReference userDocument = FirebaseFirestore.instance.collection(
-        'userInfo').doc(documentId); //refer to the document ID.
+  List<String> imageInfoList = []; //List for the images
 
-    // Reference to the 'ListingInfo' collection within the user's document
-    CollectionReference writeListingInfo = userDocument.collection(
-        'ListingInfo'); //refer to the listing Info collection
-    List<String> imageInfoList = [];
+  Future uploadTheListing() async {
 
     for (String image in AddListing.allImages) {
       if (!image.contains('https')) {
+
         File imageFile = File(image); //Get the image path
-        String imageName = basename(
-            imageFile.path); //get the basename from the path
-        String fileNameClean = imageName.split('.')[0];
-        fileNameClean = fileNameClean.replaceAll(RegExp('[^a-zA-Z0-9 ]'), "");
-        fileNameClean = fileNameClean.replaceAll(" ", "-");
-        //Upload the image
-        Reference storageReference = FirebaseStorage.instance.ref().child(
-            'images/$imageName');
-        await storageReference.putFile(imageFile); //wait for
+        String imageName = basename(imageFile.path); //get the basename from the path
+        Reference storageReference = FirebaseStorage.instance.ref().child('images/$imageName');
+        await storageReference.putFile(imageFile); //upload the image
+        String imageUrl = await storageReference.getDownloadURL(); //get the Download Url for the image
+        imageInfoList.add(imageUrl); //add the image to the list
 
-        String imageUrl = await storageReference.getDownloadURL();
-
-        imageInfoList.add(imageUrl);
+      } else {
+        imageInfoList.add(image);
       }
-      else
-        {
-          imageInfoList.add(image);
-        }
     }
+    await uploadListingInfo();
+
+  }
+
+  Future uploadListingInfo() async {
     try {
+      CollectionReference writeListingInfo = userDocument.collection('ListingInfo');
       // Find the existing document for the user
       QuerySnapshot querySnapshot = await writeListingInfo.get();
       if (querySnapshot.docs.isNotEmpty) {
@@ -61,8 +49,7 @@ class UploadListing {
           'imageInfoList': imageInfoList,
           'Rented': false,
         });
-      }
-      else {
+      } else {
         // If document doesn't exist, create a new one
         await writeListingInfo.add({
           'Title': AddDescription.titleController.text,
@@ -72,38 +59,24 @@ class UploadListing {
           'Rented': false,
         });
       }
-    } catch (e) {
-  // Handle error
-  }
-
-  }
-    Future<bool> checkIfLocationIsUploaded() async {
-      var checkLocation = await FirebaseFirestore.instance.collection(
-          'userInfo').doc(
-          loggedInWithGoogle ? googleLoginDocID : phoneLoginDocID).get();
-
-      if (checkLocation.data()!.containsKey('Latitude') &&
-          checkLocation.data()!.containsKey('Longitude')) {
-        return true;
-      }
-
-      return false;
     }
+    catch (e) {
 
-    Future checkLoginMethod() async {
-      final user = FirebaseAuth.instance.currentUser;
-
-      if (user != null) {
-        if (loggedInWithGoogle ==
-            true) { //if the user logged in via google, upload the listing to the google reg account
-          await uploadListing(googleLoginDocID);
-        } else if (loggedInWithPhone ==
-            true) { //if the user logged in via phone, upload the listing to the phone reg account
-          await uploadListing(phoneLoginDocID);
-        } //else if (signInProvider == 'apple.com') {
-        // User logged in using Apple Sign-In.
-        // Handle accordingly.
-      }
+      return e.toString();
     }
   }
 
+  Future<bool> checkIfLocationIsUploaded() async {
+    var checkLocation = await FirebaseFirestore.instance
+        .collection('userInfo')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+
+    if (checkLocation.data()!.containsKey('Latitude') &&
+        checkLocation.data()!.containsKey('Longitude')) {
+      return true;
+    }
+    return false;
+  }
+
+}

@@ -20,13 +20,11 @@ class ListingPrice extends StatefulWidget {
 }
 
 class _ListingPriceState extends State<ListingPrice> with TickerProviderStateMixin {
+
   UploadListing newListing = UploadListing();
   final GlobalKey<FormState> priceForm = GlobalKey<FormState>();
-
   bool formValidated = false;
   bool isUploading = false;
-
-  // Create a reference to the user's document in the 'userInfo' collection
 
   Future<void> verifyForm(BuildContext context) async {
     if (priceForm.currentState!.validate()) {
@@ -171,22 +169,17 @@ class _ListingPriceState extends State<ListingPrice> with TickerProviderStateMix
                   },
                 );
 
-                  await newListing.checkLoginMethod();
                   AddListing.allImages.clear();
-                  AddDescription.descriptionController
-                      .clear(); //clear the description text from the description box
-                  AddDescription.titleController
-                      .clear(); //clear the title text from the title box
-                  ListingPrice.phoneText
-                      .clear(); //clear the phone price from the textbox
+                  AddDescription.descriptionController.clear(); //clear the description text from the description box
+                  AddDescription.titleController.clear(); //clear the title text from the title box
+                  ListingPrice.phoneText.clear(); //clear the phone price from the textbox
 
                   final pref = await SharedPreferences.getInstance();
                   pref.setDouble('LinearBarVal', 0.0);
                   pref.setInt('Index', 0);
 
                   if (mounted) {
-                    Navigator.pushNamed(context,
-                        'HomeScreen'); //Navigate back to the home screen once the listing has been uploaded to the database
+                    Navigator.pushNamed(context, 'HomeScreen'); //Navigate back to the home screen once the listing has been uploaded to the database
 
                     Fluttertoast.showToast(
                       msg: 'Your listing has been uploaded',

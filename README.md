@@ -1,16 +1,5 @@
-# ecomodation
+# Ecomodation
 
-A new Flutter project.
+Apartment Renting app to help users find apartments nearby.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![Logo](https://github.com/HarshMohanSason/Ecomodation/assets/80195000/e545875e-e0a9-4ff5-bd89-29e91accc7c6)

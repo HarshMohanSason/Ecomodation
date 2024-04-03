@@ -27,17 +27,29 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
 
   Future<void> verifyForm(BuildContext context) async { //Verify form which checks the form, reads data from the database and logs user in with their phone number
 
-    final phoneProvider = context.read<PhoneAuthService>();
+    final phoneProvider = Provider.of<PhoneAuthService>(context, listen: false);
     final ip = context.read<InternetProvider>();
     await ip.checkInternetConnection(); // Check internet connection
     if (_phoneLoginKey.currentState!.validate()) { //check if the form is validated or not
 
       if (ip.hasInternet) {
         try {
-
           final otpVerificationID = await phoneProvider.sendOTP(phoneTextController.text);
           if(mounted) {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => OtpUI(phoneNo: phoneTextController.text, verificationId: "")));
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              // Prevent the user from dismissing the dialog
+              builder: (BuildContext context) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 6,
+                    color: colorTheme,
+                  ),
+                );
+              },
+            );
+            Navigator.push(context, MaterialPageRoute(builder: (context) => OtpUI(phoneNo: phoneTextController.text, verificationId: otpVerificationID)));
           }
         } catch (e) {
           Fluttertoast.showToast(
@@ -60,6 +72,9 @@ class _LoginWithPhoneState extends State<LoginWithPhone>
               backgroundColor: Colors.white,
               textColor: Colors.black,
             );
+            if(mounted) {
+              Navigator.pop(context);
+            }
         }
     }
   }

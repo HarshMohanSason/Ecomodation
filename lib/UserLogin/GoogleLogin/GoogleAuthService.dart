@@ -113,13 +113,12 @@ class GoogleAuthentication extends ChangeNotifier {
 
   Future googleSignOut() async {
 
-
-      _isLoading = false;
-      _isSignedIn = false;
-      storage.deleteAll();
-      await googleSignIn.signOut();
-      await FirebaseAuth.instance.signOut();
-      notifyListeners();
+    await googleSignIn.signOut();
+    await firebaseAuth.signOut();
+    _isSignedIn = false;
+    _isLoading = false;
+    await storage.delete(key: 'LoggedIn');
+    notifyListeners();
     }
 
   //check if the userExists already

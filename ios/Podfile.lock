@@ -662,6 +662,9 @@ PODS:
   - Firebase/Firestore (10.18.0):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 10.18.0)
+  - Firebase/Messaging (10.18.0):
+    - Firebase/CoreOnly
+    - FirebaseMessaging (~> 10.18.0)
   - Firebase/MLModelDownloader (10.18.0):
     - Firebase/CoreOnly
     - FirebaseMLModelDownloader (~> 10.18.0-beta)
@@ -674,6 +677,10 @@ PODS:
     - Flutter
   - firebase_core (2.23.0):
     - Firebase/CoreOnly (= 10.18.0)
+    - Flutter
+  - firebase_messaging (14.7.5):
+    - Firebase/Messaging (= 10.18.0)
+    - firebase_core
     - Flutter
   - firebase_ml_model_downloader (0.2.4-5):
     - Firebase/MLModelDownloader (= 10.18.0)
@@ -724,6 +731,15 @@ PODS:
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/UserDefaults (~> 7.8)
     - PromisesObjC (~> 2.1)
+  - FirebaseMessaging (10.18.0):
+    - FirebaseCore (~> 10.0)
+    - FirebaseInstallations (~> 10.0)
+    - GoogleDataTransport (~> 9.2)
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.8)
+    - GoogleUtilities/Environment (~> 7.8)
+    - GoogleUtilities/Reachability (~> 7.8)
+    - GoogleUtilities/UserDefaults (~> 7.8)
+    - nanopb (< 2.30910.0, >= 2.30908.0)
   - FirebaseMLModelDownloader (10.18.0-beta):
     - FirebaseCore (~> 10.0)
     - FirebaseInstallations (~> 10.0)
@@ -887,6 +903,7 @@ DEPENDENCIES:
   - fast_rsa (from `.symlinks/plugins/fast_rsa/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
+  - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - firebase_ml_model_downloader (from `.symlinks/plugins/firebase_ml_model_downloader/ios`)
   - firebase_storage (from `.symlinks/plugins/firebase_storage/ios`)
   - Flutter (from `Flutter`)
@@ -920,6 +937,7 @@ SPEC REPOS:
     - FirebaseFirestore
     - FirebaseFirestoreInternal
     - FirebaseInstallations
+    - FirebaseMessaging
     - FirebaseMLModelDownloader
     - FirebaseSharedSwift
     - FirebaseStorage
@@ -954,6 +972,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_auth/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
+  firebase_messaging:
+    :path: ".symlinks/plugins/firebase_messaging/ios"
   firebase_ml_model_downloader:
     :path: ".symlinks/plugins/firebase_ml_model_downloader/ios"
   firebase_storage:
@@ -1001,6 +1021,7 @@ SPEC CHECKSUMS:
   Firebase: 414ad272f8d02dfbf12662a9d43f4bba9bec2a06
   firebase_auth: 88053a759923970e580789d167a43b6031568ef5
   firebase_core: 29d66baf806970cda37c93621b27cd369b27db1b
+  firebase_messaging: 0a39f2514e1f27b0274b0d2fa99048f57856ee7c
   firebase_ml_model_downloader: 292b6cd180ee783eb0fd83972b28718011efc782
   firebase_storage: a66f6f57d1ab04fb0bff6993b211b7c89f24e759
   FirebaseAppCheckInterop: 3cd914842ba46f4304050874cd284de82f154ffd
@@ -1012,6 +1033,7 @@ SPEC CHECKSUMS:
   FirebaseFirestore: 171bcbb57a1a348dd171a0d5e382c03ef85a77bb
   FirebaseFirestoreInternal: 3d5d03f2447caae64311d2cda92abbf4ec5241be
   FirebaseInstallations: e842042ec6ac1fd2e37d7706363ebe7f662afea4
+  FirebaseMessaging: 9bc34a98d2e0237e1b121915120d4d48ddcf301e
   FirebaseMLModelDownloader: 7af44a55ae52f76eccbb8d732bb55acfb7bc1d02
   FirebaseSharedSwift: 62e248642c0582324d0390706cadd314687c116b
   FirebaseStorage: 8333c4b183764cdd170d9539a61322b71c23adff

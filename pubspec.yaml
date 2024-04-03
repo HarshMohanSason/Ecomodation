@@ -45,6 +45,7 @@ dependencies:
   croppy: ^1.1.4
   cross_file: ^0.3.3+4
   flutter_provider: ^2.1.0
+  firebase_messaging: ^14.7.5
   provider: ^5.0.0
   shared_preferences: ^2.2.2
   page_view_indicators: ^2.0.0

@@ -1,3 +1,4 @@
+
 import 'package:ecomodation/AddListingsUI/AddDescription.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -19,7 +20,7 @@ class _ListingProgressBarState extends State<ListingProgressBar>
   int currIndex = 0;
   static List<Widget> widgetScreens = [
     const AddListing(),
-    AddDescription(),
+    const AddDescription(),
     const ListingPrice()
   ];
   double barProgressVal = 0.0;

@@ -1,4 +1,6 @@
 
+import 'package:ecomodation/UserLogin/PhoneLogin/LoginWithPhoneUI.dart';
+import 'package:ecomodation/UserLogin/PhoneLogin/OTPpageUI.dart';
 import 'package:ecomodation/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import '../InternetChecker.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'dart:io';
 import '../homeScreenUI.dart';
+import 'AppleLogin/AppleLoginService.dart';
 import 'GoogleLogin/GoogleAuthService.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -36,62 +39,63 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-    return  PopScope(
-      canPop: false,
-      child: Scaffold(
-
-          backgroundColor: Colors.white,
-
-          body: Column(
-              children: <Widget>[
-            const Padding(padding: EdgeInsets.only(top: 50)),
-            Text(
-              "Ecomodation ", //Name of the app displayed on top
-              textAlign: TextAlign.center, //center the name
-              style: TextStyle(   //Some styling for the text
-                color: Colors.black,
-                fontSize: screenWidth/10,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'LibreBaskerville',
-              ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          SizedBox(height: screenHeight * 0.05),
+          Text(
+            "Ecomodation",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: screenWidth / 10,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'LibreBaskerville',
             ),
-
-            const SizedBox(height: 20), //Padding after the name
-
-            Container(
-              alignment: const Alignment(0, -0.6), //Align the animated text
-              child: AnimatedTextKit(  //Using the animated textkit from packages
-                animatedTexts: [
-                  TyperAnimatedText(
-                    'Accomodation made easier for you',  //Text to be displayed
-                    textStyle: TextStyle( //style the text
-                      fontSize: screenWidth/25, //Adjust the size of the text
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'LibreBaskerville',
-                    ),
-                    speed: const Duration(milliseconds: 80), //How fast the animation runs
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          Container(
+            alignment: Alignment.center,
+            child: AnimatedTextKit(
+              animatedTexts: [
+                TyperAnimatedText(
+                  'Accommodation made easier for you',
+                  textStyle: TextStyle(
+                    fontSize: screenWidth / 25,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'LibreBaskerville',
                   ),
-                ],
-                totalRepeatCount: 10,   //Repeat once
-                displayFullTextOnTap: true, //Display full text when tapped on it
-                stopPauseOnTap: true, //Pause it on tap, set it on true
-              ),
+                  speed: const Duration(milliseconds: 80),
+                ),
+              ],
+              totalRepeatCount: 10,
+              displayFullTextOnTap: true,
+              stopPauseOnTap: true,
             ),
-                Padding(
-                    padding: const EdgeInsets.only(top: 50),
-                    child: Center(child: Image.asset("assets/images/Logo.png", scale: screenWidth/95,))),
-            const Spacer(),
-            Padding(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: buildAllLoginButtons()), //Calling the build all login butotns
-            //fontStyle:
-          ]),
-
+          ),
+          SizedBox(height: screenHeight * 0.05),
+          Center(
+            child: Image.asset(
+              "assets/images/Logo.png",
+              scale: screenWidth / 95,
+            ),
+          ),
+          Spacer(),
+          Padding(
+            padding: EdgeInsets.only(bottom: 20),
+            child: buildAllLoginButtons(),
+          ),
+        ],
       ),
     );
-
   }
+
 
 
 
@@ -117,9 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Check if the user is signed in with Google and then navigate to HomeScreen
         if (mounted && context.read<GoogleAuthentication>().isSignedIn == true) {
           const CircularProgressIndicator();
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) => HomeScreenUI(),
-          ));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreenUI(),));
         } else {
           return;
         }
@@ -128,11 +130,24 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget buildAppleButton() {
+    final appleLoginLoading = context.watch<AppleLoginService>();
     //Using it as a separate widget to make it easy to implement it in condition for PlatformWidget
     //Button for apple signin
-    return SignInButton(
+    return appleLoginLoading.isLoading
+        ? const CircularProgressIndicator(color: Colors.black, strokeWidth: 6,) :SignInButton(
       Buttons.Apple,
-      onPressed: () {},
+      onPressed: () async {
+        try {
+          await handleAppleLogin(context);
+        } catch(e) {
+
+        }
+        if (appleLoginLoading.isSignedIn == true && mounted) {
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) =>  HomeScreenUI(),
+          ));
+        }
+      },
     );
   }
 
@@ -141,7 +156,8 @@ class _LoginScreenState extends State<LoginScreen> {
     return Align(
       alignment: const Alignment(0, 0.9),
       child: ElevatedButton.icon(
-        onPressed: () { Navigator.pushNamed(context, "LoginWithPhone");
+        onPressed: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginWithPhone()));
         },//Navigate to the loginWithPhone
         style: ButtonStyle(
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -177,11 +193,13 @@ class _LoginScreenState extends State<LoginScreen> {
     if (Platform.isIOS) //If the platform is IOS, return all three buttons
     {
       return Column(children: [
-        buildGoogleButton(),
+
+        buildAppleButton(),
+
 
         const SizedBox(height: 20),
         //Button for apple sign in
-        buildAppleButton(),
+        buildGoogleButton(),
 
         const SizedBox(height: 20),
         buildLoginPhoneButton(),
@@ -234,6 +252,34 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
+
+  Future<void> handleAppleLogin(BuildContext context) async
+  {
+    final ip = context.read<InternetProvider>();
+    final ap = context.read<AppleLoginService>();
+    await ip.checkInternetConnection(); // Check internet connection
+
+    if (!ip.hasInternet) {
+      // Display a toast message if there is no internet connection
+      Fluttertoast.showToast(
+        msg: 'Check your Internet Connection',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.white,
+        textColor: Colors.black,
+      );
+    }
+    else {
+      try {
+        // Attempt sign in with Google
+        await ap.appleLogin();
+        await storage.write(key: 'LoggedIn', value: "true");
+      } catch (e) {
+       print(e);
+      }
+    }
+  }
+
 
 
 }

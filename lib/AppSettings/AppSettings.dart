@@ -7,8 +7,8 @@ import 'package:ecomodation/UserLogin/GoogleLogin/GoogleAuthService.dart';
 import 'package:ecomodation/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-import '../UserLogin/PhoneLogin/LoginWithPhoneUI.dart';
-import '../UserLogin/PhoneLogin/OTPpageUI.dart';
+import '../UserLogin/AppleLogin/AppleLoginService.dart';
+import '../UserLogin/IntroLoginPageUI.dart';
 import 'currentUserInfo.dart';
 import 'package:flutter/material.dart';
 
@@ -167,6 +167,10 @@ class _AppSettingsState extends State<AppSettings> {
 
 
   Widget displaySettingOptions() {
+
+    final sp = context.read<GoogleAuthentication>();
+    final ap = context.read<AppleLoginService>();
+
     return Expanded(
 
       child: Column(
@@ -248,13 +252,26 @@ class _AppSettingsState extends State<AppSettings> {
 
           ListTile(
               onTap: () async {
-                final sp = context.read<GoogleAuthentication>();
-                await sp.googleSignOut();
 
-                  if(mounted) {
-                    Navigator.pushNamed(context, 'AppIntroUI');
-                  }
-
+                if (sp.isSignedIn != null && sp.isSignedIn!) {
+                  await sp.googleSignOut();
+                }
+                else if(ap.isSignedIn != null && ap.isSignedIn!)
+                {
+                  await ap.signOut();
+                }
+                else {
+                  await FirebaseAuth.instance.signOut();
+                  await storage.delete(key: 'LoggedIn');
+                }
+                if (mounted) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                  );
+                }
               },
 
               leading: const Icon(Icons.logout, size: 30),

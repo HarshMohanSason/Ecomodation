@@ -3,6 +3,7 @@ import 'package:ecomodation/AddListingsUI/AddDescription.dart';
 import 'package:ecomodation/AppSettings/AboutUs.dart';
 import 'package:ecomodation/AppSettings/AppSettings.dart';
 import 'package:ecomodation/AddListingsUI/ListingPrice.dart';
+import 'package:ecomodation/UserLogin/AppleLogin/AppleLoginService.dart';
 import 'InternetChecker.dart';
 import 'UserLogin/GoogleLogin/GoogleAuthService.dart';
 import 'package:ecomodation/Listings/DisplayListings.dart';
@@ -19,7 +20,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'UserLogin/checkIfLoggedIN.dart';
 import 'firebase_options.dart';
-
 
 // Some Global variable Declarations
 
@@ -51,7 +51,8 @@ class Ecomodation extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: ((context)=> GoogleAuthentication())),
         ChangeNotifierProvider(create: ((context) => InternetProvider())),
-        ChangeNotifierProvider(create: (context) => PhoneAuthService())
+        ChangeNotifierProvider(create: (context) => PhoneAuthService()),
+        ChangeNotifierProvider(create: (context) => AppleLoginService())
       ],
       child: MaterialApp(
               home: const CheckIfLoggedIn(),

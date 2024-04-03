@@ -71,5 +71,4 @@ class _CheckIfLoggedInState extends State<CheckIfLoggedIn> {
     }
     return false;
   }
-
 }

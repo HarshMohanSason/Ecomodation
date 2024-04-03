@@ -1,49 +1,43 @@
-
 import 'dart:async';
 import 'package:ecomodation/UserLogin/PhoneLogin/PhoneAuthService.dart';
-import 'package:ecomodation/main.dart';
+import 'package:ec'
+    'omodation/main.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pinput/pinput.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:provider/provider.dart';
 
 bool loggedInWithPhone = false; //set to true since user has been logged in
 
 class OtpUI extends StatefulWidget {
-
-  final String verificationId;  //get the verification Id.
+  final String verificationId; //get the verification Id.
   final String phoneNo;
-  const OtpUI({Key? key, required this.verificationId, required this.phoneNo}) : super(key: key);
+
+  const OtpUI({Key? key, required this.verificationId, required this.phoneNo})
+      : super(key: key);
 
   @override
   State<OtpUI> createState() => _OtpUIState();
 }
 
-
-
 class _OtpUIState extends State<OtpUI> {
-
   late Timer timer;
   int remainingTime = 60; // Initial remaining time in seconds
   bool isResent = false;
-  bool resentOtpVerified = false;
-  final formKeyOTP = GlobalKey<FormState>();   //key for the OTP
+  final formKeyOTP = GlobalKey<FormState>(); //key for the OTP
   FirebaseAuth auth = FirebaseAuth.instance;
-  final otpTextController = TextEditingController(); //Control the text for the OTP
-  PhoneAuthService phoneAuthService = PhoneAuthService();
+  final otpTextController =
+      TextEditingController(); //Control the text for the OTP
 
   @override
   void initState() {
-
     super.initState();
     startTimer();
   }
 
   @override
   void dispose() {
-
     otpTextController.dispose();
     timer.cancel();
     super.dispose();
@@ -54,24 +48,20 @@ class _OtpUIState extends State<OtpUI> {
     const oneSec = Duration(seconds: 1);
     timer = Timer.periodic(oneSec, (timer) {
       setState(() {
-        if(remainingTime < 1)
-        {
+        if (remainingTime < 1) {
           timer.cancel();
+        } else {
+          remainingTime--;
         }
-        else
-        {
-          remainingTime --;
-        }
-
       });
     });
   }
 
   final defaultPinTheme = PinTheme(
-
     width: 58,
     height: 58,
-    textStyle: const TextStyle(fontSize: 25, color: Colors.black, fontWeight: FontWeight.w600),
+    textStyle: const TextStyle(
+        fontSize: 25, color: Colors.black, fontWeight: FontWeight.w600),
     decoration: BoxDecoration(
       border: Border.all(color: Colors.black),
       borderRadius: BorderRadius.circular(22),
@@ -80,93 +70,91 @@ class _OtpUIState extends State<OtpUI> {
 
   @override
   Widget build(BuildContext context) {
-
-    return  PopScope(
+    return PopScope(
       canPop: false,
       child: Scaffold(
         backgroundColor: colorTheme, //set the background color
-            body: _otpForm(context),
-          ),
+        body: _otpForm(context),
+      ),
     );
-
   }
 
-  Widget _otpForm(BuildContext context)
-  {
+  Widget _otpForm(BuildContext context) {
+    final phoneLoginLoading = context.watch<PhoneAuthService>();
     return Form(
-      key: formKeyOTP,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 100, left: 5, right: 5),
-            child: Center(
-              child: AnimatedTextKit(
-                animatedTexts: [
-                  TyperAnimatedText('Ecomodation',
-                    textStyle : TextStyle(
-                      fontSize: screenWidth/10,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'LibreBaskerville'
-                    ),
-                    speed: const Duration(milliseconds: 100),
-                  ),
-                ],
-                totalRepeatCount: 1,
-                displayFullTextOnTap: true,
-                stopPauseOnTap: true,
+        key: formKeyOTP,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 40),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(Icons.arrow_back_rounded,
+                        size: 35, color: Colors.black)),
               ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: screenWidth/2),
-            child: Center(child: _pinInputUI(context)),
-          ),
-          const SizedBox(height: 20,),
-          Center(
-              child: InkWell(
-                onTap: () async
-                {
-                  if(remainingTime < 1)
-                  {
-                    setState((){
-                      isResent = true;
-                    });
-                    otpTextController.clear(); //making sure to clear the OTP fields
-                    String newOTPVerificationID = await phoneAuthService.sendOTP(widget.phoneNo); //send the OTP again to the phone number
-                    resentOtpVerified = await phoneAuthService.checkOTP(newOTPVerificationID, widget.phoneNo);
-                  }
-
-                  else
-                  {
-                    return;
-                  }
-                },
+            const SizedBox(height: 20),
+            Center(
                 child: Text(
-                  "Resend OTP?  $remainingTime s",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    decoration: TextDecoration.underline, // Add underline decoration
-                  ),
-                ),
-              )),
-
-        ],
-      )
-
-    );
+              "Enter your OTP",
+              style: TextStyle(
+                  fontSize: screenWidth / 10,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'LibreBaskerville'),
+            )),
+            Padding(
+              padding: EdgeInsets.only(top: screenWidth / 2),
+              child: Center(child: _pinInputUI(context)),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Center(
+                child: InkWell(
+              onTap: () async {
+                if (remainingTime < 1) {
+                  otpTextController
+                      .clear(); //making sure to clear the OTP fields
+                  String newOTPVerificationID = await phoneLoginLoading.sendOTP(
+                      widget.phoneNo); //send the OTP again to the phone number
+                  isResent = await phoneLoginLoading.checkOTP(
+                      newOTPVerificationID, widget.phoneNo);
+                } else {
+                  return;
+                }
+              },
+              child: phoneLoginLoading.isLoading
+                  ? const CircularProgressIndicator(
+                      strokeWidth: 6,
+                      color: Colors.black,
+                    )
+                  : Text(
+                      "Resend OTP?  $remainingTime s",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        decoration: TextDecoration
+                            .underline, // Add underline decoration
+                      ),
+                    ),
+            )),
+          ],
+        ));
   }
-
-
 
   /*------------------------ Widget for building the Pinput UI ------------------------------*/
 
   Widget _pinInputUI(BuildContext context) {
-
+    final phoneLoginLoading = context.watch<PhoneAuthService>();
     return SizedBox(
       width: screenWidth - 20,
       child: Pinput(
           controller: otpTextController,
-          length: 6, // Length for the OTP being entered
+          length: 6,
+          // Length for the OTP being entered
           defaultPinTheme: PinTheme(
             width: 80,
             height: 70,
@@ -185,27 +173,21 @@ class _OtpUIState extends State<OtpUI> {
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
-          onSubmitted: (value)
-          {
-            setState(() {
-              value = otpTextController.text;
-            });
-          },
-          onCompleted: (String value) async
-          {
+          onCompleted: (value) async {
             try {
-              bool checkOTP = await phoneAuthService.checkOTP(widget.verificationId, otpTextController.text);
+              if (formKeyOTP.currentState!.validate()) {
+                bool checkOTP = await phoneLoginLoading.checkOTP(
+                    widget.verificationId, otpTextController.text);
 
-              if (checkOTP && mounted && formKeyOTP.currentState!.validate()) {
-                Navigator.pushNamed(context, 'HomeScreen');
-                await storage.write(key: 'LoggedIn', value: "true");
-              }
-              if(isResent && resentOtpVerified && mounted)
-                {
+                if (checkOTP && mounted) {
                   Navigator.pushNamed(context, 'HomeScreen');
                   await storage.write(key: 'LoggedIn', value: "true");
                 }
-              else {
+              }
+              if (isResent && mounted) {
+                Navigator.pushNamed(context, 'HomeScreen');
+                await storage.write(key: 'LoggedIn', value: "true");
+              } else {
                 Fluttertoast.showToast(
                   msg: 'OTP entered is incorrect, try again',
                   toastLength: Toast.LENGTH_SHORT,
@@ -214,10 +196,7 @@ class _OtpUIState extends State<OtpUI> {
                   textColor: Colors.black,
                 );
               }
-
-            }
-            catch(e)
-            {
+            } catch (e) {
               Fluttertoast.showToast(
                 msg: 'An error occurred, try again',
                 toastLength: Toast.LENGTH_SHORT,
@@ -242,5 +221,4 @@ class _OtpUIState extends State<OtpUI> {
           }),
     );
   }
-
 }

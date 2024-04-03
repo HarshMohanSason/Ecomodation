@@ -50,7 +50,7 @@ class PhoneAuthService extends ChangeNotifier{
     try {
       await FirebaseAuth.instance.verifyPhoneNumber(
 
-          phoneNumber: '+91$phoneNo',
+          phoneNumber: '+1$phoneNo',
 
           verificationCompleted: (
               PhoneAuthCredential credential) async { //if verification is completed, sign in
@@ -79,7 +79,8 @@ class PhoneAuthService extends ChangeNotifier{
 
   Future<bool> checkOTP(String verificationID, String otpNo) async {
     //function to check the OTP
-
+    _isLoading = true;
+    notifyListeners();
     try {
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
           verificationId: verificationID,
@@ -90,6 +91,8 @@ class PhoneAuthService extends ChangeNotifier{
       if (!await checkIfUserExistsFirestore(user.phoneNumber!)) {
         writeUserInfo(user.phoneNumber!, user.uid); //write the userInfo if does not exist in firestore.
       }
+      _isLoading = false;
+      notifyListeners();
       return true; //return true since the OTP matched
     }
 

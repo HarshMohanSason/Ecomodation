@@ -210,7 +210,6 @@ class _DetailedListingInfoState extends State<DetailedListingInfo> {
 
   }
 
-
   Widget circleIndicator()
   {
     return CirclePageIndicator(
